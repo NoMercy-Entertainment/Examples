@@ -84,7 +84,7 @@ module.exports = {
 	},
 	plugins: [
 		// require('@tailwindcss/forms'),
-		require('tailwindcss-children'),
+		require('tailwind-children'),
 		scrollBar({nocompatible: true}),
 		radialGradientPlugin,
 		plugin(({ addVariant }) => {
