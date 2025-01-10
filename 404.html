@@ -19,7 +19,7 @@
 
     <script>
         sessionStorage.redirect = location.href;
-        const projectPages = true;
+        const projectPages = false;
         const l = window.location;
         const repo = projectPages ? '/' + l.pathname.split('/')[1] : '';
         l.replace(
