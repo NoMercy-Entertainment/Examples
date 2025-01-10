@@ -23,5 +23,16 @@
   </head>
   <body class="flex flex-col items-center justify-center w-screen h-screen gap-4 text-white bg-zinc-900 overflow-clip">
     <div id="app" class="w-screen h-screen flex flex-col items-center justify-center"></div>
+
+    <script>
+        // Redirects user from 404
+        (function () {
+            const redirect = sessionStorage.redirect;
+            delete sessionStorage.redirect;
+            if (redirect && redirect !== location.href) {
+                history.replaceState(null, null, redirect);
+            }
+        })();
+    </script>
   </body>
 </html>
