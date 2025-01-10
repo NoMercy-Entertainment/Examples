@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>NoMercy Library Examples</title>
+    <meta name="description" content="Examples for the NoMercy Entertainment Repositories" />
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="NoMercy Library Examples" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://examples.nomercy.tv" />
+
+    <meta property="og:description" content="Examples for the NoMercy Entertainment Repositories" />
+    <meta property="og:site_name" content="NoMercy Library Examples" />
+    <meta property="og:locale" content="en_US" />
+
+    <script>
+        sessionStorage.redirect = location.href;
+        const projectPages = false;
+        const l = window.location;
+        const repo = projectPages ? '/' + l.pathname.split('/')[1] : '';
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + repo
+        );
+    </script>
+</head>
+</html>
