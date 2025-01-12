@@ -5,7 +5,7 @@ export const fetchPlaylist = async (genre = 'Pop', limit = 1) => {
 	const pageSize = 20;
 	let page = 1;
 
-	const baseUrl = 'https://api-dev.nomercy.tv/cors?url=';
+	const baseUrl = 'https://api.nomercy.tv/cors?url=';
 	musicPlayer.baseUrl = baseUrl;
 	const baseCoverUrl = baseUrl +  'https://files.freemusicarchive.org/storage-freemusicarchive-org/';
 
