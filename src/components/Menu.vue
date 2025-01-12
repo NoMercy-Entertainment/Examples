@@ -77,7 +77,7 @@ onUnmounted(() => {
             :key="option.label">
 
           <li
-              class="py-1.5 px-3 theme-button flex gap-2 items-center bg-gradient-to-r  rounded-md cursor-pointer mr-1 text-left"
+              class="py-1.5 px-3 theme-button flex gap-2 items-center bg-gradient-to-r rounded-md cursor-pointer mr-1 text-left"
               @click="handleItemClick(option)"
           >
             <span v-if="option.active" class="material-icons text-white w-5">checkmark</span>

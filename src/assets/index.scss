@@ -91,10 +91,10 @@ $themes: (
 
   @each $key, $val in $themes {
     .theme-#{$key} .theme-button {
-      background: linear-gradient(90deg, #{list.nth($val, 1)} 40%, #{list.nth($val, 2)});
+      background: linear-gradient(90deg in oklch, #{list.nth($val, 1)} 40%, #{list.nth($val, 2)});
     }
     .theme-#{$key} .theme-button:hover {
-      background: linear-gradient(90deg,
+      background: linear-gradient(90deg in oklch,
               hsl(from #{list.nth($val, 1)} h s 50%) 40%,
               hsl(from #{list.nth($val, 2)} h s 60%));
     }
@@ -109,7 +109,7 @@ $themes: (
 .nomercyplayer .seek-ripple {
   --deg: 90deg;
   align-items: center;
-  background: linear-gradient(var(--deg), #ffffff10 10%, #ffffff10 45%, #ffffff05 100%);
+  background: linear-gradient(var(--deg) in oklch, #ffffff10 10%, #ffffff10 45%, #ffffff05 100%);
   display: none;
   flex-direction: column;
   height: 100%;
