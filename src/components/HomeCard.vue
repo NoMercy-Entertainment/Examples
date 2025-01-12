@@ -11,7 +11,7 @@ defineProps({
 
 <template>
   <router-link :to="route"
-               class="home-card relative group/card overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-[30%] h-auto aspect-[16/10] border-[3px] hover:border-2  p-2 sm:p-4 empty:hidden"
+               class="home-card relative group/card overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-[30%] h-auto aspect-[16/10] border-[3px] hover:border-2  p-2 sm:p-4 empty:hidden-"
   >
     <slot />
   </router-link>

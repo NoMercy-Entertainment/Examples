@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import {ref, watch} from 'vue';
+
+import musicPlayer from '../musicPlayerStore';
+
+import SliderBar from '@/components/MusicPlayer/components/SliderBar.vue';
+
+const volumePercentage = ref<number>(musicPlayer.volume ?? 0);
+
+function calculateLogVolume(sliderValue: number, p = 1.5) {
+  const normalizedValue = sliderValue / 100;
+  return Math.pow(normalizedValue, p) * 100;
+}
+
+watch(volumePercentage, (value) => {
+  const volume = calculateLogVolume(value);
+  musicPlayer.setVolume(volume);
+});
+
+</script>
+
+<template>
+  <SliderBar
+      :percentage="volumePercentage"
+      :position="volumePercentage"
+      @input="volumePercentage = Number(($event.target as HTMLInputElement).value)"
+      :min="0"
+      :step="1"
+      :max="100"
+  />
+</template>

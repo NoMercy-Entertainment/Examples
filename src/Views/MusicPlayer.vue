@@ -1,9 +1,11 @@
 ﻿<script setup lang="ts">
 import { ref } from 'vue';
-import {Option} from "@/types/types";
-import Menu from "@/components/Menu.vue";
-import HomeCorner from "@/components/HomeCorner.vue";
-import GithubCorner from "@/components/GithubCorner.vue";
+
+import type {Option} from "@/types/types";
+import Layout from "@/Views/Layout.vue";
+
+import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
+import {fetchPlaylist} from "@/lib/musicPlaylist";
 
 defineProps({
   theme: {
@@ -13,18 +15,21 @@ defineProps({
 });
 
 const musicPlayerRef = ref<{ player:  any }>();
-const currentMenu = ref('main');
+
+const loadPlaylist = (genre: string) => {
+  fetchPlaylist(genre, 3);
+}
 
 const options = ref<Option[]>([
   {
     label: 'Play',
     level: 0,
-    action: () => musicPlayerRef.value?.player.play(),
+    action: () => musicPlayerRef.value?.player?.play(),
   },
   {
     label: 'Pause',
     level: 0,
-    action: () => musicPlayerRef.value?.player.pause(),
+    action: () => musicPlayerRef.value?.player?.pause(),
   },
   {
     label: 'Settings',
@@ -32,41 +37,46 @@ const options = ref<Option[]>([
     options: [
     ]
   },
+  {
+    label: 'Playlists',
+    level: 0,
+    options: [
+      {
+        label: 'Rock',
+        level: 1,
+        action: () => loadPlaylist('Rock'),
+      },
+      {
+        label: 'Pop',
+        level: 1,
+        action: () => loadPlaylist('Pop'),
+      },
+      {
+        label: 'Jazz',
+        level: 1,
+        action: () => loadPlaylist('Jazz'),
+      },
+      {
+        label: 'Classical',
+        level: 1,
+        action: () => loadPlaylist('Classical'),
+      },
+    ]
+  },
 ]);
-
-const goBack = () => {
-  currentMenu.value = 'main';
-};
 
 </script>
 
 <template>
-  <HomeCorner :style="`--color-theme: var(--color-${theme}-shadow)`" />
-  <GithubCorner :style="`--color-theme: var(--color-${theme}-shadow)`" />
-  <div class="w-full h-32 min-h-32 flex items-center justify-center">
-    <h1 class="text-4xl font-bold text-center">
-      NoMercy Entertainment - Music Player
-    </h1>
-  </div>
-  <div id="container"
-       class="flex flex-wrap flex-col-reverse justify-center sm:justify-center items-center w-full gap-4 sm:gap-16 sm:flex-row flex-1">
+  <Layout :theme="theme" :title="`NoMercy Entertainment - Music Player`"  :options="options as Option[]">
 
-    <aside
-        id="menu"
-        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm  max-h-[calc(100vh-12rem)] h-64 sm:h-screen border border-neutral-700 p-2 sm:p-4">
-      <Menu :options="options as Option[]" @goBack="goBack"
-            :class="theme"
-            :style="`
-                  --color-1: var(--color-${theme}-shadow);
-                  --color-2: var(--color-${theme}-border);
-            `"/>
-    </aside>
+<!--    canvas container-->
+    <div class="flex flex-col items-center justify-center h-96 w-auto aspect-[32/9] bg-neutral-900/80">
+      <canvas id="visualizer" class="w-full h-full" />
+    </div>
 
-    <main id="wrapper"
-          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col sm:w-px h-screen w-auto aspect-[16/10]  max-h-[calc(100vh-12rem)] sm:flex-1 sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 sm:pb-0 z-0">
-
-    </main>
-  </div>
+      <MusicPlayer ref="musicPlayerRef" />
+  </Layout>
 </template>
 
 <style scoped>

@@ -2,7 +2,6 @@
 import {onMounted, onUnmounted, ref} from "vue";
 
 import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
-import OctopusPlugin from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 import type {NMPlayer} from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 import config from "./config";
@@ -10,9 +9,8 @@ import config from "./config";
 const player = ref<NMPlayer>();
 
 onMounted(() => {
-
     player.value = nmplayer('player1')
-        .setup(config);
+        .setup(config) as unknown as NMPlayer;
 });
 
 onUnmounted(() => {

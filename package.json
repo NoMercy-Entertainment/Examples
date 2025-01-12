@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@nomercy-entertainment/nomercy-music-player": "^0.1.6",
+    "@vueuse/core": "^12.4.0",
     "nomercyplayer": "https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer.git",
     "tailwind-children": "^0.5.0",
     "tailwind-merge": "^2.6.0",

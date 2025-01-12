@@ -1,15 +1,5 @@
 @use "sass:list";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/fonts/Material-Icons.woff2) format('woff2');
-}
+@use "sass:meta";
 
 .material-icons {
   font-family: 'Material Icons';
@@ -25,6 +15,19 @@
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@include meta.load-css("inputs");
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/fonts/Material-Icons.woff2) format('woff2');
 }
 
 body {

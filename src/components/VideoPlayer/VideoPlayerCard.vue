@@ -8,7 +8,7 @@ import HomeCard from "@/components/HomeCard.vue";
     <div class="text-right text-sm group-hover/card:text-base  group-hover/card:font-bold transition-all duration-300 delay-0">
       Video player
     </div>
-    <div class="absolute center top-0 left-0 w-full h-full flex items-center justify-center">
+    <div class="absolute center top-0 left-0 w-full h-full flex items-center justify-center !bg-gradient-circle-c from-black/40 from-15% via-70% via-black/40 to-100% to-black/0">
       <span class="material-icons text-white text-4xl -mt-10">play_arrow</span>
     </div>
 
@@ -23,9 +23,9 @@ import HomeCard from "@/components/HomeCard.vue";
         <span class="material-icons text-white">skip_previous</span>
         <span class="material-icons text-white">skip_next</span>
         <span class="material-icons text-white">volume_up</span>
-        <span class="font-mono text-white">2:10</span>
+        <span class="font-mono text-white text-xs">2:10</span>
         <span class="flex flex-1"></span>
-        <span class="font-mono text-white">4:20</span>
+        <span class="font-mono text-white text-xs">4:20</span>
         <span class="material-icons text-white">subtitles</span>
         <span class="material-icons text-white">language</span>
         <span class="material-icons text-white">settings</span>
@@ -33,6 +33,7 @@ import HomeCard from "@/components/HomeCard.vue";
 
       </div>
     </div>
+
   </HomeCard>
 </template>
 

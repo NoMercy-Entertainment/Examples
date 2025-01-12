@@ -13,6 +13,7 @@ import VideoPlayer from '@/components/VideoPlayer/VideoPlayer.vue';
 import GithubCorner from "@/components/GithubCorner.vue";
 import Menu from "@/components/Menu.vue";
 import HomeCorner from "@/components/HomeCorner.vue";
+import Layout from "@/Views/Layout.vue";
 
 defineProps({
   theme: {
@@ -23,7 +24,6 @@ defineProps({
 
 const videoPlayerRef = ref<{ player: NMPlayer }>();
 const isMounted = ref(false);
-const currentMenu = ref('main');
 
 const subtitleOptions = ref<Option[]>([]);
 const audioOptions = ref<Option[]>([]);
@@ -172,7 +172,7 @@ watch(videoPlayerRef, (value) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
         active: true,
-        action: () => player.setCurrentAudioTrack(track.id),
+        action: () => player.setCurrentAudioTrack(track.id!),
       };
     });
   });
@@ -182,7 +182,7 @@ watch(videoPlayerRef, (value) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
         active: tracks.indexOf(player.getCurrentCaptions()!) == index,
-        action: () => player.setCurrentCaption(track.id),
+        action: () => player.setCurrentCaption(track.id!),
       };
     });
   });
@@ -220,8 +220,6 @@ const toggleKeyHandler = () => {
   }
   localStorage.setItem('NoMercy-example-video-keyhandler', keyHandlerActive.value.toString());
 };
-
-// if opus is enabled we need to disable sabre and vice versa
 
 const toggleOpus = () => {
   if (sabreActive.value) {
@@ -287,7 +285,7 @@ const options = ref<Option[]>([
     ]
   },
   {
-    label: 'Plugins (enable UI here)',
+    label: 'Plugins',
     level: 0,
     options: [
       {
@@ -304,15 +302,11 @@ const options = ref<Option[]>([
   },
 ]);
 
-const goBack = () => {
-  currentMenu.value = 'main';
-};
-
 onMounted(() => {
   isMounted.value = true;
   nextTick(() => {
-    console.log(videoPlayerRef.value?.player);
-    if (localStorage.getItem('NoMercy-example-video-ui') === 'true') {
+
+    if (localStorage.getItem('NoMercy-example-video-ui') == null || localStorage.getItem('NoMercy-example-video-ui') === 'true') {
       toggleUI();
     }
     if (localStorage.getItem('NoMercy-example-video-keyhandler') === 'true') {
@@ -328,39 +322,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <HomeCorner :style="`--color-theme: var(--color-${theme}-shadow)`" />
-  <GithubCorner :style="`--color-theme: var(--color-${theme}-shadow)`" />
-  <div class="w-full h-32 min-h-32 flex items-center justify-center">
-    <h1 class="text-4xl font-bold text-center">
-      NoMercy Entertainment - Video Player
-    </h1>
-  </div>
-  <div id="container"
-       class="flex flex-wrap flex-col-reverse justify-center sm:justify-center items-center w-full gap-4 sm:gap-16 sm:flex-row flex-1">
-
-    <aside
-        id="menu"
-        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm  max-h-[calc(100vh-12rem)] h-64 sm:h-screen border border-neutral-700 p-2 sm:p-4">
-      <Menu :options="options as Option[]" @goBack="goBack"
-            :class="theme"
-            :style="`
-                  --color-1: var(--color-${theme}-shadow);
-                  --color-2: var(--color-${theme}-border);
-            `"/>
-
-    </aside>
-
-    <main id="wrapper"
-          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col sm:w-px h-screen w-auto aspect-[16/10]  max-h-[calc(100vh-12rem)] sm:flex-1 sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 sm:pb-0 z-0">
-      <VideoPlayer v-if="isMounted" ref="videoPlayerRef"/>
-      <div
-          class="flex flex-1 text-left mx-auto transform transition-transform duration-300 hover:scale-105 h-10 max-h-10 -mt-2">
-        <pre id="output" class="d-inline-block text-left mb-0 scale-50 h-20" style="font-size: 6px;">$$\   $$\           $$\      $$\                                               $$$$$$$$\ $$\    $$\ <br>$$$\  $$ |          $$$\    $$$ |                                              \__$$  __|$$ |   $$ |<br>$$$$\ $$ | $$$$$$\  $$$$\  $$$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\   $$\          $$ |   $$ |   $$ |<br>$$ $$\$$ |$$  __$$\ $$\$$\$$ $$ |$$  __$$\ $$  __$$\ $$  _____|$$ |  $$ |         $$ |   \$$\  $$  |<br>$$ \$$$$ |$$ /  $$ |$$ \$$$  $$ |$$$$$$$$ |$$ |  \__|$$ /      $$ |  $$ |         $$ |    \$$\$$  / <br>$$ |\$$$ |$$ |  $$ |$$ |\$  /$$ |$$   ____|$$ |      $$ |      $$ |  $$ |         $$ |     \$$$  /  <br>$$ | \$$ |\$$$$$$  |$$ | \_/ $$ |\$$$$$$$\ $$ |      \$$$$$$$\ \$$$$$$$ |         $$ |      \$  /   <br>\__|  \__| \______/ \__|     \__| \_______|\__|       \_______| \____$$ |         \__|       \_/    <br>                                                               $$\   $$ |                           <br>                                                               \$$$$$$  |                           <br>                                                                \______/                            </pre>
-      </div>
-    </main>
-  </div>
-
-</template>
+  <Layout :theme="theme" title="NoMercy Entertainment - Video Player" :options="options as Option[]">
+    <VideoPlayer v-if="isMounted" ref="videoPlayerRef"/>
+    <div class="flex flex-1 text-left mx-auto transform transition-transform duration-300 hover:scale-105 h-14 max-h-14 -mt-2">
+      <pre id="output" class="d-inline-block text-left mb-0 scale-50 h-20" style="font-size: 6px;">$$\   $$\           $$\      $$\                                               $$$$$$$$\ $$\    $$\ <br>$$$\  $$ |          $$$\    $$$ |                                              \__$$  __|$$ |   $$ |<br>$$$$\ $$ | $$$$$$\  $$$$\  $$$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\   $$\          $$ |   $$ |   $$ |<br>$$ $$\$$ |$$  __$$\ $$\$$\$$ $$ |$$  __$$\ $$  __$$\ $$  _____|$$ |  $$ |         $$ |   \$$\  $$  |<br>$$ \$$$$ |$$ /  $$ |$$ \$$$  $$ |$$$$$$$$ |$$ |  \__|$$ /      $$ |  $$ |         $$ |    \$$\$$  / <br>$$ |\$$$ |$$ |  $$ |$$ |\$  /$$ |$$   ____|$$ |      $$ |      $$ |  $$ |         $$ |     \$$$  /  <br>$$ | \$$ |\$$$$$$  |$$ | \_/ $$ |\$$$$$$$\ $$ |      \$$$$$$$\ \$$$$$$$ |         $$ |      \$  /   <br>\__|  \__| \______/ \__|     \__| \_______|\__|       \_______| \____$$ |         \__|       \_/    <br>                                                               $$\   $$ |                           <br>                                                               \$$$$$$  |                           <br>                                                                \______/                            </pre>
+    </div>
+  </Layout>
+  </template>
 
 <style scoped>
 pre {
