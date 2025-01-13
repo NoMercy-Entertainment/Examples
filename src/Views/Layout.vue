@@ -39,7 +39,7 @@ defineProps({
     </h1>
   </div>
   <div id="container"
-       class="flex flex-wrap flex-col-reverse justify-center sm:justify-center items-center w-full gap-4 sm:gap-16 px-4 sm:px-16 sm:flex-row flex-1">
+       class="flex flex-nowrap flex-col-reverse justify-center sm:justify-center items-center w-full gap-4 sm:gap-16 px-4 sm:px-16 sm:flex-row flex-1">
 
     <aside
         id="menu"
