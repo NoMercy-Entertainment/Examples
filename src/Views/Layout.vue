@@ -39,11 +39,11 @@ defineProps({
     </h1>
   </div>
   <div id="container"
-       class="flex flex-nowrap flex-col-reverse justify-center sm:justify-center items-center w-full gap-4 sm:gap-16 px-4 sm:px-16 sm:flex-row flex-1">
+       class="flex flex-nowrap flex-col-reverse justify-center sm:justify-evenly items-center w-full gap-4 sm:gap-16 px-4 sm:px-16 sm:flex-row flex-1 max-h-[calc(100vh-12rem)] overflow-clip">
 
     <aside
         id="menu"
-        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm  max-h-[calc(100vh-12rem)] h-64 sm:h-screen border border-neutral-700 p-2 sm:p-4">
+        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm h-available border border-neutral-700 p-2 sm:p-4">
       <Menu :options="options as Option[]"
             :class="theme"
             :style="`
@@ -53,7 +53,7 @@ defineProps({
     </aside>
 
     <main id="wrapper"
-          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-auto w-screen aspect-[16/10] max-h-[calc(100vh-12rem)] sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 z-0">
+          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-full w-auto aspect-[16/10] 5xl:aspect-[16/9.5] sm:max-w-[120rem] border border-neutral-700 p-2 sm:p-4 z-0">
         <slot />
     </main>
   </div>

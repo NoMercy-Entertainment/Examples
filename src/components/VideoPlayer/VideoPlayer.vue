@@ -24,7 +24,7 @@ defineExpose({
 </script>
 
 <template>
-  <div id="player1" class="group nomercyplayer rounded-md"></div>
+  <div id="player1" class="group nomercyplayer rounded-md !overflow-unset"></div>
 </template>
 
 <style scoped>
