@@ -53,7 +53,7 @@ defineProps({
     </aside>
 
     <main id="wrapper"
-          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-screen w-auto aspect-[16/10]  max-h-[calc(100vh-12rem)] sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 z-0">
+          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-auto w-screen aspect-[16/10] max-h-[calc(100vh-12rem)] sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 z-0">
         <slot />
     </main>
   </div>
