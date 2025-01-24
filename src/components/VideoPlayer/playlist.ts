@@ -161,6 +161,36 @@ const playlist: PlaylistItem[] = [
 		],
 	},
 	{
+		title: 'Big Buck Bunny',
+		id: 'big-buck-bunny',
+		description: 'Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the rabbit ain\'t no bunny anymore! In the typical cartoon tradition he prepares the nasty rodents a comical revenge.',
+		image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
+		logo: 'https://image.tmdb.org/t/p/original/fW0heBZpksNXSNAeLl0wT2N7cD3.svg',
+		file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+		duration: '9:56',
+		// season: 1,
+		episode: 3,
+		year: 2015,
+		rating: {
+			rating: 12,
+			image: 'NL/NL_AL.svg',
+		},
+		tracks: [
+			{
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/thumbs_320x178.vtt',
+				kind: 'thumbnails',
+			},
+			{
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/chapters.vtt',
+				kind: 'chapters',
+			},
+			{
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/thumbs_320x178.webp',
+				kind: 'sprite',
+			},
+		],
+	},
+	{
 		title: 'Tears of Steel',
 		id: 'tears-of-steel',
 		description: 'Tears of Steel was realized with crowd-funding by users of the open source 3D creation tool Blender. Target was to improve and test a complete open and free pipeline for visual effects in film - and to make a compelling sci-fi film in Amsterdam, the Netherlands.  The film itself, and all raw material used for making it, have been released under the Creatieve Commons 3.0 Attribution license. Visit the tearsofsteel.org website to find out more about this, or to purchase the 4-DVD box with a lot of extras.  (CC) Blender Foundation - https://www.tearsofsteel.org',
@@ -169,7 +199,7 @@ const playlist: PlaylistItem[] = [
 		file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Tears.of.Steel.(2012)/Tears.of.Steel.(2012).NoMercy.m3u8',
 		duration: '12:13',
 		// season: 1,
-		episode: 3,
+		episode: 4,
 		year: 2012,
 		rating: {
 			rating: 6,
@@ -338,7 +368,7 @@ const playlist: PlaylistItem[] = [
 		file: 'https://backstore.fra1.digitaloceanspaces.com/demo/railwars/railwars.mp4',
 		duration: '1:30',
 		// season: 1,
-		episode: 4,
+		episode: 5,
 		rating: {
 			rating: 6,
 			image: 'NL/NL_6.svg',
@@ -368,7 +398,7 @@ const playlist: PlaylistItem[] = [
 		file: 'https://backstore.fra1.digitaloceanspaces.com/demo/nourin/nourin.mp4',
 		duration: '23:39',
 		// season: 1,
-		episode: 5,
+		episode: 6,
 		tracks: [
 			{
 				label: 'English (Full)',
