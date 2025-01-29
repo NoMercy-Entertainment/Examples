@@ -1,4 +1,4 @@
-﻿import {PlaylistItem} from "nomercyplayer/src/types";
+﻿import { PlaylistItem } from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 const playlist: PlaylistItem[] = [
 	{

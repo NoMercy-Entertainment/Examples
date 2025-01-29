@@ -13,7 +13,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@nomercy-entertainment/nomercy-video-player': fileURLToPath(new URL('./node_modules/nomercyplayer', import.meta.url)),
     },
   },
   build: {

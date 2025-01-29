@@ -14,7 +14,6 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@nomercy-entertainment/nomercy-video-player/*": ["./node_modules/nomercyplayer/*"]
     }
   },
   "exclude": ["node_modules", "dist"],
