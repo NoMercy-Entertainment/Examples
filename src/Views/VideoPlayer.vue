@@ -2,7 +2,7 @@
 import {nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 
 import type {NMPlayer, TimeData} from "@nomercy-entertainment/nomercy-video-player/src/types";
-import {KeyHandlerPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/keyHandlerPlugin";
+import KeyHandlerPlugin from "@nomercy-entertainment/nomercy-video-player/src/plugins/keyHandlerPlugin";
 import {DesktopUIPlugin} from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
 import {OctopusPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 import {SabrePlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/sabrePlugin";
@@ -10,9 +10,6 @@ import {SabrePlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugi
 import type {Option} from "@/types/types";
 
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer.vue';
-import GithubCorner from "@/components/GithubCorner.vue";
-import Menu from "@/components/Menu.vue";
-import HomeCorner from "@/components/HomeCorner.vue";
 import Layout from "@/Views/Layout.vue";
 
 defineProps({
