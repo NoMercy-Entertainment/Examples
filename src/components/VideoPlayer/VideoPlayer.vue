@@ -2,6 +2,8 @@
 import {onMounted, onUnmounted, ref} from "vue";
 
 import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
+// // @ts-ignore
+// import nmplayer from "http://localhost:5503/src/index.ts";
 import type {NMPlayer} from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 import config from "./config";
@@ -27,6 +29,8 @@ defineExpose({
   <div id="player1" class="group nomercyplayer rounded-md !overflow-unset"></div>
 </template>
 
-<style scoped>
-
+<style >
+video::-webkit-media-text-track-container {
+  display: none;
+}
 </style>

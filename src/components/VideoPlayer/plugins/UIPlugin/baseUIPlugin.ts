@@ -262,7 +262,7 @@ export class BaseUIPlugin extends Plugin {
 				'from-black/70',
 				'from-15%',
 				'via-70%',
-				'via-black/70',
+				'via-black/20',
 				'to-100%',
 				'to-black/0',
 			])
