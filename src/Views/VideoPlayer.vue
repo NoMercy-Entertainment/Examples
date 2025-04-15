@@ -203,6 +203,18 @@ const toggleUI = () => {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
+
+    setTimeout(() => {
+      const ui = window.nmplayer().plugins.get('desktopUI');
+      if (loadMenu.value && ui.mainMenu.childNodes.length == 1) {
+        ui.createMenuButton(ui.mainMenu, 'language');
+        ui.createMenuButton(ui.mainMenu, 'subtitles');
+        ui.createMenuButton(ui.mainMenu, 'subtitle settings');
+        ui.createMenuButton(ui.mainMenu, 'quality');
+        ui.createMenuButton(ui.mainMenu, 'speed');
+        ui.createMenuButton(ui.mainMenu, 'playlist');
+      }
+    }, 50);
   }
   else {
     uiActive.value = false;

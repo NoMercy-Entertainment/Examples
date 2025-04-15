@@ -883,7 +883,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			'rounded-lg',
 		]);
 
-		this.player.on('translationsLoaded', () => {
+		this.player.once('translationsLoaded', () => {
 			this.createMenuButton(this.mainMenu, 'language');
 			this.createMenuButton(this.mainMenu, 'subtitles');
 			this.createMenuButton(this.mainMenu, 'subtitle settings');
@@ -1169,19 +1169,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			});
 		}
 		else if (id === 'subtitleSettings') {
-			this.player.on('id', () => {
-				menuButton.style.display = 'none';
-			});
-			if (this.player.hasCaptions()) {
-				menuButton.style.display = 'flex';
-			}
-			this.player.on('captionsList', (captions) => {
-				if (captions.length > 1) {
-					menuButton.style.display = 'flex';
-				} else {
-					menuButton.style.display = 'none';
-				}
-			});
+			menuButton.style.display = 'flex';
 		}
 		else if (id === 'quality') {
 			this.player.on('item', () => {
