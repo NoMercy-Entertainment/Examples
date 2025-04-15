@@ -287,7 +287,10 @@ const options = ref<Option[]>([
     options: [
       {
         label: 'UI',
-        action: toggleUI,
+        action: () => {
+          toggleUI();
+          window.nmplayer?.()?.emit('translationsLoaded');
+        },
         active: uiActive,
       },
       {
