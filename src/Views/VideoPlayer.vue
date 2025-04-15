@@ -192,14 +192,11 @@ watch(videoPlayerRef, (value) => {
   });
 });
 
-const toggleUI = (reload: boolean = true) => {
+const toggleUI = () => {
   if (!uiActive.value) {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
-    if (reload) {
-    videoPlayerRef.value?.player.emit('translationsLoaded');
-    }
   }
   else {
     uiActive.value = false;
@@ -307,7 +304,7 @@ onMounted(() => {
   nextTick(() => {
 
     if (localStorage.getItem('NoMercy-example-video-ui') == null || localStorage.getItem('NoMercy-example-video-ui') === 'true') {
-      toggleUI(false);
+      toggleUI();
     }
     if (localStorage.getItem('NoMercy-example-video-keyhandler') === 'true') {
       toggleKeyHandler();
