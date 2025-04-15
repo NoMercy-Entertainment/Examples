@@ -35,9 +35,15 @@ const desktopUIPlugin = new DesktopUIPlugin();
 const octopusPlugin = new OctopusPlugin();
 const sabrePlugin = new SabrePlugin();
 
+const loadMenu = ref(false);
+
 watch(videoPlayerRef, (value) => {
   if (!value) return;
   const player = value.player;
+
+  player.once('translationsLoaded', () => {
+    loadMenu.value = true;
+  });
 
   player.on('ready', () => {
     console.log('ready');
@@ -192,16 +198,14 @@ watch(videoPlayerRef, (value) => {
   });
 });
 
-var hasLoadedManually = false;
-
 const toggleUI = () => {
   if (!uiActive.value) {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
 
-    if (!hasLoadedManually && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
-      hasLoadedManually = true;
+    if (loadMenu.value && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
+      loadMenu.value = false;
       videoPlayerRef.value?.player?.emit('translationsLoaded');
     }
   }
