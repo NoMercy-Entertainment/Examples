@@ -922,6 +922,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		this.createLanguageMenu(submenu);
 		this.createSubtitleMenu(submenu);
+		this.createSubtitleSettingsMenu(submenu);
 		this.createQualityMenu(submenu);
 		this.createSpeedMenu(submenu);
 
@@ -932,10 +933,6 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				this.createEpisodeMenu(submenu);
 			});
 		}
-
-		this.player.once('playlist', () => {
-			this.createSubtitleSettingsMenu(submenu);
-		});
 
 		return submenu;
 	}
