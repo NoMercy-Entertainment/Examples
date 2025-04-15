@@ -252,6 +252,8 @@ const toggleSabre = () => {
   }
 };
 
+var hasLoadedManually = false;
+
 const options = ref<Option[]>([
   {
     label: 'Play',
@@ -289,7 +291,10 @@ const options = ref<Option[]>([
         label: 'UI',
         action: () => {
           toggleUI();
-          window.nmplayer?.()?.emit('translationsLoaded');
+          if (!hasLoadedManually) {
+            hasLoadedManually = true;
+            window.nmplayer?.()?.emit('translationsLoaded');
+          }
         },
         active: uiActive,
       },
