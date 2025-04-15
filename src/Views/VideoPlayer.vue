@@ -197,6 +197,10 @@ const toggleUI = () => {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
+
+    if (videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
+      videoPlayerRef.value?.player?.emit('translationsLoaded');
+    }
   }
   else {
     uiActive.value = false;
@@ -252,8 +256,6 @@ const toggleSabre = () => {
   }
 };
 
-var hasLoadedManually = false;
-
 const options = ref<Option[]>([
   {
     label: 'Play',
@@ -289,13 +291,7 @@ const options = ref<Option[]>([
     options: [
       {
         label: 'UI',
-        action: () => {
-          toggleUI();
-          if (!hasLoadedManually) {
-            hasLoadedManually = true;
-            window.nmplayer?.()?.emit('translationsLoaded');
-          }
-        },
+        action: toggleUI,
         active: uiActive,
       },
       {
