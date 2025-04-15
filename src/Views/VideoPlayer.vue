@@ -197,6 +197,7 @@ const toggleUI = () => {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
+    videoPlayerRef.value?.player.emit('translationsLoaded');
   }
   else {
     uiActive.value = false;
