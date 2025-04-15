@@ -204,8 +204,11 @@ const toggleUI = () => {
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
 
+    console.log('desktopUI', videoPlayerRef.value?.player.plugins.get('desktopUI'));
     setTimeout(() => {
-      if (loadMenu.value && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
+      console.log('timeout')
+      if (loadMenu.value && window.nmplayer().plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
+        console.log('loadMenu', loadMenu.value, window.nmplayer().plugins.get('desktopUI').mainMenu.childNodes.length);
         videoPlayerRef.value?.player?.emit('translationsLoaded');
       }
     }, 1500);
