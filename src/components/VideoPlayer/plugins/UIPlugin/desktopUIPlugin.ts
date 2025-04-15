@@ -1609,6 +1609,10 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				this.player.emit('show-menu', false);
 				this.player.setSpeed(speed);
 			});
+
+			if (speed == this.player.getSpeed()) {
+				chevron.classList.remove('hidden');
+			}
 		}
 
 		this.player.on('show-speed-menu', (showing) => {
