@@ -204,15 +204,17 @@ const toggleUI = () => {
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
 
-    if (loadMenu.value && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
-      videoPlayerRef.value?.player?.emit('translationsLoaded');
-    }
+    setTimeout(() => {
+      if (loadMenu.value && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
+        videoPlayerRef.value?.player?.emit('translationsLoaded');
+      }
+    }, 1500);
   }
   else {
     uiActive.value = false;
     videoPlayerRef.value?.player.plugins.get('desktopUI').dispose();
   }
-  
+
   localStorage.setItem('NoMercy-example-video-ui', uiActive.value.toString());
 };
 
