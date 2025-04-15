@@ -3,9 +3,15 @@ import { WebVTTParser } from 'webvtt-parser';
 
 import Plugin from '@nomercy-entertainment/nomercy-video-player/src/plugin';
 import type { NMPlayer, PreviewTime, VolumeState } from '@nomercy-entertainment/nomercy-video-player/src/types';
-import { breakEpisodeTitle, breakLogoTitle, humanTime, nearestValue, unique } from '@nomercy-entertainment/nomercy-video-player/src/helpers';
-import { buttons, type  Icon } from './buttons';
-import {TimeData} from "@nomercy-entertainment/nomercy-video-player/src/types";
+import {
+	breakEpisodeTitle,
+	breakLogoTitle,
+	humanTime,
+	nearestValue,
+	unique
+} from '@nomercy-entertainment/nomercy-video-player/src/helpers';
+import { buttons, type Icon } from './buttons';
+import { TimeData } from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 export class BaseUIPlugin extends Plugin {
 	player: NMPlayer = <NMPlayer>{};
@@ -17,7 +23,8 @@ export class BaseUIPlugin extends Plugin {
 	menuFrame: HTMLDialogElement = <HTMLDialogElement>{};
 	nextUp: HTMLDivElement & {
 		firstChild: HTMLButtonElement,
-		lastChild: HTMLButtonElement	} = <HTMLDivElement & {
+		lastChild: HTMLButtonElement
+	} = <HTMLDivElement & {
 		firstChild: HTMLButtonElement,
 		lastChild: HTMLButtonElement
 	}>{};
@@ -29,6 +36,7 @@ export class BaseUIPlugin extends Plugin {
 	episodeScrollContainer: HTMLDivElement = <HTMLDivElement>{};
 	playbackButton: HTMLButtonElement = <HTMLButtonElement>{};
 	loader: HTMLDivElement = <HTMLDivElement>{};
+	thumbnailClone: HTMLDivElement = <HTMLDivElement>{};
 
 	chapters: any[] = [];
 	previewTime: PreviewTime[] = [];
@@ -45,15 +53,16 @@ export class BaseUIPlugin extends Plugin {
 	mainMenuOpen = false;
 	languageMenuOpen = false;
 	subtitlesMenuOpen = false;
+	subtitleSettingsMenuOpen = false;
 	qualityMenuOpen = false;
 	speedMenuOpen = false;
 	playlistMenuOpen = false;
 	theaterModeEnabled = false;
 	highQuality = false;
-	shouldSlide = false;
+	shouldSlide = true;
 	currentTimeFile = '';
 
-	currentMenu: 'language'|'episode'|'pause'|'quality'|'seek'|null = null;
+	currentMenu: 'language' | 'episode' | 'pause' | 'quality' | 'seek' | null = null;
 	thumbs: {
 		time: PreviewTime,
 		el: HTMLDivElement
@@ -83,11 +92,24 @@ export class BaseUIPlugin extends Plugin {
 		'active:outline-white',
 	];
 
-	menuButtonTextStyles =  [
+	menuButtonTextStyles = [
 		'menu-button-text',
 		'text-white',
 		'cursor-pointer',
 		'font-semibold',
+		'pl-2',
+		'flex',
+		'gap-2',
+		'leading-[normal]',
+		'line-clamp-1',
+	];
+
+	menuButtonSubTextStyles = [
+		'menu-button-text',
+		'text-white/60',
+		'cursor-pointer',
+		'font-semibold',
+		'text-2xs',
 		'pl-2',
 		'flex',
 		'gap-2',
@@ -101,6 +123,10 @@ export class BaseUIPlugin extends Plugin {
 		this.buttons = buttons();
 		this.imageBaseUrl = player.options.basePath ? '' : 'https://image.tmdb.org/t/p/w185';
 		// Initialize the plugin with the player
+
+		this.player.on('play', () => {
+			this.player.emit('hide-episode-tip');
+		});
 	}
 
 	dispose() {
@@ -140,6 +166,7 @@ export class BaseUIPlugin extends Plugin {
 				requestAnimationFrame(scrollStep);
 			}
 		}
+
 		requestAnimationFrame(scrollStep);
 	}
 
@@ -186,15 +213,20 @@ export class BaseUIPlugin extends Plugin {
 
 				if (icon.title == 'Fullscreen' && this.player.getFullscreen()) {
 					return;
-				} if (icon.title == 'Exit fullscreen' && !this.player.getFullscreen()) {
+				}
+				if (icon.title == 'Exit fullscreen' && !this.player.getFullscreen()) {
 					return;
-				} if (icon.title == 'Play' && this.player.isPlaying) {
+				}
+				if (icon.title == 'Play' && this.player.isPlaying) {
 					return;
-				} if (icon.title == 'Pause' && !this.player.isPlaying) {
+				}
+				if (icon.title == 'Pause' && !this.player.isPlaying) {
 					return;
-				} if (icon.title == 'Mute' && this.player.isMuted()) {
+				}
+				if (icon.title == 'Mute' && this.player.isMuted()) {
 					return;
-				} if (icon.title == 'Unmute' && !this.player.isMuted()) {
+				}
+				if (icon.title == 'Unmute' && !this.player.isMuted()) {
 					return;
 				}
 
@@ -258,11 +290,11 @@ export class BaseUIPlugin extends Plugin {
 				'group-[&.nomercyplayer:not(.paused):not(.playing)]:!bg-gradient-circle-c',
 				'group-[&.nomercyplayer.buffering]:bg-gradient-circle-c',
 				'group-[&.nomercyplayer.error]:bg-gradient-circle-c',
-				'group-[&.nomercyplayer.paused]:bg-gradient-circle-c',
-				'from-black/70',
+
 				'from-15%',
-				'via-70%',
-				'via-black/20',
+				'from-black/50',
+				'via-40%',
+				'via-black/30',
 				'to-100%',
 				'to-black/0',
 			])
@@ -368,48 +400,48 @@ export class BaseUIPlugin extends Plugin {
 	getButtonKeyCode(id: string) {
 
 		switch (id) {
-		case 'play':
-		case 'pause':
-			return `(${this.player.localize('SPACE')})`;
-		case 'volumeMuted':
-		case 'volumeLow':
-		case 'volumeMedium':
-		case 'volumeHigh':
-			return '(m)';
-		case 'seekBack':
-			return '(<)';
-		case 'seekForward':
-			return '(>)';
-		case 'next':
-			return '(n)';
-		case 'theater':
-			return '(t)';
-		case 'theater-enabled':
-			return '(t)';
-		case 'pip-enter':
-		case 'pip-exit':
-			return '(i)';
-		case 'playlist':
-			return '';
-		case 'previous':
-			return '(p)';
-		case 'speed':
-			return '';
-		case 'subtitle':
-		case 'subtitled':
-			return '(v)';
-		case 'audio':
-			return '(b)';
-		case 'settings':
-			return '';
-		case 'fullscreen-enable':
-		case 'fullscreen':
-			return '(f)';
-		default:
-			return '';
+			case 'play':
+			case 'pause':
+				return `(${this.player.localize('SPACE')})`;
+			case 'volumeMuted':
+			case 'volumeLow':
+			case 'volumeMedium':
+			case 'volumeHigh':
+				return '(m)';
+			case 'seekBack':
+				return '(<)';
+			case 'seekForward':
+				return '(>)';
+			case 'next':
+				return '(n)';
+			case 'theater':
+				return '(t)';
+			case 'theater-enabled':
+				return '(t)';
+			case 'pip-enter':
+			case 'pip-exit':
+				return '(i)';
+			case 'playlist':
+				return '';
+			case 'previous':
+				return '(p)';
+			case 'speed':
+				return '';
+			case 'subtitle':
+			case 'subtitled':
+				return '(v)';
+			case 'audio':
+				return '(b)';
+			case 'settings':
+				return '';
+			case 'fullscreen-enable':
+			case 'fullscreen':
+				return '(f)';
+			default:
+				return '';
 		}
 
-	};
+	}
 
 	fetchPreviewTime() {
 		if (this.previewTime.length === 0) {
@@ -421,7 +453,7 @@ export class BaseUIPlugin extends Plugin {
 			});
 
 			if (imageFile) {
-				this.image =  imageFile;
+				this.image = imageFile;
 				if (this.player.options.accessToken) {
 					this.player.getFileContents<Blob>({
 						url: imageFile,
@@ -604,7 +636,7 @@ export class BaseUIPlugin extends Plugin {
 			'settings'
 		);
 
-		this.createSVGElement(settingsButton, 'settings', this.buttons.settings, false,  hovered);
+		this.createSVGElement(settingsButton, 'settings', this.buttons.settings, false, hovered);
 
 		settingsButton.addEventListener('click', () => {
 			this.player.emit('hide-tooltip');
@@ -751,12 +783,11 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createChapterBackButton(parent: HTMLDivElement, hovered = false) {
-		if (this.player.isMobile()) return;
 		const chapterBack = this.createUiButton(
 			parent,
 			'chapterBack'
 		);
-		chapterBack.style.display = 'none';
+		this.player.addClasses(chapterBack, ['portrait:!hidden']);
 
 		this.player.on('item', () => {
 			chapterBack.style.display = 'none';
@@ -790,12 +821,11 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createChapterForwardButton(parent: HTMLDivElement, hovered = false) {
-		if (this.player.isMobile()) return;
 		const chapterForward = this.createUiButton(
 			parent,
 			'chapterForward'
 		);
-		chapterForward.style.display = 'none';
+		this.player.addClasses(chapterForward, ['portrait:!hidden']);
 
 		this.player.on('item', () => {
 			chapterForward.style.display = 'none';
@@ -847,55 +877,52 @@ export class BaseUIPlugin extends Plugin {
 		time.innerText = humanTime(this.player.getDuration());
 
 		switch (type) {
-		case 'current':
+			case 'current':
 
-			this.player.on('active', () => {
-				time.innerText = humanTime(this.player.getCurrentTime());
-			});
+				this.player.on('time', (data) => {
+					if (this.player.container.classList.contains('active')) {
+						time.innerText = humanTime(data.currentTime);
+					}
+				});
 
-			this.player.on('time', (data) => {
-				if (this.player.container.classList.contains('active')) {
+				this.player.on('currentScrubTime', (data) => {
 					time.innerText = humanTime(data.currentTime);
-				}
-			});
+				});
+				break;
 
-			this.player.on('currentScrubTime', (data) => {
-				time.innerText = humanTime(data.currentTime);
-			});
-			break;
+			case 'remaining':
 
-		case 'remaining':
+				this.player.on('duration', (data) => {
+					if (data.remaining === Infinity) {
+						time.innerText = 'Live';
+					} else {
+						time.innerText = humanTime(data.remaining);
+					}
+				});
 
-			this.player.on('duration', (data) => {
-				if (data.remaining === Infinity) {
-					time.innerText = 'Live';
-				} else {
-					time.innerText = humanTime(data.remaining);
-				}
-			});
+				this.player.on('time', (data) => {
+					if (data.remaining === Infinity) {
+						time.innerText = 'Live';
+					}
+					else if (this.player.container.classList.contains('active')) {
+						time.innerText = humanTime(data.remaining);
+					}
+				});
 
-			this.player.on('time', (data) => {
-				if (data.remaining === Infinity) {
-					time.innerText = 'Live';
-				} else if (this.player.container.classList.contains('active')) {
-					time.innerText = humanTime(data.remaining);
-				}
-			});
+				break;
 
-			break;
+			case 'duration':
+				this.player.on('duration', (data) => {
+					if (data.duration === Infinity) {
+						time.innerText = 'Live';
+					} else {
+						time.innerText = humanTime(data.duration);
+					}
+				});
+				break;
 
-		case 'duration':
-			this.player.on('duration', (data) => {
-				if (data.duration === Infinity) {
-					time.innerText = 'Live';
-				} else {
-					time.innerText = humanTime(data.duration);
-				}
-			});
-			break;
-
-		default:
-			break;
+			default:
+				break;
 		}
 
 		this.player.on('pip-internal', (data) => {
@@ -977,7 +1004,7 @@ export class BaseUIPlugin extends Plugin {
 		const mutedButton = this.createSVGElement(volumeButton, 'volumeMuted', this.buttons.volumeMuted, true, hovered);
 		const lowButton = this.createSVGElement(volumeButton, 'volumeLow', this.buttons.volumeLow, true, hovered);
 		const mediumButton = this.createSVGElement(volumeButton, 'volumeMedium', this.buttons.volumeMedium, true, hovered);
-		const highButton = this.createSVGElement(volumeButton, 'volumeHigh', this.buttons.volumeHigh, false,  hovered);
+		const highButton = this.createSVGElement(volumeButton, 'volumeHigh', this.buttons.volumeHigh, false, hovered);
 
 		volumeButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -1074,7 +1101,7 @@ export class BaseUIPlugin extends Plugin {
 
 		previousButton.style.display = 'none';
 
-		this.createSVGElement(previousButton, 'previous', this.buttons.previous, false,  hovered);
+		this.createSVGElement(previousButton, 'previous', this.buttons.previous, false, hovered);
 
 		previousButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -1287,7 +1314,7 @@ export class BaseUIPlugin extends Plugin {
 		audioButton.style.display = 'none';
 		audioButton.ariaLabel = this.buttons.language?.title;
 
-		this.createSVGElement(audioButton, 'audio', this.buttons.languageOff, false,  hovered);
+		this.createSVGElement(audioButton, 'audio', this.buttons.languageOff, false, hovered);
 
 		audioButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -1324,8 +1351,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('pip-internal', (data) => {
 			if (data) {
 				audioButton.style.display = 'none';
-			}
-			else if (this.player.hasAudioTracks()) {
+			} else if (this.player.hasAudioTracks()) {
 				audioButton.style.display = 'flex';
 			}
 		});
@@ -1344,7 +1370,7 @@ export class BaseUIPlugin extends Plugin {
 
 		qualityButton.style.display = 'none';
 
-		const offButton = this.createSVGElement(qualityButton, 'low', this.buttons.quality, false,  hovered);
+		const offButton = this.createSVGElement(qualityButton, 'low', this.buttons.quality, false, hovered);
 		const onButton = this.createSVGElement(qualityButton, 'high', this.buttons.quality, true, hovered);
 
 		qualityButton.addEventListener('click', (event) => {
@@ -1461,7 +1487,7 @@ export class BaseUIPlugin extends Plugin {
 			'fullscreen'
 		);
 
-		this.createSVGElement(fullscreenButton, 'fullscreen', this.buttons.fullscreen, false,  hovered);
+		this.createSVGElement(fullscreenButton, 'fullscreen', this.buttons.fullscreen, false, hovered);
 		this.createSVGElement(fullscreenButton, 'fullscreen-enabled', this.buttons.exitFullscreen, true, hovered);
 
 		fullscreenButton.addEventListener('click', (event) => {
@@ -1502,7 +1528,7 @@ export class BaseUIPlugin extends Plugin {
 
 		playlistButton.style.display = 'none';
 
-		this.createSVGElement(playlistButton, 'playlist', this.buttons.playlist, false,  hovered);
+		this.createSVGElement(playlistButton, 'playlist', this.buttons.playlist, false, hovered);
 
 		playlistButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -1561,23 +1587,18 @@ export class BaseUIPlugin extends Plugin {
 				'flex',
 				'flex-col',
 				'gap-2',
-				'group-[&.nomercyplayer.active]:translate-y-0',
 				'group-[&.nomercyplayer.paused]:translate-y-0',
 				'group-[&.nomercyplayer:has(.open)]:translate-y-0',
-				'group-[&.nomercyplayer:has(:focus)]:duration-0',
+				'group-[&.nomercyplayer.active]:translate-y-0',
+				'group-[&.nomercyplayer:has(.volume-container:hover)]:!translate-y-0',
 				'items-center',
 				'mt-auto',
-				'px-2',
-				'lg:px-6',
-				'py-1',
-				'lg:py-4',
 				'text-center',
 				'transition-all',
-				'translate-y-full',
+				'translate-y-[100vh]',
 				'w-available',
 				'z-10',
 				'pointer-events-none',
-				// 'group-[&.nomercyplayer:has(:focus)]:translate-y-0',
 			])
 			.appendTo(parent);
 
@@ -1585,12 +1606,13 @@ export class BaseUIPlugin extends Plugin {
 			.addClasses([
 				'absolute',
 				'pointer-events-none',
-				'bottom-0',
-				'bg-gradient-to-t',
-				'via-black/20',
-				'from-black/90',
 				'pt-[10%]',
 				'w-available',
+				'bottom-0',
+				'bg-gradient-to-t',
+				'from-black/85',
+				'via-black/40',
+				'to-black/0',
 			])
 			.appendTo(bottomBar);
 
@@ -1646,7 +1668,7 @@ export class BaseUIPlugin extends Plugin {
 		});
 
 		return playerMessage;
-	};
+	}
 
 	createSeekContainer(parent: HTMLElement) {
 
@@ -1654,7 +1676,7 @@ export class BaseUIPlugin extends Plugin {
 			.addClasses([
 				'relative',
 				'h-auto',
-				'-mb-28',
+				'mb-28',
 				'w-available',
 				'translate-y-[80vh]',
 				'z-40',
@@ -1675,15 +1697,12 @@ export class BaseUIPlugin extends Plugin {
 			])
 			.appendTo(seekContainer);
 
-		this.player.createElement('div', `thumbnail-clone-${1}`)
+		this.thumbnailClone = this.player.createElement('div', `thumbnail-clone-${1}`)
 			.addClasses([
-				'w-[calc(23%+(var(--gap)/2))]',
 				'h-auto',
 				'object-cover',
-				'aspect-video',
 				'border-4',
 				'mx-auto',
-				'',
 			])
 			.appendTo(seekScrollCloneContainer);
 
@@ -1718,20 +1737,20 @@ export class BaseUIPlugin extends Plugin {
 
 				this.player.once('time', () => {
 					this.currentScrubTime = this.getClosestSeekableInterval();
-					// this.player.emit('currentScrubTime', {
-					// 	...this.player.getTimeData(),
-					// 	currentTime: this.getClosestSeekableInterval(),
-					// });
+					this.player.emit('currentScrubTime', {
+						...this.player.getTimeData(),
+						currentTime: this.getClosestSeekableInterval(),
+					});
 				});
 			});
 		});
 
 		this.player.on('lastTimeTrigger', () => {
 			this.currentScrubTime = this.getClosestSeekableInterval();
-			// this.player.emit('currentScrubTime', {
-			// 	...this.player.getTimeData(),
-			// 	currentTime: this.getClosestSeekableInterval(),
-			// });
+			this.player.emit('currentScrubTime', {
+				...this.player.getTimeData(),
+				currentTime: this.getClosestSeekableInterval(),
+			});
 		});
 
 		this.player.on('currentScrubTime', (data: TimeData) => {
@@ -1770,7 +1789,7 @@ export class BaseUIPlugin extends Plugin {
 		return this.player.createElement('div', 'top-bar')
 			.addClasses([
 				'top-bar',
-				'-translate-y-full',
+				'-translate-y-[100vh]',
 				'absolute',
 				'flex',
 				'gap-2',
@@ -1787,13 +1806,15 @@ export class BaseUIPlugin extends Plugin {
 				'group-[&.nomercyplayer.active]:translate-y-0',
 				'group-[&.nomercyplayer.paused]:translate-y-0',
 				'group-[&.nomercyplayer:has(.open)]:translate-y-0',
-				'group-[&.nomercyplayer:has(:focus)]:duration-0',
+
+				'group-[&.nomercyplayer:has(.volume-container:hover)]:!translate-y-0',
 				'transition-all',
 				'duration-300',
 
 				'bg-gradient-to-b',
-				'from-black/90',
-				'via-black/50',
+				'from-black/85',
+				'via-black/40',
+				'to-black/0',
 			])
 			.appendTo(parent);
 	}
@@ -1883,12 +1904,11 @@ export class BaseUIPlugin extends Plugin {
 			} else {
 				languageButtonText.innerText = `${this.player.localize(data.language ?? '')} (${this.player.localize(data.type)})`;
 			}
-		}
-		else {
+		} else {
 			languageButtonText.innerText = this.player.localize(data.language);
 		}
 
-		const chevron = this.createSVGElement(languageButton, 'checkmark', this.buttons.checkmark, false,  hovered);
+		const chevron = this.createSVGElement(languageButton, 'checkmark', this.buttons.checkmark, false, hovered);
 		this.player.addClasses(chevron, ['ml-auto']);
 
 		if (data.id > 0) {
@@ -1909,8 +1929,7 @@ export class BaseUIPlugin extends Plugin {
 				this.player.setCurrentAudioTrack(data.id);
 				this.player.emit('show-menu', false);
 			});
-		}
-		else if (data.buttonType == 'subtitle') {
+		} else if (data.buttonType == 'subtitle') {
 			if (data.id === this.player.getCaptionIndex()) {
 				chevron.classList.remove('hidden');
 			} else {
@@ -1936,6 +1955,20 @@ export class BaseUIPlugin extends Plugin {
 
 		return languageButton;
 	}
+
+	/**
+	 * Converts a snake_case string to camelCase.
+	 * @param str - The snake_case string to convert.
+	 * @returns The camelCase version of the string.
+	 */
+	snakeToCamel(str: string): string {
+		return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+	}
+
+	spaceToCamel(str: string): string {
+		return str.replace(/\s([a-z])/g, (_, letter) => letter.toUpperCase());
+	}
+
 
 	getClosestElement(element: HTMLButtonElement, selector: string) {
 
@@ -1985,6 +2018,11 @@ export class BaseUIPlugin extends Plugin {
 		thumbnail.style.backgroundPosition = `-${time.x}px -${time.y}px`;
 		thumbnail.style.width = `max(232px, ${time.w}px)`;
 		thumbnail.style.minWidth = `max(232px, ${time.w}px)`;
+		thumbnail.style.aspectRatio = `${time.w} / ${time.h}`;
+
+		this.thumbnailClone.style.aspectRatio = `${time.w} / ${time.h}`;
+		this.thumbnailClone.style.width = `max(232px, ${time.w}px)`;
+		this.thumbnailClone.style.minWidth = `max(232px, ${time.w}px)`;
 
 		return thumbnail;
 	}
@@ -1997,6 +2035,7 @@ export class BaseUIPlugin extends Plugin {
 			this.sliderPopImage.style.width = `${img.w}px`;
 			this.sliderPopImage.style.height = `${img.h}px`;
 			this.chapterText.style.width = `${img.w}px`;
+
 		}
 	}
 
@@ -2015,7 +2054,10 @@ export class BaseUIPlugin extends Plugin {
 		this.fetchPreviewTime();
 
 		let img = this.previewTime.find(
-			(p: { start: number; end: number; }) => scrubTime.scrubTimePlayer >= p.start && scrubTime.scrubTimePlayer < p.end
+			(p: {
+				start: number;
+				end: number;
+			}) => scrubTime.scrubTimePlayer >= p.start && scrubTime.scrubTimePlayer < p.end
 		);
 		if (!img) {
 			img = this.previewTime.at(-1);
@@ -2051,8 +2093,8 @@ export class BaseUIPlugin extends Plugin {
 		} else {
 			this.player.playlistItem(item);
 		}
-		this.player.play();
-	};
+		this.player.play().then();
+	}
 
 	scrollCenter(el: HTMLElement, container: HTMLElement, options?: {
 		duration?: number;
@@ -2079,6 +2121,6 @@ export class BaseUIPlugin extends Plugin {
 		}
 
 		requestAnimationFrame(scrollStep);
-	};
+	}
 
 }
