@@ -794,6 +794,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				menuContent.classList.remove('translate-x-0');
 				menuContent.classList.add('sub-menu-open');
 				menuFrame.style.display = 'flex';
+
+				this.player.emit('switch-season', this.player.playlistItem().season);
 			} else {
 				menuFrame.style.width = '';
 			}
@@ -1133,6 +1135,10 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		menuButton.addEventListener('click', (event) => {
 			event.stopPropagation();
 			this.player.emit(`show-${id}-menu`, true);
+
+			if (id === 'playlist') {
+				window.nmplayer().emit('switch-season', window.nmplayer().playlistItem().season);
+			}
 		});
 
 		if (id === 'language') {

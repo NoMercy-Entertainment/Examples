@@ -1540,7 +1540,6 @@ export class BaseUIPlugin extends Plugin {
 				this.menuFrame.close();
 			} else {
 				this.player.emit('show-playlist-menu', true);
-				this.player.emit('switch-season', this.player.playlistItem().season);
 
 				this.menuFrame.showModal();
 
