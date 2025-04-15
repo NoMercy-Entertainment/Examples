@@ -633,7 +633,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 			setTimeout(() => {
 				(Array.from(this.mainMenu.children).find(el =>
-					(el as HTMLButtonElement).style.display != 'none' && el.id != 'menu-header') as HTMLButtonElement).focus();
+					(el as HTMLButtonElement).style.display != 'none' && el.id != 'menu-header') as HTMLButtonElement)?.focus();
 			}, 200);
 
 			this.player.emit('show-language-menu', false);
@@ -666,7 +666,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 				setTimeout(() => {
 					(Array.from(this.mainMenu.children).find(el =>
-						(el as HTMLButtonElement).style.display != 'none' && el.id != 'menu-header') as HTMLButtonElement).focus();
+						(el as HTMLButtonElement).style.display != 'none' && el.id != 'menu-header') as HTMLButtonElement)?.focus();
 				}, 200);
 			}
 		});
