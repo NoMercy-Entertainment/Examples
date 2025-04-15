@@ -41,10 +41,6 @@ watch(videoPlayerRef, (value) => {
   if (!value) return;
   const player = value.player;
 
-  player.once('translationsLoaded', () => {
-    loadMenu.value = true;
-  });
-
   player.on('ready', () => {
     console.log('ready');
   });
@@ -196,6 +192,10 @@ watch(videoPlayerRef, (value) => {
       return option;
     });
   });
+
+  player.once('translationsLoaded', () => {
+    loadMenu.value = true;
+  });
 });
 
 const toggleUI = () => {
@@ -205,7 +205,6 @@ const toggleUI = () => {
     videoPlayerRef.value?.player.usePlugin('desktopUI');
 
     if (loadMenu.value && videoPlayerRef.value?.player.plugins.get('desktopUI').mainMenu.childNodes.length == 1) {
-      loadMenu.value = false;
       videoPlayerRef.value?.player?.emit('translationsLoaded');
     }
   }
@@ -213,6 +212,7 @@ const toggleUI = () => {
     uiActive.value = false;
     videoPlayerRef.value?.player.plugins.get('desktopUI').dispose();
   }
+  
   localStorage.setItem('NoMercy-example-video-ui', uiActive.value.toString());
 };
 
