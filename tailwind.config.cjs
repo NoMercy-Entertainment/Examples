@@ -51,7 +51,6 @@ module.exports = {
 				available: [
 					'100%',
 					'-webkit-fill-available',
-					'-moz-available',
 					'stretch',
 				],
 			},
@@ -59,7 +58,6 @@ module.exports = {
 				available: [
 					'100%',
 					'-webkit-fill-available',
-					'-moz-available',
 					'stretch',
 				],
 			},
@@ -67,7 +65,6 @@ module.exports = {
 				available: [
 					'100%',
 					'-webkit-fill-available',
-					'-moz-available',
 					'stretch',
 				],
 			},
