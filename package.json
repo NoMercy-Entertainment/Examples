@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host  --force",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postbuild": "node remove-moz.cjs"
   },
   "dependencies": {
     "@nomercy-entertainment/nomercy-music-player": "^0.1.6",
