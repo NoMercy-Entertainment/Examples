@@ -7,12 +7,17 @@ import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
 import type {NMPlayer} from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 import config from "./config";
+import OctopusPlugin from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 
 const player = ref<NMPlayer>();
 
 onMounted(() => {
     player.value = nmplayer('player1')
         .setup(config) as unknown as NMPlayer;
+
+  const octopusPlugin = new OctopusPlugin();
+  player.value?.registerPlugin('octopus', octopusPlugin);
+  player.value?.usePlugin('octopus');
 });
 
 onUnmounted(() => {
