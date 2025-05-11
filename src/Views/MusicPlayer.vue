@@ -234,11 +234,11 @@ const list = computed(() => {
     <div class="flex flex-col sm:flex-row items-center justify-center w-full gap-2 mt-2 mb-2 sm:my-4">
       <label for="playlist-url" class="text-pretty text-lg hidden sm:flex flex-nowrap whitespace-nowrap gap-1">
         <a class="underline underline-offset-2" target="_blank"
-          :href="currentSong?.album_track.at(0)?.url || 'https://freemusicarchive.org/music/artistShuffle'">freemusicarchive.org</a>
+          :href="currentSong?.album_track?.at(0)?.url || 'https://freemusicarchive.org/music/artistShuffle'">freemusicarchive.org</a>
         url:
       </label>
       <div class="flex gap-2 flex-1 w-full">
-        <input type="text" class="w-px flex-1 px-2 py-1" :placeholder="currentSong?.album_track.at(0)?.url"
+        <input type="text" class="w-px flex-1 px-2 py-1" :placeholder="currentSong?.album_track?.at(0)?.url"
           @change="handleChange" />
         <button @click="handleChange"
           class="px-4 py-2 bg-pretty text-white rounded-lg bg-[var(--color-theme-2-shadow)]">Load</button>
