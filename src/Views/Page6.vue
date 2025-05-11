@@ -53,7 +53,7 @@ const goBack = () => {
 
     <aside
         id="menu"
-        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm  max-h-[calc(100vh-12rem)] h-64 sm:h-screen border border-neutral-700 p-2 sm:p-4">
+        class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full sm:w-1/3 max-w-sm  max-h-[calc(100vh-12rem)] h-64 sm:h-[100dvh] border border-neutral-700 p-2 sm:p-4">
       <Menu :options="options as Option[]" @goBack="goBack"
             :class="theme"
             :style="`
@@ -63,7 +63,7 @@ const goBack = () => {
     </aside>
 
     <main id="wrapper"
-          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col sm:w-px h-screen w-auto aspect-[16/10]  max-h-[calc(100vh-12rem)] sm:flex-1 sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 sm:pb-0 z-0">
+          class="relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col sm:w-px h-[100dvh] w-auto aspect-[16/10]  max-h-[calc(100vh-12rem)] sm:flex-1 sm:max-w-[88rem] border border-neutral-700 p-2 sm:p-4 sm:pb-0 z-0">
 
     </main>
   </div>

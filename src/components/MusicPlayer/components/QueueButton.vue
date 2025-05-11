@@ -13,7 +13,7 @@ const handleClick = (e?: MouseEvent) => {
     <MusicButton label="Queue" :onclick="handleClick">
       <span class="material-icons text-white ml-auto text-2xl"
             :class="{
-              'fill-[var(--color-theme-2-shadow)]': queueMenuOpen,
+              '!text-[var(--color-theme-2-shadow)]': queueMenuOpen,
             }"
       >queue_music</span>
     </MusicButton>

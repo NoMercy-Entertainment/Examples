@@ -33,6 +33,7 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: rgb(24 24 27);
+  color-scheme: dark;
 }
 
 *:not(svg) {
@@ -183,4 +184,8 @@ $themes: (
   100% {
     opacity: 0;
   }
+}
+
+canvas:not([id="visualizer"]){
+  display: none;
 }

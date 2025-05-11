@@ -1,7 +1,7 @@
 ﻿import {Ref} from "vue";
 
 export interface Option {
-	label: string;
+	label: string |Ref<string>;
 	action?: () => void;
 	options?: (Option | Ref<Option>)[];
 	level?: number;

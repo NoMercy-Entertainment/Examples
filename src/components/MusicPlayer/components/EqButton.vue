@@ -14,7 +14,7 @@ const handleClick = (e?: MouseEvent) => {
   <MusicButton label="Equalizer" :onclick="handleClick">
     <span class="material-icons text-white text-2xl"
           :class="{
-              'fill-[var(--color-theme-2-shadow)]': equalizerMenuOpen,
+              '!text-[var(--color-theme-2-shadow)]': equalizerMenuOpen,
             }"
     >equalizer</span>
   </MusicButton>

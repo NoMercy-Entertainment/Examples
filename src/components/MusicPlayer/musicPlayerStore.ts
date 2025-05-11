@@ -4,28 +4,7 @@ import {ref, toRaw} from 'vue';
 import MusicPlayer from '@nomercy-entertainment/nomercy-music-player';
 
 import {RepeatState, type EQBand, type EqualizerPreset, type EQSliderValues} from '@nomercy-entertainment/nomercy-music-player/src/types';
-
-export interface BasePlaylistItem {
-	id: string;
-	name: string;
-	cover: string | null;
-	path: string;
-	album_track: {
-		name: string;
-		[key: string]: any;
-	}[];
-	artist_track: {
-		name: string;
-		[key: string]: any;
-	}[];
-	[key: string]: any;
-}
-
-export interface PlaylistItem extends BasePlaylistItem {
-	duration: string;
-	favorite: boolean;
-	date: string;
-}
+import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player/dist/types';
 
 export const musicPlayer = new MusicPlayer<BasePlaylistItem>({
 	motionConfig: {
@@ -73,26 +52,26 @@ export const setCurrentPlaylist = (value: string): void => {
 export const queueMenuOpen = ref<boolean>(false);
 export const setQueueMenuOpen = (value: boolean): void => {
 	queueMenuOpen.value = value;
-	equalizerMenuOpen.value = false;
+	// equalizerMenuOpen.value = false;
 };
 export const toggleQueueMenuOpen = (): void => {
 	queueMenuOpen.value = !queueMenuOpen.value;
-	equalizerMenuOpen.value = false;
+	// equalizerMenuOpen.value = false;
 };
 
-export const equalizerMenuOpen = ref<boolean>(false);
+export const equalizerMenuOpen = ref<boolean>(true);
 export const setEqualizerMenuOpen = (value: boolean): void => {
 	equalizerMenuOpen.value = value;
-	queueMenuOpen.value = false;
+	// queueMenuOpen.value = false;
 };
 export const toggleEqualizerMenuOpen = (): void => {
 	equalizerMenuOpen.value = !equalizerMenuOpen.value;
-	queueMenuOpen.value = false;
+	// queueMenuOpen.value = false;
 };
 
 export const closeEqualizerMenu = (): void => {
 	equalizerMenuOpen.value = false;
-	queueMenuOpen.value = false;
+	// queueMenuOpen.value = false;
 }
 
 export const abbreviateFrequency = (frequency: number) => {

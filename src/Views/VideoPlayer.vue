@@ -339,12 +339,14 @@ onUnmounted(() => {
 
 <template>
   <Layout :theme="theme" title="NoMercy Entertainment - Video Player" :options="options as Option[]">
-    <VideoPlayer v-if="isMounted" ref="videoPlayerRef"/>
-    <div class="flex flex-1 text-left mx-auto transform transition-transform duration-300 hover:scale-105 h-14 max-h-14 -mt-2">
-      <pre id="output" class="d-inline-block text-left mb-0 scale-50 h-20" style="font-size: 6px;">$$\   $$\           $$\      $$\                                               $$$$$$$$\ $$\    $$\ <br>$$$\  $$ |          $$$\    $$$ |                                              \__$$  __|$$ |   $$ |<br>$$$$\ $$ | $$$$$$\  $$$$\  $$$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\   $$\          $$ |   $$ |   $$ |<br>$$ $$\$$ |$$  __$$\ $$\$$\$$ $$ |$$  __$$\ $$  __$$\ $$  _____|$$ |  $$ |         $$ |   \$$\  $$  |<br>$$ \$$$$ |$$ /  $$ |$$ \$$$  $$ |$$$$$$$$ |$$ |  \__|$$ /      $$ |  $$ |         $$ |    \$$\$$  / <br>$$ |\$$$ |$$ |  $$ |$$ |\$  /$$ |$$   ____|$$ |      $$ |      $$ |  $$ |         $$ |     \$$$  /  <br>$$ | \$$ |\$$$$$$  |$$ | \_/ $$ |\$$$$$$$\ $$ |      \$$$$$$$\ \$$$$$$$ |         $$ |      \$  /   <br>\__|  \__| \______/ \__|     \__| \_______|\__|       \_______| \____$$ |         \__|       \_/    <br>                                                               $$\   $$ |                           <br>                                                               \$$$$$$  |                           <br>                                                                \______/                            </pre>
+    <VideoPlayer v-if="isMounted" ref="videoPlayerRef" />
+    <div
+      class="flex flex-1 text-left mx-auto transform transition-transform duration-300 hover:scale-105 h-14 max-h-14">
+      <pre id="output" class="d-inline-block text-left mb-0 scale-50 h-20"
+        style="font-size: 6px;">$$\   $$\           $$\      $$\                                               $$$$$$$$\ $$\    $$\ <br>$$$\  $$ |          $$$\    $$$ |                                              \__$$  __|$$ |   $$ |<br>$$$$\ $$ | $$$$$$\  $$$$\  $$$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\   $$\          $$ |   $$ |   $$ |<br>$$ $$\$$ |$$  __$$\ $$\$$\$$ $$ |$$  __$$\ $$  __$$\ $$  _____|$$ |  $$ |         $$ |   \$$\  $$  |<br>$$ \$$$$ |$$ /  $$ |$$ \$$$  $$ |$$$$$$$$ |$$ |  \__|$$ /      $$ |  $$ |         $$ |    \$$\$$  / <br>$$ |\$$$ |$$ |  $$ |$$ |\$  /$$ |$$   ____|$$ |      $$ |      $$ |  $$ |         $$ |     \$$$  /  <br>$$ | \$$ |\$$$$$$  |$$ | \_/ $$ |\$$$$$$$\ $$ |      \$$$$$$$\ \$$$$$$$ |         $$ |      \$  /   <br>\__|  \__| \______/ \__|     \__| \_______|\__|       \_______| \____$$ |         \__|       \_/    <br>                                                               $$\   $$ |                           <br>                                                               \$$$$$$  |                           <br>                                                                \______/                            </pre>
     </div>
   </Layout>
-  </template>
+</template>
 
 <style scoped>
 pre {

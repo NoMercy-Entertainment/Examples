@@ -7,13 +7,13 @@ import MusicPlayerCard from "@/components/MusicPlayer/MusicPlayerCard.vue";
 
 <template>
   <GithubCorner />
-  <div class="w-full h-32 min-h-32 flex items-center justify-center">
-    <h1 class="text-4xl font-bold text-center">
+  <div class="w-full h-32 min-h-32 flex items-center justify-center px-8 mt-8 text-pretty">
+    <h1 class="text-2xl sm:text-4xl font-bold text-center">
         NoMercy Entertainment - Library Examples
     </h1>
   </div>
   <div id="container"
-       class="flex flex-wrap flex-col-reverse justify-center sm:justify-evenly items-center w-full gap-4 sm:flex-row flex-1 p-4 sm:p-16 max-w-[120rem]">
+       class="flex flex-wrap flex-col-reverse justify-end sm:justify-evenly items-center w-full gap-4 sm:flex-row flex-1 p-4 sm:p-16 max-w-[120rem]">
 
     <VideoPlayerCard />
 

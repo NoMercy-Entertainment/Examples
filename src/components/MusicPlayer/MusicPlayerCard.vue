@@ -16,7 +16,7 @@ import HomeCard from "@/components/HomeCard.vue";
 
         <div class="flex items-center gap-2 w-full px-2">
           <div class="flex w-full gap-2">
-            <div class="w-10 aspect-square bg-black">
+            <div class="w-10 aspect-square bg-black hidden">
               <img class="object-fit w-full h-full p-1" :src="logo" alt="logo" />
             </div>
             <div class="flex flex-col w-full">

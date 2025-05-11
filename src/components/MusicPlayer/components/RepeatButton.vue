@@ -33,7 +33,7 @@ const handleClick = (e?: MouseEvent) => {
 <template>
   <MusicButton :label="`repeat ${state}`" :key="state" :onclick="handleClick">
     <span v-if="state == 'off'" class="material-icons text-white text-xl">repeat</span>
-    <span v-else-if="state == 'one'" class="material-icons  text-xl text-[var(--color-theme-2-shadow)]">repeat_one_on</span>
-    <span  v-else-if="state == 'all'" class="material-icons  text-xl text-[var(--color-theme-2-shadow)]">repeat_on</span>
+    <span v-else-if="state == 'one'" class="material-icons  text-xl !text-[var(--color-theme-2-shadow)]">repeat_one_on</span>
+    <span  v-else-if="state == 'all'" class="material-icons  text-xl !text-[var(--color-theme-2-shadow)]">repeat_on</span>
   </MusicButton>
 </template>
