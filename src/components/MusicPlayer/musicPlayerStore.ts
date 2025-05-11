@@ -220,11 +220,11 @@ musicPlayer.on('song', (data) => {
 });
 
 musicPlayer.on('queue', (data) => {
-	queue.value = toRaw(data);
+	queue.value = [...Object.values(toRaw(data))];
 });
 
 musicPlayer.on('backlog', (data) => {
-	backlog.value = toRaw(data);
+	backlog.value = [...Object.values(toRaw(data))];
 });
 
 musicPlayer.on('play', () => {

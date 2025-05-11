@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
 
 import type { Option } from "@/types/types";
 import Layout from "@/Views/Layout.vue";
@@ -9,7 +9,7 @@ import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import playlists from '@/components/MusicPlayer/playlists';
 import { fetchPlaylist } from '@/lib/fetchPlaylist';
 import { useLocalStorage } from '@vueuse/core';
-import { currentSong, equalizerMenuOpen, queueMenuOpen } from '@/components/MusicPlayer/musicPlayerStore';
+import { backlog, currentSong, equalizerMenuOpen, queue, queueMenuOpen } from '@/components/MusicPlayer/musicPlayerStore';
 import { unique } from '@nomercy-entertainment/nomercy-video-player/src/helpers';
 import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player/dist/types';
 
@@ -23,6 +23,7 @@ defineProps({
 const musicPlayerRef = ref<{ player: any }>();
 const canvas = ref<HTMLCanvasElement>();
 const audioColor = ref<HTMLDivElement>();
+const currentPlaylist = ref<BasePlaylistItem[]>([]);
 
 const useTheme = useLocalStorage('useTheme', true);
 
@@ -73,8 +74,11 @@ const options = ref<Option[]>([
         label: `${playlist.artist} - ${playlist.name}`,
         level: 1,
         action: () => {
-          musicPlayerRef.value?.player?.setBaseUrl('');
-          musicPlayerRef.value?.player?.playTrack(playlist.tracks[0], playlist.tracks);
+          currentPlaylist.value = playlist.tracks;
+          musicPlayerRef.value!.player!._backLog = [];
+          musicPlayerRef.value!.player!.setBaseUrl('');
+          musicPlayerRef.value!.player!.playTrack(playlist.tracks[0], playlist.tracks);
+          musicPlayerRef.value!.player!.pause();
         },
       })),
     ]
@@ -86,6 +90,7 @@ onMounted(() => {
 
   musicPlayerRef.value.player?.setBaseUrl('');
   const playlist = playlists.value.find(p => p.name == 'Wake Up')!;
+  currentPlaylist.value = playlist.tracks;
   musicPlayerRef.value.player?.playTrack(playlist.tracks[0], playlist.tracks);
   musicPlayerRef.value.player?.pause();
 
@@ -111,20 +116,22 @@ const handleChange = async (event: Event) => {
           label: `${playlist.artist} - ${playlist.name}`,
           level: 1,
           action: () => {
-            musicPlayerRef.value?.player?.setBaseUrl('');
-            musicPlayerRef.value?.player?.setQueue(playlist.tracks);
-            musicPlayerRef.value?.player?.setCurrentSong(playlist.tracks[0]);
-            musicPlayerRef.value?.player?.pause();
+            currentPlaylist.value = playlist.tracks;
+            musicPlayerRef.value!.player!._backLog = [];
+            musicPlayerRef.value!.player!.setBaseUrl('');
+            musicPlayerRef.value!.player!.playTrack(playlist.tracks[0], playlist.tracks);
+            musicPlayerRef.value!.player!.pause();
           },
         }
       ]
     }
   ];
 
-  musicPlayerRef.value?.player?.setBaseUrl('');
-  musicPlayerRef.value?.player?.setQueue(playlist.tracks);
-  musicPlayerRef.value?.player?.setCurrentSong(playlist.tracks[0]);
-  musicPlayerRef.value?.player?.pause();
+  currentPlaylist.value = playlist.tracks;
+  musicPlayerRef.value!.player!._backLog = [];
+  musicPlayerRef.value!.player!.setBaseUrl('');
+  musicPlayerRef.value!.player!.playTrack(playlist.tracks[0], playlist.tracks);
+  musicPlayerRef.value!.player!.pause();
 };
 
 watch(canvas, (value) => {
@@ -183,19 +190,10 @@ watch(musicPlayerRef, (value) => {
   console.log(value?.player);
 });
 
-const handleClick = (song: any) => {
+const handleClick = (song: BasePlaylistItem) => {
   if (!musicPlayerRef.value) return;
-  musicPlayerRef.value.player?.setCurrentSong(song);
-  musicPlayerRef.value.player?.play();
+  musicPlayerRef.value!.player!.playTrack(song, currentPlaylist);
 };
-
-const list = computed(() => {
-  if (!musicPlayerRef.value) return [];
-
-  return unique<BasePlaylistItem>(musicPlayerRef.value?.player?._backLog
-    .concat([musicPlayerRef.value?.player?.currentSong])
-    .concat(musicPlayerRef.value?.player?._queue), 'name')
-});
 
 </script>
 
@@ -206,25 +204,25 @@ const list = computed(() => {
       class="absolute top-0 left-0 overflow-clip bg-[var(--color-theme-2-shadow)] h-0 w-0"></div>
 
     <div class="flex gap-2 items-center justify-center h-10 flex-1 w-auto bg-black relative overflow-clip">
-      <canvas ref="canvas" id="visualizer" class="w-full h-full" :class="{
+      <canvas ref="canvas" id="visualizer" class="flex w-px flex-1 h-full" :class="{
         'opacity-0': !equalizerMenuOpen,
-        'w-full': !queueMenuOpen,
       }" />
 
-      <div class="flex flex-col w-full h-available overflow-auto py-2 gap-2 pr-4 transition-all duration-300" :class="{
+      <div class="flex flex-col w-2/5 h-available overflow-auto py-2 gap-2 pr-4 transition-all duration-300" :class="{
         '-translate-x-0': queueMenuOpen,
         'translate-x-full !w-0': !queueMenuOpen,
       }">
-        <template v-for="(song, index) in list" :key="index">
+        <template v-for="(song, index) in currentPlaylist" :key="index">
           <button class="flex items-center w-full h-full gap-2 text-left" @click="handleClick(song)">
-            <div class="flex items-center justify-center">
-              <img :src="song?.cover" class="w-12 aspect-square" />
+            <div class="flex items-center justify-center min-w-12 w-12">
+              <img :key="song?.cover" :src="song?.cover" class="min-w-12 w-12 aspect-square" />
             </div>
             <div class="flex flex-col w-full h-full" :class="{
               '!text-[var(--color-theme-2-shadow)]': song?.name == currentSong?.name,
             }">
-              <h1 class="text-lg">{{ song?.name }}</h1>
-              <h2 class="text-sm">{{ song?.album_track?.at(0)?.name }} - {{ song?.artist_track?.at(0)?.name }}</h2>
+              <h1 class="text-lg line-clamp-1">{{ song?.name }}</h1>
+              <h2 class="text-sm line-clamp-1">{{ song?.album_track?.at(0)?.name }} - {{ song?.artist_track?.at(0)?.name
+                }}</h2>
             </div>
           </button>
         </template>
