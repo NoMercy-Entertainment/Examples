@@ -428,7 +428,7 @@ const playlist: PlaylistItem[] = [
 		title: 'Rail Wars',
 		description: 'Takayama enters the training program of JNR with the ambition of becoming one of the venerable train company\'s engineers. As a trainee he is teamed up with fight-ready Sakurai and stolid Iwaizumi and fellow Haruka Kōmi who has encyclopedic knowledge of trains. Together they learn how security officers for the train line work and get involved in more than one tricky situation.',
 		image: 'https://image.tmdb.org/t/p/original/vH8NqN2LMcmtBv037iHGwcPOgCZ.jpg',
-		file: 'https://backstore.fra1.digitaloceanspaces.com/demo/railwars/railwars.mp4',
+		file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/refs/heads/master/Anime/Anime/Rail.Wars!.(2014)/Rail.Wars!.S00E00/Rail.Wars!.(2014).S00E00.NoMercy.m3u8',
 		duration: '1:30',
 		rating: {
 			rating: 6,
@@ -458,7 +458,7 @@ const playlist: PlaylistItem[] = [
 			image: 'NL/NL_9.svg',
 		},
 		image: 'https://image.tmdb.org/t/p/original/myHS6X2yonpoBQOptVuQ85PudtC.jpg',
-		file: 'https://backstore.fra1.digitaloceanspaces.com/demo/nourin/nourin.mp4',
+		file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/refs/heads/master/Anime/Anime/No-Rin.(2014)/No-Rin.S00E00/No-Rin.(2014).S00E00.NoMercy.m3u8',
 		duration: '23:39',
 		tracks: [
 			{
