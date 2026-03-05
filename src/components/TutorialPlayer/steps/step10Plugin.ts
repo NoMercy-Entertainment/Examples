@@ -23,7 +23,7 @@ export class StepPlugin extends Step9Plugin {
 		super.use();
 
 		// Remove the inherited center play button — this step replaces it with touch zones
-		this.player.overlay.querySelector('#center-play')?.remove();
+		document.getElementById('center-play')?.remove();
 
 		this.createCenter();
 
