@@ -12,6 +12,7 @@ const props = defineProps<{
 }>();
 
 const player = ref<NMPlayer>();
+let createId = 0;
 
 const stepModules: Record<number, () => Promise<any>> = {
 	1: () => import('./steps/step1Plugin'),
@@ -27,6 +28,8 @@ const stepModules: Record<number, () => Promise<any>> = {
 };
 
 async function createPlayer(step: number) {
+	const id = ++createId;
+
 	if (player.value) {
 		player.value.dispose();
 		player.value = undefined;
@@ -37,19 +40,23 @@ async function createPlayer(step: number) {
 		container.innerHTML = '';
 	}
 
+	const mod = await stepModules[step]();
+
+	// A newer createPlayer call was started while we were awaiting — bail out
+	if (id !== createId) return;
+
 	player.value = nmplayer('tutorial-player')
 		.setup(config) as unknown as NMPlayer;
 
-	const mod = await stepModules[step]();
 	const PluginClass = mod.StepPlugin ?? mod.default;
 
 	const uiPlugin = new PluginClass();
-	player.value?.registerPlugin('ui', uiPlugin);
-	player.value?.usePlugin('ui');
+	player.value.registerPlugin('ui', uiPlugin);
+	player.value.usePlugin('ui');
 
 	const keyPlugin = new KeyHandlerPlugin();
-	player.value?.registerPlugin('keys', keyPlugin);
-	player.value?.usePlugin('keys');
+	player.value.registerPlugin('keys', keyPlugin);
+	player.value.usePlugin('keys');
 }
 
 onMounted(() => {
@@ -61,6 +68,7 @@ watch(() => props.step, (newStep) => {
 });
 
 onUnmounted(() => {
+	createId++;
 	player.value?.dispose();
 });
 

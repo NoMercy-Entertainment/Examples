@@ -68,16 +68,6 @@ export class StepPlugin extends Step9Plugin {
 				'w-full',
 				'z-0',
 				'pointer-events-none',
-				'transition-all',
-				'duration-300',
-				'bg-transparent',
-				'group-[&.nomercyplayer:not(.buffering).paused]:bg-gradient-circle-c',
-				'from-15%',
-				'from-black/50',
-				'via-40%',
-				'via-black/30',
-				'to-100%',
-				'to-black/0',
 			]);
 
 		// Insert as first child of overlay so controls render on top
