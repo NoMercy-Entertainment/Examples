@@ -1,5 +1,5 @@
 import playlists, { Playlist } from "@/components/MusicPlayer/playlists";
-import { BasePlaylistItem } from "@nomercy-entertainment/nomercy-music-player/dist/types";
+import { BasePlaylistItem } from "@nomercy-entertainment/nomercy-music-player";
 
 export const fetchPlaylist = async (url: string) => {
   const response = await fetch("https://api.nomercy.tv/cors?url=" + url);

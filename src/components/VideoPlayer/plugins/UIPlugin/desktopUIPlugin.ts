@@ -26,6 +26,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	isMouseDown = false;
 	pipEnabled = false;
 	lockActive = false;
+	isAutoQuality = true;
+	selectedQualityIndex = -1;
 
 	bottomBar: HTMLDivElement = <HTMLDivElement>{};
 	topRow: HTMLDivElement = <HTMLDivElement>{};
@@ -166,7 +168,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'relative',
 				'w-available',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 	}
 
 	createBottomRow(parent: HTMLDivElement) {
@@ -182,7 +184,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'relative',
 				'w-available',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 	}
 
 	eventHandlers() {
@@ -248,7 +250,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'to-100%',
 				'to-black/0',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createSpinnerContainer(center);
 
@@ -429,7 +431,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	createTouchBox(parent: HTMLElement, id: string, currentTime: Position) {
 		const touch = this.player.createElement('div', `touch-box-${id}`)
 			.addClasses([`touch-box-${id}`, 'z-40'])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		touch.style.gridColumnStart = currentTime.x.start.toString();
 		touch.style.gridColumnEnd = currentTime.x.end.toString();
@@ -456,6 +458,16 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		}
 
 		this.createSVGElement(speedButton, 'speed', this.buttons.speed, false, hovered);
+
+		// Outlined when normal (1x), filled when any other speed
+		this.player.on('speed', (speed) => {
+			const path = speedButton.querySelector('path');
+			if (path) {
+				path.setAttribute('d', speed === 1
+					? this.buttons.speed.normal
+					: this.buttons.speed.hover);
+			}
+		});
 
 		speedButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -557,7 +569,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'group-[&.nomercyplayer:has(.open)]:backdrop:bg-black/60',
 				'group-[&.nomercyplayer:has(.open)]:backdrop:pointer-events-none',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.menuFrame.setAttribute('popover', 'manual');
 		this.menuFrame.setAttribute('role', 'modal');
@@ -567,7 +579,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'menu-wrapper',
 				'text-white',
 			])
-			.appendTo(this.menuFrame);
+			.appendTo(this.menuFrame).get();
 
 		const menuFrame = this.player.createElement('div', 'menu-frame')
 			.addClasses([
@@ -585,7 +597,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-fit',
 				'z-50',
 			])
-			.appendTo(menuWrapper);
+			.appendTo(menuWrapper).get();
 
 		this.sizeMenuFrame();
 
@@ -600,7 +612,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'overflow-clip',
 				'w-full',
 			])
-			.appendTo(menuFrame);
+			.appendTo(menuFrame).get();
 
 		this.player.on('resize', () => {
 			this.sizeMenuFrame();
@@ -861,7 +873,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-lg',
 				'pointer-events-auto',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.mainMenu.style.transform = 'translateX(0)';
 
@@ -918,7 +930,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'pointer-events-auto',
 				'w-full',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		submenu.style.transform = 'translateX(0)';
 
@@ -952,7 +964,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 			])
 			.addClasses(['border-b', 'border-gray-300/20', '!p-0'])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const close = this.createUiButton(
 			menuHeader,
@@ -990,7 +1002,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 			])
 			.addClasses(['border-b', 'border-gray-300/20'])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		if (title !== 'Episodes') {
 			const back = this.createUiButton(
@@ -1016,7 +1028,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const menuButtonText = this.player.createElement('span', 'menu-button-text')
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(menuHeader);
+			.appendTo(menuHeader).get();
 
 		menuButtonText.innerText = this.player.localize(title).toTitleCase();
 
@@ -1058,7 +1070,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 			])
 			.addClasses(['border-b', 'border-gray-300/20'])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const back = this.createUiButton(
 			menuHeader,
@@ -1076,7 +1088,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const menuButtonText = this.player.createElement('span', 'menu-button-text')
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(menuHeader);
+			.appendTo(menuHeader).get();
 
 		menuButtonText.innerText = this.player.localize(title).toTitleCase();
 
@@ -1109,7 +1121,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const menuButton = this.player.createElement('button', `menu-button-${id}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		if (id !== 'speed') {
 			menuButton.style.display = 'none';
@@ -1125,7 +1137,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const menuButtonText = this.player.createElement('span', `menu-button-${id}`)
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(menuButton);
+			.appendTo(menuButton).get();
 
 		menuButtonText.innerText = this.player.localize(item.toTitleCase());
 
@@ -1206,13 +1218,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	createLanguageMenu(parent: HTMLDivElement) {
 		const languageMenu = this.player.createElement('div', 'language-menu')
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createMenuHeader(languageMenu, 'Language');
 
 		const scrollContainer = this.player.createElement('div', 'language-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(languageMenu);
+			.appendTo(languageMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
@@ -1264,13 +1276,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	createSubtitleMenu(parent: HTMLDivElement) {
 		const subtitleMenu = this.player.createElement('div', 'subtitle-menu')
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createMenuHeader(subtitleMenu, 'subtitles');
 
 		const scrollContainer = this.player.createElement('div', 'subtitle-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(subtitleMenu);
+			.appendTo(subtitleMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
@@ -1328,17 +1340,17 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const subtitleSettingButton = this.player.createElement('button', `subtitleSetting-button-${this.spaceToCamel(data.label)}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const subtitleSettingButtonText = this.player.createElement('span', `menu-button-text-${this.spaceToCamel(data.label)}`)
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(subtitleSettingButton);
+			.appendTo(subtitleSettingButton).get();
 
 		subtitleSettingButtonText.innerText = this.player.localize(data.label);
 
 		const subtitleSettingButtonValueText = this.player.createElement('span', `menu-button-text-${this.spaceToCamel(data.label)}`)
 			.addClasses(this.menuButtonSubTextStyles)
-			.appendTo(subtitleSettingButton);
+			.appendTo(subtitleSettingButton).get();
 		this.player.addClasses(subtitleSettingButtonValueText, ['ml-auto']);
 
 		if (data.property) {
@@ -1398,7 +1410,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const subtitleSettingsMenu = this.player.createElement('div', 'subtitleSettings-menu')
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createMenuHeader(subtitleSettingsMenu, 'subtitle settings');
 
@@ -1407,7 +1419,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				...this.scrollContainerStyles,
 				'!w-80',
 			])
-			.appendTo(subtitleSettingsMenu);
+			.appendTo(subtitleSettingsMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
@@ -1488,7 +1500,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const subtitleSettingMenu = this.player.createElement('div', `subtitleSetting-menu-${data.property}`)
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent.parentElement!.parentElement!);
+			.appendTo(parent.parentElement!.parentElement!).get();
 		subtitleSettingMenu.style.display = 'none';
 
 		this.createSubtitleSettingMenuHeader(subtitleSettingMenu, data.label);
@@ -1498,7 +1510,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				...this.scrollContainerStyles,
 				'!w-80',
 			])
-			.appendTo(subtitleSettingMenu);
+			.appendTo(subtitleSettingMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
@@ -1533,11 +1545,11 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const subtitleSettingActionButton = this.player.createElement('button', `subtitleSetting-action-button-${data.property}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const subtitleSettingActionButtonText = this.player.createElement('span', 'menu-button-text')
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(subtitleSettingActionButton);
+			.appendTo(subtitleSettingActionButton).get();
 
 		subtitleSettingActionButtonText.innerText = this.player.localize(data.label).toTitleCase();
 
@@ -1573,27 +1585,27 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	createSpeedMenu(parent: HTMLDivElement, hovered = false) {
 		const speedMenu = this.player.createElement('div', 'speed-menu')
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createMenuHeader(speedMenu, 'speed');
 
 		const scrollContainer = this.player.createElement('div', 'speed-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(speedMenu);
+			.appendTo(speedMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
 		for (const speed of this.player.getSpeeds() ?? []) {
 			const speedButton = this.player.createElement('button', `speed-button-${speed}`)
 				.addClasses(this.languageMenuStyles)
-				.appendTo(scrollContainer);
+				.appendTo(scrollContainer).get();
 
 			const speedButtonSpan = this.player.createElement('span', `menu-button-text-${speed}`)
-				.appendTo(speedButton);
+				.appendTo(speedButton).get();
 
 			const speedButtonText = this.player.createElement('span', `menu-button-text-${speed}`)
 				.addClasses(this.menuButtonTextStyles)
-				.appendTo(speedButtonSpan);
+				.appendTo(speedButtonSpan).get();
 
 			speedButtonText.innerText = speed == 1 ? this.player.localize('Normal') : speed.toString();
 
@@ -1606,8 +1618,10 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			this.player.on('speed', (event) => {
 				if (event === speed) {
 					chevron.classList.remove('hidden');
+					speedButton.classList.add('bg-white/20');
 				} else {
 					chevron.classList.add('hidden');
+					speedButton.classList.remove('bg-white/20');
 				}
 			});
 
@@ -1618,6 +1632,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 			if (speed == this.player.getSpeed()) {
 				chevron.classList.remove('hidden');
+				speedButton.classList.add('bg-white/20');
 			}
 		}
 
@@ -1639,13 +1654,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	createQualityMenu(parent: HTMLDivElement) {
 		const qualityMenu = this.player.createElement('div', 'quality-menu')
 			.addClasses(this.subMenuContentStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.createMenuHeader(qualityMenu, 'quality');
 
 		const scrollContainer = this.player.createElement('div', 'quality-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(qualityMenu);
+			.appendTo(qualityMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
 
@@ -1653,7 +1668,12 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			scrollContainer.innerHTML = '';
 		});
 
+		const addAutoButton = (container: HTMLDivElement) => {
+			this.createAutoQualityButton(container);
+		};
+
 		if (this.player.hasQualities()) {
+			addAutoButton(scrollContainer);
 			Object.values(this.player.getQualityLevels()).forEach((level) => {
 				this.createQualityMenuButton(scrollContainer, {
 					id: level.id,
@@ -1663,11 +1683,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 					bitrate: level.bitrate ?? 0,
 				});
 			});
+			this.highlightCurrentQuality(scrollContainer);
 		}
 
 		this.player.on('levels', (levels) => {
 			scrollContainer.innerHTML = '';
 
+			addAutoButton(scrollContainer);
 			Object.values(levels).forEach((level) => {
 				this.createQualityMenuButton(scrollContainer, {
 					id: level.id,
@@ -1677,6 +1699,9 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 					bitrate: level.bitrate ?? 0,
 				});
 			});
+			this.isAutoQuality = true;
+			this.highQuality = false;
+			this.highlightCurrentQuality(scrollContainer);
 		});
 
 		this.player.on('show-quality-menu', (showing) => {
@@ -1704,11 +1729,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const qualityButton = this.player.createElement('button', `quality-button-${data.height}-${data.bitrate}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
+
+		qualityButton.dataset.levelId = String(data.id);
 
 		const qualityButtonText = this.player.createElement('span', 'menu-button-text')
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(qualityButton);
+			.appendTo(qualityButton).get();
 
 		qualityButtonText.innerText = `${this.player.localize((data.label)
 			?.replace('segment-metadata', 'Off'))}`;
@@ -1721,17 +1748,24 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		}
 
 		this.player.on('levelsChanging', (level) => {
-			if (level.id == data.id) {
+			if (!this.isAutoQuality && level.id == data.id) {
 				chevron.classList.remove('hidden');
+				qualityButton.classList.add('bg-white/20');
 			} else {
 				chevron.classList.add('hidden');
+				qualityButton.classList.remove('bg-white/20');
 			}
 		});
 
 		qualityButton.addEventListener('click', (event) => {
 			event.stopPropagation();
 
+			this.isAutoQuality = false;
+			this.highQuality = true;
+			this.selectedQualityIndex = data.id;
 			this.player.setCurrentQuality(data.id);
+			this.highlightCurrentQuality(parent);
+			this.updateQualityButtonIcon();
 
 			this.player.emit('show-menu', false);
 		});
@@ -1739,19 +1773,93 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		return qualityButton;
 	}
 
+	createAutoQualityButton(parent: HTMLDivElement, hovered = false) {
+		const autoButton = this.player.createElement('button', 'quality-button-auto')
+			.addClasses(this.languageMenuStyles)
+			.appendTo(parent).get();
+
+		const autoButtonText = this.player.createElement('span', 'menu-button-text')
+			.addClasses(this.menuButtonTextStyles)
+			.appendTo(autoButton).get();
+
+		const updateAutoLabel = () => {
+			if (!this.isAutoQuality) {
+				autoButtonText.innerText = this.player.localize('auto');
+				return;
+			}
+			const levels = this.player.getQualityLevels();
+			const currentId = this.player.getCurrentQuality();
+			const current = levels.find(l => l.id === currentId);
+			if (current?.label) {
+				autoButtonText.innerText = `${this.player.localize('auto')} (${this.player.localize(current.label)})`;
+			} else {
+				autoButtonText.innerText = this.player.localize('auto');
+			}
+		};
+
+		updateAutoLabel();
+		this.player.on('levelsChanging', updateAutoLabel);
+		this.player.on('levelsChanged', updateAutoLabel);
+
+		const chevron = this.createSVGElement(autoButton, 'checkmark', this.buttons.checkmark, false, hovered);
+		this.player.addClasses(chevron, ['ml-auto']);
+
+		autoButton.addEventListener('click', (event) => {
+			event.stopPropagation();
+
+			this.isAutoQuality = true;
+			this.highQuality = false;
+			this.player.setCurrentQuality(-1);
+			this.highlightCurrentQuality(parent);
+			this.updateQualityButtonIcon();
+
+			this.player.emit('show-menu', false);
+		});
+
+		return autoButton;
+	}
+
+	updateQualityButtonIcon() {
+		const qualityBtn = this.player.getContainer().querySelector('#quality');
+		const path = qualityBtn?.querySelector('path');
+		if (path) {
+			path.setAttribute('d', this.highQuality
+				? this.buttons.quality.hover
+				: this.buttons.quality.normal);
+		}
+	}
+
+	highlightCurrentQuality(container: HTMLDivElement) {
+		const buttons = container.querySelectorAll('button');
+		buttons.forEach((btn) => {
+			const chevron = btn.querySelector('.checkmark, [id*="checkmark"]');
+			const levelId = (btn as HTMLElement).dataset.levelId;
+			if (levelId === undefined) {
+				// Auto button
+				chevron?.classList.toggle('hidden', !this.isAutoQuality);
+				btn.classList.toggle('bg-white/20', this.isAutoQuality);
+			} else {
+				// Level buttons
+				const isActive = !this.isAutoQuality && Number(levelId) === this.selectedQualityIndex;
+				chevron?.classList.toggle('hidden', !isActive);
+				btn.classList.toggle('bg-white/20', isActive);
+			}
+		});
+	}
+
 	createSeekRipple(parent: HTMLDivElement, side: string) {
 
 		const seekRipple = this.player.createElement('div', 'seek-ripple')
 			.addClasses(['seek-ripple', side])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const arrowHolder = this.player.createElement('div', 'seek-ripple-arrow')
 			.addClasses(['seek-ripple-arrow'])
-			.appendTo(seekRipple);
+			.appendTo(seekRipple).get();
 
 		const text = this.player.createElement('p', 'seek-ripple-text')
 			.addClasses(['seek-ripple-text'])
-			.appendTo(seekRipple);
+			.appendTo(seekRipple).get();
 
 		if (side == 'left') {
 			seekRipple.style.borderRadius = '0 50% 50% 0';
@@ -1803,22 +1911,22 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-full',
 				'w-available',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const sliderBuffer = this.player.createElement('div', 'slider-buffer')
 			.addClasses([
 				'slider-buffer',
 				'absolute',
-				'bg-white/20',
 				'flex',
 				'h-full',
 				'overflow-clip',
 				'overflow-hidden',
 				'pointer-events-none',
 				'rounded-full',
-				'z-0',
 			])
-			.appendTo(this.sliderBar);
+			.appendTo(this.sliderBar).get();
+		sliderBuffer.style.zIndex = '1';
+		sliderBuffer.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
 
 		const sliderHover = this.player.createElement('div', 'slider-hover')
 			.addClasses([
@@ -1834,7 +1942,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-full',
 				'z-0',
 			])
-			.appendTo(this.sliderBar);
+			.appendTo(this.sliderBar).get();
 
 		const sliderProgress = this.player.createElement('div', 'slider-progress')
 			.addClasses([
@@ -1849,7 +1957,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-full',
 				'z-10',
 			])
-			.appendTo(this.sliderBar);
+			.appendTo(this.sliderBar).get();
 
 		this.chapterBar = this.player.createElement('div', 'chapter-progress')
 			.addClasses([
@@ -1862,7 +1970,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-full',
 				'w-available',
 			])
-			.appendTo(this.sliderBar);
+			.appendTo(this.sliderBar).get();
 
 		const sliderNipple = document.createElement('div');
 		this.player.addClasses(sliderNipple, [
@@ -1905,25 +2013,25 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-center',
 				'z-20',
 			])
-			.appendTo(this.sliderBar);
+			.appendTo(this.sliderBar).get();
 
 		sliderPop.style.setProperty('--visibility', '0');
 		sliderPop.style.opacity = 'var(--visibility)';
 
 		this.sliderPopImage = this.player.createElement('div', 'slider-pop-image')
 			.addClasses(['slider-pop-image'])
-			.appendTo(sliderPop);
+			.appendTo(sliderPop).get();
 
 		const sliderText = this.player.createElement('div', 'slider-text')
 			.addClasses([
 				'slider-pop-text',
 				'font-mono',
 			])
-			.appendTo(sliderPop);
+			.appendTo(sliderPop).get();
 
 		this.chapterText = this.player.createElement('div', 'chapter-text')
 			.addClasses(['chapter-text'])
-			.appendTo(sliderPop);
+			.appendTo(sliderPop).get();
 
 		if (this.player.options.chapters && !this.player.isTv() && this.player.getChapters()?.length > 0) {
 			this.sliderBar.style.background = '';
@@ -2028,6 +2136,17 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			}
 		});
 
+		const updateBuffer = () => {
+			const video = this.player.getVideoElement();
+			if (video && video.buffered.length > 0 && video.duration > 0) {
+				const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+				const bufferPct = (bufferedEnd / video.duration) * 100;
+				sliderBuffer.style.width = `${bufferPct}%`;
+			}
+		};
+
+		this.player.getVideoElement()?.addEventListener('progress', updateBuffer);
+
 		this.player.on('time', (data) => {
 			if (this.player.getChapters()?.length == 0) {
 				sliderProgress.style.width = `${data.percentage}%`;
@@ -2035,6 +2154,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			if (!this.isScrubbing) {
 				sliderNipple.style.left = `${data.percentage}%`;
 			}
+			updateBuffer();
 		});
 
 		this.player.on('controls', (showing) => {
@@ -2079,7 +2199,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'overflow-hidden',
 				'rounded-sm',
 			])
-			.appendTo(this.chapterBar);
+			.appendTo(this.chapterBar).get();
 		chapterMarker.style.left = `${chapter.left}%`;
 		chapterMarker.style.width = `calc(${chapter.width}% - 2px)`;
 
@@ -2094,7 +2214,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 				'z-0',
 			])
-			.appendTo(chapterMarker);
+			.appendTo(chapterMarker).get();
 
 		const chapterMarkerHover = this.player.createElement('div', `chapter-marker-hover-${chapter.id.replace(/\s/gu, '-')}`)
 			.addClasses([
@@ -2109,7 +2229,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 				'z-10',
 			])
-			.appendTo(chapterMarker);
+			.appendTo(chapterMarker).get();
 
 		const chapterMarkerProgress = this.player.createElement('div', `chapter-marker-progress-${chapter.id.replace(/\s/gu, '-')}`)
 			.addClasses([
@@ -2124,7 +2244,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'w-available',
 				'z-20',
 			])
-			.appendTo(chapterMarker);
+			.appendTo(chapterMarker).get();
 
 		const left = chapter.left;
 		const right = chapter.left + chapter.width;
@@ -2203,7 +2323,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'!flex-row',
 				'!gap-0',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const subMenu = this.player.createElement('div', 'sub-menu-content')
 			.addClasses([
@@ -2212,13 +2332,13 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'border-r-2',
 				'border-gray-500/20',
 			])
-			.appendTo(playlistMenu);
+			.appendTo(playlistMenu).get();
 
 		this.createMenuHeader(subMenu, 'Seasons');
 
 		const seasonScrollContainer = this.player.createElement('div', 'playlist-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(subMenu);
+			.appendTo(subMenu).get();
 		seasonScrollContainer.style.transform = 'translateX(0)';
 
 		seasonScrollContainer.innerHTML = '';
@@ -2231,16 +2351,18 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				...this.subMenuContentStyles,
 				'!w-[63rem]',
 			])
-			.appendTo(playlistMenu);
+			.appendTo(playlistMenu).get();
 
 		this.createMainMenuHeader(episodeMenu);
 
 		const scrollContainer = this.player.createElement('div', 'playlist-scroll-container')
 			.addClasses(this.scrollContainerStyles)
-			.appendTo(episodeMenu);
+			.appendTo(episodeMenu).get();
 
 		scrollContainer.innerHTML = '';
 		scrollContainer.tabIndex = 1;
+		scrollContainer.style.scrollbarWidth = 'thin';
+		scrollContainer.style.scrollbarColor = 'rgba(255,255,255,0.3) transparent';
 
 		scrollContainer.addEventListener('focus', () => {
 			(scrollContainer.firstChild as HTMLButtonElement)?.focus();
@@ -2269,11 +2391,11 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		const seasonButton = this.player.createElement('button', `season-${item.id}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const buttonSpan = this.player.createElement('span', `season-${item.id}-span`)
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(seasonButton);
+			.appendTo(seasonButton).get();
 
 		buttonSpan.innerText = item?.seasonName
 			? item?.seasonName
@@ -2323,7 +2445,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'transition-all',
 				'w-available',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		if (this.player.playlistItem()?.season !== 1) {
 			button.style.display = 'none';
@@ -2340,7 +2462,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'self-center',
 				'w-[30%]',
 			])
-			.appendTo(button);
+			.appendTo(button).get();
 
 		this.player.createElement('div', `episode-${item.id}-shadow`)
 			.addClasses([
@@ -2353,7 +2475,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'shadow-[inset_0px_1px_0px_rgba(255,255,255,0.24),inset_0px_-1px_0px_rgba(0,0,0,0.24),inset_0px_-2px_0px_rgba(0,0,0,0.24)]',
 				'w-available',
 			])
-			.appendTo(leftSide);
+			.appendTo(leftSide).get();
 
 		const image = this.player.createElement('img', `episode-${item.id}-image`)
 			.addClasses([
@@ -2363,7 +2485,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'object-cover',
 				'w-available',
 			])
-			.appendTo(leftSide);
+			.appendTo(leftSide).get();
 		image.setAttribute('loading', 'lazy');
 		image.src = item.image && item.image != '' ? `${this.imageBaseUrl.includes('https') ? '' : this.imageBaseUrl}${item.image}` : '';
 
@@ -2377,7 +2499,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'px-3',
 				'w-available',
 			])
-			.appendTo(leftSide);
+			.appendTo(leftSide).get();
 
 		const progressContainerItemBox = this.player.createElement('div', `episode-${item.id}-progress-box`)
 			.addClasses([
@@ -2389,7 +2511,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'px-1',
 				'sm:mx-2',
 			])
-			.appendTo(progressContainer);
+			.appendTo(progressContainer).get();
 
 
 		const progressContainerItemText = this.player.createElement('div', `episode-${item.id}-progress-item`)
@@ -2397,7 +2519,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'progress-item-text',
 				'text-[0.7rem]',
 			])
-			.appendTo(progressContainerItemBox);
+			.appendTo(progressContainerItemBox).get();
 
 		if (item.episode) {
 			progressContainerItemText.innerText = `${this.player.localize('E')}${item.episode}`;
@@ -2408,7 +2530,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'progress-duration',
 				'text-[0.7rem]',
 			])
-			.appendTo(progressContainerItemBox);
+			.appendTo(progressContainerItemBox).get();
 		progressContainerDurationText.innerText = item.duration?.replace(/^00:/u, '') ?? '';
 
 		const sliderContainer = this.player.createElement('div', `episode-${item.id}-slider-container`)
@@ -2423,14 +2545,14 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-md',
 				'sm:mx-2',
 			])
-			.appendTo(progressContainer);
+			.appendTo(progressContainer).get();
 
 		const progressBar = this.player.createElement('div', `episode-${item.id}-progress-bar`)
 			.addClasses([
 				'progress-bar',
 				'bg-white',
 			])
-			.appendTo(sliderContainer);
+			.appendTo(sliderContainer).get();
 
 		if (item.progress?.time) {
 			progressBar.style.width = `${(item.progress.time / convertToSeconds(item.duration)) * 100}%`;
@@ -2447,7 +2569,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-left',
 				'w-3/4',
 			])
-			.appendTo(button);
+			.appendTo(button).get();
 
 		const episodeMenuButtonTitle = this.player.createElement('span', `episode-${item.id}-title`)
 			.addClasses([
@@ -2456,7 +2578,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'line-clamp-2',
 				'text-white',
 			])
-			.appendTo(episodeMenuButtonRightSide);
+			.appendTo(episodeMenuButtonRightSide).get();
 
 		if (item.episode) {
 			episodeMenuButtonTitle.innerText = lineBreakShowTitle(item.title?.replace(item.show ?? '', '').replace('%S', this.player.localize('S'))
@@ -2472,7 +2594,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-[0.7rem]',
 				'text-white',
 			])
-			.appendTo(episodeMenuButtonRightSide);
+			.appendTo(episodeMenuButtonRightSide).get();
 		episodeMenuButtonOverview.innerText = limitSentenceByCharacters(item.description, 600);
 
 		this.player.on('item', (playlistItem) => {
@@ -2553,7 +2675,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-xs',
 				'z-50',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.tooltip.style.transform = 'translateX(10px)';
 		this.tooltip.innerText = 'Play (space)';
@@ -2600,7 +2722,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'z-50',
 				'group-[&.nomercyplayer:not(.active)]:!hidden',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const leftSide = this.player.createElement('div', 'next-tip-left')
 			.addClasses([
@@ -2611,7 +2733,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'self-center',
 				'w-[40%]',
 			])
-			.appendTo(nextTip);
+			.appendTo(nextTip).get();
 
 		const image = this.player.createElement('img', 'next-tip-image')
 			.addClasses([
@@ -2622,7 +2744,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'rounded-md',
 				'w-available',
 			])
-			.appendTo(leftSide);
+			.appendTo(leftSide).get();
 		image.setAttribute('loading', 'eager');
 
 		const rightSide = this.player.createElement('div', 'next-tip-right-side')
@@ -2634,14 +2756,14 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-left',
 				'w-[60%]',
 			])
-			.appendTo(nextTip);
+			.appendTo(nextTip).get();
 
 		const header = this.player.createElement('span', 'next-tip-header')
 			.addClasses([
 				'next-tip-header',
 				'font-bold',
 			])
-			.appendTo(rightSide);
+			.appendTo(rightSide).get();
 
 		const title = this.player.createElement('span', 'next-tip-title')
 			.addClasses([
@@ -2650,7 +2772,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'font-sm',
 				'line-clamp-3',
 			])
-			.appendTo(rightSide);
+			.appendTo(rightSide).get();
 
 		this.player.on('show-episode-tip', (data) => {
 			this.getTipData({ direction: data.direction, header, title, image });

@@ -23,6 +23,7 @@ const stepModules: Record<number, () => Promise<any>> = {
 	7: () => import('./steps/step7Plugin'),
 	8: () => import('./steps/step8Plugin'),
 	9: () => import('./steps/step9Plugin'),
+	10: () => import('./steps/step10Plugin'),
 };
 
 async function createPlayer(step: number) {

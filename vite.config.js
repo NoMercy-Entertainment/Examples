@@ -13,6 +13,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@nomercy-entertainment/media-session': fileURLToPath(
+        new URL('./node_modules/@nomercy-entertainment/media-session/src/index.ts', import.meta.url)
+      ),
     },
   },
   build: {

@@ -268,7 +268,7 @@ export class BaseUIPlugin extends Plugin {
 	modifySpinner(parent: HTMLDivElement) {
 		this.loader = this.player.createElement('h2', 'loader')
 			.addClasses(['loader', 'pointer-events-none'])
-			.appendTo(parent);
+			.appendTo(parent).get();
 	}
 
 	createSpinnerContainer(parent: HTMLDivElement) {
@@ -298,7 +298,7 @@ export class BaseUIPlugin extends Plugin {
 				'to-100%',
 				'to-black/0',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const role = this.player.createElement('div', 'spinner-role')
 			.addClasses([
@@ -308,7 +308,7 @@ export class BaseUIPlugin extends Plugin {
 				'gap-4',
 				'mt-11',
 			])
-			.appendTo(spinnerContainer);
+			.appendTo(spinnerContainer).get();
 
 		role.setAttribute('role', 'status');
 
@@ -322,7 +322,7 @@ export class BaseUIPlugin extends Plugin {
 				'text-lg',
 				'font-bold',
 			])
-			.appendTo(role);
+			.appendTo(role).get();
 
 		status.innerText = this.player.localize('Loading...');
 
@@ -565,7 +565,7 @@ export class BaseUIPlugin extends Plugin {
 				'tv:fill-white/30',
 				'w-10',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		button.ariaLabel = this.buttons[icon]?.title;
 
@@ -788,6 +788,7 @@ export class BaseUIPlugin extends Plugin {
 			'chapterBack'
 		);
 		this.player.addClasses(chapterBack, ['portrait:!hidden']);
+		chapterBack.style.display = 'none';
 
 		this.player.on('item', () => {
 			chapterBack.style.display = 'none';
@@ -826,6 +827,7 @@ export class BaseUIPlugin extends Plugin {
 			'chapterForward'
 		);
 		this.player.addClasses(chapterForward, ['portrait:!hidden']);
+		chapterForward.style.display = 'none';
 
 		this.player.on('item', () => {
 			chapterForward.style.display = 'none';
@@ -872,7 +874,7 @@ export class BaseUIPlugin extends Plugin {
 				'justify-center',
 				`${type}-time`,
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		time.innerText = humanTime(this.player.getDuration());
 
@@ -947,7 +949,7 @@ export class BaseUIPlugin extends Plugin {
 				'overflow-clip',
 				'pointer-events-auto',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const volumeButton = this.createUiButton(
 			volumeContainer,
@@ -992,7 +994,7 @@ export class BaseUIPlugin extends Plugin {
 				'range-thumb:shadow-sm',
 				'range-thumb:border-none',
 			])
-			.appendTo(volumeContainer);
+			.appendTo(volumeContainer).get();
 
 		volumeSlider.type = 'range';
 		volumeSlider.min = '0';
@@ -1281,13 +1283,17 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('captionsChanging', (data) => {
-			if (data.id == -1) {
-				onButton.style.display = 'none';
-				offButton.style.display = 'flex';
+		this.player.on('captionsChanged', (data) => {
+			if (!data || data.id == -1) {
+				onButton.classList.add('hidden');
+				onButton.classList.remove('flex');
+				offButton.classList.remove('hidden');
+				offButton.classList.add('flex');
 			} else {
-				onButton.style.display = 'flex';
-				offButton.style.display = 'none';
+				onButton.classList.remove('hidden');
+				onButton.classList.add('flex');
+				offButton.classList.add('hidden');
+				offButton.classList.remove('flex');
 			}
 		});
 
@@ -1370,8 +1376,7 @@ export class BaseUIPlugin extends Plugin {
 
 		qualityButton.style.display = 'none';
 
-		const offButton = this.createSVGElement(qualityButton, 'low', this.buttons.quality, false, hovered);
-		const onButton = this.createSVGElement(qualityButton, 'high', this.buttons.quality, true, hovered);
+		this.createSVGElement(qualityButton, 'quality', this.buttons.quality, false, hovered);
 
 		qualityButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -1386,19 +1391,19 @@ export class BaseUIPlugin extends Plugin {
 
 				this.menuFrame.showModal();
 			}
-
-			if (this.highQuality) {
-				this.highQuality = false;
-				onButton.style.display = 'none';
-				offButton.style.display = 'flex';
-			} else {
-				this.highQuality = true;
-				offButton.style.display = 'none';
-				onButton.style.display = 'flex';
-			}
-
-			// this.player.toggleLanguage();
 		});
+
+		// Show outlined icon when auto (normal), filled when manually selected (hover)
+		const updateQualityIcon = () => {
+			const path = qualityButton.querySelector('path');
+			if (path) {
+				path.setAttribute('d', this.highQuality
+					? this.buttons.quality.hover
+					: this.buttons.quality.normal);
+			}
+		};
+		this.player.on('levelsChanging', updateQualityIcon);
+		this.player.on('levelsChanged', updateQualityIcon);
 
 		this.player.on('item', () => {
 			qualityButton.style.display = 'none';
@@ -1599,7 +1604,7 @@ export class BaseUIPlugin extends Plugin {
 				'z-10',
 				'pointer-events-none',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.player.createElement('div', 'bottom-bar-shadow')
 			.addClasses([
@@ -1613,7 +1618,7 @@ export class BaseUIPlugin extends Plugin {
 				'via-black/40',
 				'to-black/0',
 			])
-			.appendTo(bottomBar);
+			.appendTo(bottomBar).get();
 
 		return bottomBar;
 	}
@@ -1627,7 +1632,7 @@ export class BaseUIPlugin extends Plugin {
 		];
 		const divider = this.player.createElement('div', 'divider')
 			.addClasses(dividerStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		if (content) {
 			divider.innerHTML = content;
@@ -1655,7 +1660,7 @@ export class BaseUIPlugin extends Plugin {
 				'-translate-x-1/2',
 				'z-50',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		this.player.on('display-message', (val: string | null) => {
 			playerMessage.style.display = 'flex';
@@ -1681,7 +1686,7 @@ export class BaseUIPlugin extends Plugin {
 				'z-40',
 				'w-available',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const seekScrollCloneContainer = this.player.createElement('div', 'seek-scroll-clone-container')
 			.addClasses([
@@ -1694,7 +1699,7 @@ export class BaseUIPlugin extends Plugin {
 				'z-10',
 				'pointer-events-none',
 			])
-			.appendTo(seekContainer);
+			.appendTo(seekContainer).get();
 
 		this.thumbnailClone = this.player.createElement('div', `thumbnail-clone-${1}`)
 			.addClasses([
@@ -1703,7 +1708,7 @@ export class BaseUIPlugin extends Plugin {
 				'border-4',
 				'mx-auto',
 			])
-			.appendTo(seekScrollCloneContainer);
+			.appendTo(seekScrollCloneContainer).get();
 
 		const seekScrollContainer = this.player.createElement('div', 'seek-scroll-container')
 			.addClasses([
@@ -1716,7 +1721,7 @@ export class BaseUIPlugin extends Plugin {
 				'gap-1.5',
 				'scrollbar-none',
 			])
-			.appendTo(seekContainer);
+			.appendTo(seekContainer).get();
 
 		this.player.once('item', () => {
 			this.player.on('preview-time', () => {
@@ -1815,7 +1820,7 @@ export class BaseUIPlugin extends Plugin {
 				'via-black/40',
 				'to-black/0',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 	}
 
 	createTvCurrentItem(parent: HTMLElement) {
@@ -1828,7 +1833,7 @@ export class BaseUIPlugin extends Plugin {
 				'items-end',
 				'gap-2',
 			])
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const currentItemShow = this.player.createElement('div', 'current-item-show')
 			.addClasses([
@@ -1837,7 +1842,7 @@ export class BaseUIPlugin extends Plugin {
 				'whitespace-pre',
 				'font-bold',
 			])
-			.appendTo(currentItemContainer);
+			.appendTo(currentItemContainer).get();
 
 		const currentItemTitleContainer = this.player.createElement('div', 'current-item-title-container')
 			.addClasses([
@@ -1845,18 +1850,18 @@ export class BaseUIPlugin extends Plugin {
 				'flex-row',
 				'gap-2',
 			])
-			.appendTo(currentItemContainer);
+			.appendTo(currentItemContainer).get();
 
 		const currentItemEpisode = this.player.createElement('div', 'current-item-episode')
 			.addClasses([])
-			.appendTo(currentItemTitleContainer);
+			.appendTo(currentItemTitleContainer).get();
 
 		const currentItemTitle = this.player.createElement('div', 'current-item-title')
 			.addClasses([
 				'whitespace-pre',
 				'text-sm',
 			])
-			.appendTo(currentItemTitleContainer);
+			.appendTo(currentItemTitleContainer).get();
 
 		this.player.on('item', () => {
 			const item = this.player.playlistItem();
@@ -1889,11 +1894,11 @@ export class BaseUIPlugin extends Plugin {
 
 		const languageButton = this.player.createElement('button', `${data.type}-button-${data.language}`)
 			.addClasses(this.languageMenuStyles)
-			.appendTo(parent);
+			.appendTo(parent).get();
 
 		const languageButtonText = this.player.createElement('span', 'menu-button-text')
 			.addClasses(this.menuButtonTextStyles)
-			.appendTo(languageButton);
+			.appendTo(languageButton).get();
 
 		if (data.buttonType == 'subtitle') {
 			if (data.styled) {
@@ -1918,8 +1923,10 @@ export class BaseUIPlugin extends Plugin {
 			this.player.on('audioTrackChanging', (audio) => {
 				if (data.id === audio.id) {
 					chevron.classList.remove('hidden');
+					languageButton.classList.add('bg-white/20');
 				} else {
 					chevron.classList.add('hidden');
+					languageButton.classList.remove('bg-white/20');
 				}
 			});
 
@@ -1931,15 +1938,19 @@ export class BaseUIPlugin extends Plugin {
 		} else if (data.buttonType == 'subtitle') {
 			if (data.id === this.player.getCaptionIndex()) {
 				chevron.classList.remove('hidden');
+				languageButton.classList.add('bg-white/20');
 			} else {
 				chevron.classList.add('hidden');
+				languageButton.classList.remove('bg-white/20');
 			}
 
 			this.player.on('captionsChanged', (track) => {
 				if (data.id === track.id) {
 					chevron.classList.remove('hidden');
+					languageButton.classList.add('bg-white/20');
 				} else {
 					chevron.classList.add('hidden');
+					languageButton.classList.remove('bg-white/20');
 				}
 			});
 

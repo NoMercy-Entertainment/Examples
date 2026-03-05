@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import type { Option } from "@/types/types";
 import Layout from "@/Views/Layout.vue";
@@ -9,9 +9,8 @@ import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import playlists from '@/components/MusicPlayer/playlists';
 import { fetchPlaylist } from '@/lib/fetchPlaylist';
 import { useLocalStorage } from '@vueuse/core';
-import { backlog, currentSong, equalizerMenuOpen, queue, queueMenuOpen } from '@/components/MusicPlayer/musicPlayerStore';
-import { unique } from '@nomercy-entertainment/nomercy-video-player/src/helpers';
-import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player/dist/types';
+import { currentSong, equalizerMenuOpen, queueMenuOpen } from '@/components/MusicPlayer/musicPlayerStore';
+import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player';
 
 defineProps({
   theme: {

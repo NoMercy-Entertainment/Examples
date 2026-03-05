@@ -3,8 +3,7 @@ import {ref, toRaw} from 'vue';
 
 import MusicPlayer from '@nomercy-entertainment/nomercy-music-player';
 
-import {RepeatState, type EQBand, type EqualizerPreset, type EQSliderValues} from '@nomercy-entertainment/nomercy-music-player/src/types';
-import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player/dist/types';
+import {RepeatState, type EQBand, type EqualizerPreset, type EQSliderValues, type BasePlaylistItem} from '@nomercy-entertainment/nomercy-music-player';
 
 export const musicPlayer = new MusicPlayer<BasePlaylistItem>({
 	motionConfig: {

@@ -176,7 +176,7 @@ watch(videoPlayerRef, (value) => {
     subtitleOptions.value = tracks.map((track, index) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
-        active: tracks.indexOf(player.getCurrentCaptions()!) == index,
+        active: tracks.indexOf(player.getCurrentCaption()!) == index,
         action: () => player.setCurrentCaption(track.id!),
       };
     });

@@ -12,7 +12,7 @@ export class StepPlugin extends PlayerUIPlugin {
     super.use();
     this.createSeekPreview();
 
-    this.player.on('firstFrame', () => this.fetchPreviewTime());
+    this.player.on('ready', () => this.fetchPreviewTime());
     this.player.on('item', () => {
       this.previewTime = [];
       this.fetchPreviewTime();

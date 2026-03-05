@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@vueuse/core';
-import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player/dist/types';
+import { BasePlaylistItem } from '@nomercy-entertainment/nomercy-music-player';
 
 export interface Playlist {
     name: string,

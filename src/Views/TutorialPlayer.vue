@@ -24,8 +24,9 @@ const steps = [
 	{ num: 5, title: 'Volume' },
 	{ num: 6, title: 'Title Bar' },
 	{ num: 7, title: 'Fullscreen & Speed' },
-	{ num: 8, title: 'Full Plugin' },
+	{ num: 8, title: 'Selectors' },
 	{ num: 9, title: 'Seek Preview' },
+	{ num: 10, title: 'Full Plugin' },
 ];
 
 const currentStep = ref(1);
@@ -34,7 +35,7 @@ const videoPlayerRef = ref<{ player: any }>();
 
 onMounted(() => {
 	const stepParam = Number(route.query.step);
-	if (stepParam >= 1 && stepParam <= 9) {
+	if (stepParam >= 1 && stepParam <= 10) {
 		currentStep.value = stepParam;
 	}
 });
