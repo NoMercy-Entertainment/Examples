@@ -21,7 +21,6 @@ const config = {
 		1.75,
 		2,
 	],
-	renderAhead: 10,
 } satisfies Partial<PlayerConfig>;
 
 export default config;

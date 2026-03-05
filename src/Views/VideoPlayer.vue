@@ -5,7 +5,6 @@ import type {NMPlayer, TimeData} from "@nomercy-entertainment/nomercy-video-play
 import KeyHandlerPlugin from "@nomercy-entertainment/nomercy-video-player/src/plugins/keyHandlerPlugin";
 import {DesktopUIPlugin} from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
 import {OctopusPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
-import {SabrePlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/sabrePlugin";
 
 import type {Option} from "@/types/types";
 
@@ -28,12 +27,9 @@ const audioOptions = ref<Option[]>([]);
 const uiActive = ref(false);
 const keyHandlerActive = ref(false);
 const opusActive = ref(false);
-const sabreActive = ref(false);
-
 const keyHandlerPlugin = new KeyHandlerPlugin();
 const desktopUIPlugin = new DesktopUIPlugin();
 const octopusPlugin = new OctopusPlugin();
-const sabrePlugin = new SabrePlugin();
 
 const loadMenu = ref(false);
 
@@ -238,11 +234,6 @@ const toggleKeyHandler = () => {
 };
 
 const toggleOpus = () => {
-  if (sabreActive.value) {
-    sabreActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('sabre').dispose();
-  }
-
   if (!opusActive.value) {
     opusActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('octopus', octopusPlugin);
@@ -251,23 +242,6 @@ const toggleOpus = () => {
   else {
     opusActive.value = false;
     videoPlayerRef.value?.player.plugins.get('octopus').dispose();
-  }
-};
-
-const toggleSabre = () => {
-  if (opusActive.value) {
-    opusActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('octopus').dispose();
-  }
-
-  if (!sabreActive.value) {
-    sabreActive.value = true;
-    videoPlayerRef.value?.player.registerPlugin('sabre', sabrePlugin);
-    videoPlayerRef.value?.player.usePlugin('sabre');
-  }
-  else {
-    sabreActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('sabre').dispose();
   }
 };
 

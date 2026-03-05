@@ -41,18 +41,18 @@ body {
   scrollbar-color: unset;
 }
 
-$color-theme-1-shadow: hsl(252, 60%, 40%);
-$color-theme-1-border: hsl(252, 60%, 57%);
-$color-theme-2-shadow: hsl(335, 100%, 35%);
-$color-theme-2-border: hsl(332, 60%, 50%);
-$color-theme-3-shadow: hsl(240, 80%, 50%);
-$color-theme-3-border: hsl(200, 100%, 40%);
-$color-theme-4-shadow: hsl(20, 100%, 40%);
-$color-theme-4-border: hsl(20, 100%, 60%);
-$color-theme-5-shadow: hsl(0, 100%, 50%);
-$color-theme-5-border: hsl(0, 100%, 60%);
-$color-theme-6-shadow: hsl(120, 100%, 27%);
-$color-theme-6-border: hsl(120, 100%, 50%);
+$color-theme-6-shadow: oklch(52.7% 0.154 150.069);
+$color-theme-6-border: oklch(79.2% 0.209 151.711);
+$color-theme-5-shadow: oklch(0.511 0.096 186.391);
+$color-theme-5-border: oklch(0.777 0.152 181.912);
+$color-theme-4-shadow: oklch(55.3% 0.195 38.402);
+$color-theme-4-border: oklch(75% 0.183 55.934);
+$color-theme-3-shadow: oklch(48.8% 0.243 264.376);
+$color-theme-3-border: oklch(62.3% 0.214 259.815);
+$color-theme-2-shadow: oklch(51.4% 0.222 16.935);
+$color-theme-2-border: oklch(71.2% 0.194 13.428);
+$color-theme-1-shadow: oklch(0.491 0.27 292.581);
+$color-theme-1-border: oklch(0.702 0.183 293.541);
 
 $theme-1: (
     $color-theme-1-shadow,

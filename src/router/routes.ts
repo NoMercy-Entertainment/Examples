@@ -35,6 +35,13 @@ export const routes: Array<RouteRecordRaw> = [
 		}
 	},
 	{
+		path: '/tutorial',
+		component: () => import('@/Views/TutorialPlayer.vue'),
+		props: {
+			theme: 'theme-1',
+		}
+	},
+	{
 		path: '/page3',
 		component: () => import('@/Views/Page3.vue'),
 		props: {
