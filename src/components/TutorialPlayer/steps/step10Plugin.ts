@@ -24,9 +24,7 @@ export class StepPlugin extends Step9Plugin {
 		this.createCenter();
 
 		this.player.on('active', (value: boolean) => {
-			setTimeout(() => {
-				this.controlsVisible = value;
-			}, (this.player.options.doubleClickDelay ?? 300) + 10);
+			this.controlsVisible = value;
 		});
 	}
 
@@ -62,12 +60,14 @@ export class StepPlugin extends Step9Plugin {
 			.addClasses([
 				'center',
 				'absolute',
+				'inset-0',
 				'grid',
 				'grid-cols-3',
 				'grid-rows-6',
 				'h-full',
 				'w-full',
 				'z-0',
+				'pointer-events-none',
 				'transition-all',
 				'duration-300',
 				'bg-transparent',
@@ -78,9 +78,10 @@ export class StepPlugin extends Step9Plugin {
 				'via-black/30',
 				'to-100%',
 				'to-black/0',
-			])
-			.appendTo(this.player.overlay);
+			]);
 
+		// Insert as first child of overlay so controls render on top
+		this.player.overlay.insertBefore(center.get(), this.player.overlay.firstChild);
 		this.center = center.get();
 
 		if (this.player.isMobile()) {
@@ -98,7 +99,7 @@ export class StepPlugin extends Step9Plugin {
 
 	private createTouchBox(parent: HTMLElement, id: string, pos: Position): HTMLDivElement {
 		const touch = this.player.createElement('div', `touch-box-${id}`)
-			.addClasses([`touch-box-${id}`, 'z-40'])
+			.addClasses([`touch-box-${id}`, 'pointer-events-auto'])
 			.appendTo(parent);
 
 		const el = touch.get();
