@@ -8,7 +8,6 @@ const config = {
 	controls: false,
 	preload: 'auto',
 	debug: false,
-	disableAutoPlayback: true,
 	playlist: playlist,
 	controlsTimeout: 3000,
 	doubleClickDelay: 500,
