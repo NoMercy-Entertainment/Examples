@@ -4,15 +4,15 @@ import type { Icon, NMPlayer, VolumeState } from '@nomercy-entertainment/nomercy
 const icons: Icon = {
 	play: {
 		classes: [],
-		title: 'Play',
-		normal: 'M5.541 2.159C4.58 1.604 3.375 2.299 3.375 3.413v17.174c0 1.114 1.205 1.81 2.166 1.254l14.124-8.587a1.452 1.452 0 000-2.508L5.541 2.159zM4.875 3.413a.078.078 0 01.116-.068l14.124 8.587a.077.077 0 010 .136L4.99 20.655a.078.078 0 01-.116-.068V3.413z',
-		hover: 'M5.541 2.159C4.58 1.604 3.375 2.299 3.375 3.413v17.174c0 1.114 1.205 1.81 2.166 1.254l14.124-8.587a1.452 1.452 0 000-2.508L5.541 2.159z',
+		title: 'Pause',
+		normal: 'M7.60846 4.61586C7.1087 4.34394 6.5 4.7057 6.5 5.27466V18.727C6.5 19.2959 7.1087 19.6577 7.60846 19.3858L19.97 12.6596C20.4921 12.3755 20.4921 11.6261 19.97 11.342L7.60846 4.61586ZM5 5.27466C5 3.5678 6.82609 2.48249 8.32538 3.29828L20.687 10.0244C22.2531 10.8766 22.2531 13.125 20.687 13.9772L8.32538 20.7033C6.82609 21.5191 5 20.4338 5 18.727V5.27466Z',
+		hover: 'M5 5.27466C5 3.5678 6.82609 2.48249 8.32538 3.29828L20.687 10.0244C22.2531 10.8766 22.2531 13.125 20.687 13.9772L8.32538 20.7033C6.82609 21.5191 5 20.4338 5 18.727V5.27466Z',
 	},
 	pause: {
 		classes: [],
-		title: 'Pause',
-		normal: 'M5.746 3a1.75 1.75 0 00-1.75 1.75v14.5c0 .966.784 1.75 1.75 1.75h2.508a1.75 1.75 0 001.75-1.75V4.75a1.75 1.75 0 00-1.75-1.75H5.746zm0 1.5h2.508a.25.25 0 01.25.25v14.5a.25.25 0 01-.25.25H5.746a.25.25 0 01-.25-.25V4.75a.25.25 0 01.25-.25zm9.998-1.5a1.75 1.75 0 00-1.75 1.75v14.5c0 .966.784 1.75 1.75 1.75h2.508a1.75 1.75 0 001.75-1.75V4.75a1.75 1.75 0 00-1.75-1.75h-2.508zm0 1.5h2.508a.25.25 0 01.25.25v14.5a.25.25 0 01-.25.25h-2.508a.25.25 0 01-.25-.25V4.75a.25.25 0 01.25-.25z',
-		hover: 'M5.746 3a1.75 1.75 0 00-1.75 1.75v14.5c0 .966.784 1.75 1.75 1.75h2.508a1.75 1.75 0 001.75-1.75V4.75a1.75 1.75 0 00-1.75-1.75H5.746zm10 0a1.75 1.75 0 00-1.75 1.75v14.5c0 .966.784 1.75 1.75 1.75h2.508a1.75 1.75 0 001.75-1.75V4.75a1.75 1.75 0 00-1.75-1.75h-2.508z',
+		title: 'Play',
+		normal: 'M6.25 3C5.00736 3 4 4.00736 4 5.25V18.75C4 19.9926 5.00736 21 6.25 21H8.75C9.99264 21 11 19.9926 11 18.75V5.25C11 4.00736 9.99264 3 8.75 3H6.25ZM5.5 5.25C5.5 4.83579 5.83579 4.5 6.25 4.5H8.75C9.16421 4.5 9.5 4.83579 9.5 5.25V18.75C9.5 19.1642 9.16421 19.5 8.75 19.5H6.25C5.83579 19.5 5.5 19.1642 5.5 18.75V5.25ZM15.25 3C14.0074 3 13 4.00736 13 5.25V18.75C13 19.9926 14.0074 21 15.25 21H17.75C18.9926 21 20 19.9926 20 18.75V5.25C20 4.00736 18.9926 3 17.75 3H15.25ZM14.5 5.25C14.5 4.83579 14.8358 4.5 15.25 4.5H17.75C18.1642 4.5 18.5 4.83579 18.5 5.25V18.75C18.5 19.1642 18.1642 19.5 17.75 19.5H15.25C14.8358 19.5 14.5 19.1642 14.5 18.75V5.25Z',
+		hover: 'M5.74609 3C4.7796 3 3.99609 3.7835 3.99609 4.75V19.25C3.99609 20.2165 4.7796 21 5.74609 21H9.24609C10.2126 21 10.9961 20.2165 10.9961 19.25V4.75C10.9961 3.7835 10.2126 3 9.24609 3H5.74609ZM14.7461 3C13.7796 3 12.9961 3.7835 12.9961 4.75V19.25C12.9961 20.2165 13.7796 21 14.7461 21H18.2461C19.2126 21 19.9961 20.2165 19.9961 19.25V4.75C19.9961 3.7835 19.2126 3 18.2461 3H14.7461Z',
 	},
 	seekBack: {
 		classes: [],
@@ -78,6 +78,12 @@ export class StepPlugin extends Plugin {
 		this.createSkipButtons();
 		this.createTimeDisplay();
 		this.createVolumeControl();
+
+		if (this.player.videoElement?.paused) {
+			this.player.container.classList.add('paused');
+		} else {
+			this.centerButton.style.display = 'none';
+		}
 	}
 
 	dispose() {
@@ -131,17 +137,14 @@ export class StepPlugin extends Plugin {
 				'w-16', 'h-16', 'rounded-full',
 				'bg-black/50', 'text-white',
 				'flex', 'items-center', 'justify-center',
-				'opacity-0', 'transition-opacity', 'duration-300', 'pointer-events-none',
-				'group-[&.nomercyplayer.paused]:opacity-100',
-				'group-[&.nomercyplayer.paused]:pointer-events-auto',
+				'transition-opacity', 'duration-300',
 				'hover:bg-black/70', 'hover:scale-110',
 				'cursor-pointer', 'group/button',
 			])
 			.appendTo(this.overlay)
 			.get();
 
-		const pausedIcon = this.player.createSVGElement(this.centerButton, 'center-paused', icons.play, false, true);
-		const playIcon = this.player.createSVGElement(this.centerButton, 'center-playing', icons.pause, true, true);
+		this.player.createSVGElement(this.centerButton, 'center-paused', icons.play, false, true);
 
 		this.centerButton.addEventListener('click', (event) => {
 			event.stopPropagation();
@@ -149,13 +152,8 @@ export class StepPlugin extends Plugin {
 			this.player.emit('hide-tooltip');
 		});
 
-		this.player.on('pause', () => {
-			playIcon.style.display = 'none';
-			pausedIcon.style.display = 'flex';
-		});
 		this.player.on('play', () => {
-			pausedIcon.style.display = 'none';
-			playIcon.style.display = 'flex';
+			this.centerButton.style.display = 'none';
 		});
 	}
 

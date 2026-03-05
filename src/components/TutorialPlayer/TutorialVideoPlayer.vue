@@ -64,7 +64,7 @@ defineExpose({
 </script>
 
 <template>
-	<div id="tutorial-player" class="group nomercyplayer rounded-md !overflow-unset"></div>
+	<div id="tutorial-player" class="group nomercyplayer rounded-md !overflow-unset h-full w-full flex-1"></div>
 </template>
 
 <style>
