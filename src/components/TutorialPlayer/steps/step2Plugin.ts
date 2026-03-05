@@ -44,6 +44,7 @@ export class StepPlugin extends Plugin {
 			this.player.container.classList.add('paused');
 		} else {
 			this.centerButton.style.display = 'none';
+			this.player.emit('play');
 		}
 	}
 
