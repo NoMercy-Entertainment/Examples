@@ -355,7 +355,8 @@ export class StepPlugin extends Plugin {
 				'w-0', 'opacity-0',
 				'group-hover/volume:w-20', 'group-hover/volume:mx-2', 'group-hover/volume:opacity-100',
 				'group-focus-within/volume:w-20', 'group-focus-within/volume:mx-2', 'group-focus-within/volume:opacity-100',
-				'transition-all', 'duration-200',
+				'hover:h-2',
+				'transition-all', 'duration-150',
 			])
 			.appendTo(volumeContainer).get();
 
@@ -364,7 +365,7 @@ export class StepPlugin extends Plugin {
 			.appendTo(this.volumeSlider).get();
 
 		const volumeNipple = this.player.createElement('div', 'volume-nipple')
-			.addClasses(['absolute', 'top-1/2', '-translate-y-1/2', '-translate-x-1/2', 'w-3', 'h-3', 'rounded-full', 'bg-white', 'pointer-events-none', 'z-20'])
+			.addClasses(['absolute', 'top-1/2', '-translate-y-1/2', '-translate-x-1/2', 'w-3', 'h-3', 'rounded-full', 'bg-white', 'hidden', 'group-hover/vol-slider:flex', 'pointer-events-none', 'z-20'])
 			.appendTo(this.volumeSlider).get();
 
 		const updateVolSliderUI = (vol: number) => {
