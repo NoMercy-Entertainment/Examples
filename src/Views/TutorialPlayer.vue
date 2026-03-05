@@ -82,7 +82,7 @@ function selectStep(step: number) {
 	<div id="container"
 		class="flex flex-col justify-center items-center w-full px-4 sm:px-16 flex-1 max-h-[calc(100vh-18rem)] min-h-[calc(100vh-18rem)] overflow-clip landscape:mt-4">
 		<main id="wrapper"
-			class="sm:max-h-fit relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-full w-full aspect-[16/10] 5xl:aspect-[16/9.5] sm:max-w-[120rem] border border-neutral-700 p-2 sm:p-4 z-0">
+			class="sm:max-h-fit relative overflow-hidden bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col h-full w-full aspect-video sm:max-w-[120rem] border border-neutral-700 p-2 sm:p-4 z-0">
 			<TutorialVideoPlayer :key="playerKey" ref="videoPlayerRef" :step="currentStep" />
 		</main>
 	</div>
