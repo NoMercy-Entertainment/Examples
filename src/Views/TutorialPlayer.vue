@@ -58,7 +58,7 @@ function selectStep(step: number) {
 	</div>
 
 	<!-- Step selector -->
-	<div class="w-full flex justify-center px-4 sm:px-16 mb-4">
+	<div class="w-full flex justify-center px-4 sm:px-16 mt-6 mb-4">
 		<div class="flex flex-wrap gap-1.5 sm:gap-2 justify-evenly w-full max-w-[120rem]">
 			<button
 				v-for="step in steps"
