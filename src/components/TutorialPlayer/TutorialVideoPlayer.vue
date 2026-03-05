@@ -3,6 +3,7 @@ import {onMounted, onUnmounted, ref, watch} from "vue";
 
 import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
 import type {NMPlayer} from "@nomercy-entertainment/nomercy-video-player/src/types";
+import {KeyHandlerPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/keyHandlerPlugin";
 
 import config from "../VideoPlayer/config";
 
@@ -44,6 +45,10 @@ async function createPlayer(step: number) {
 	const uiPlugin = new PluginClass();
 	player.value?.registerPlugin('ui', uiPlugin);
 	player.value?.usePlugin('ui');
+
+	const keyPlugin = new KeyHandlerPlugin();
+	player.value?.registerPlugin('keys', keyPlugin);
+	player.value?.usePlugin('keys');
 }
 
 onMounted(() => {
