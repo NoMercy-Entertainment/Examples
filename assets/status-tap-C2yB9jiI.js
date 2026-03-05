@@ -1,0 +1,3 @@
+import{r as i,f as a,b as m,w as p,s as c}from"./MusicPlayer-B6FA3WiJ.js";import"./Layout.vue_vue_type_script_setup_true_lang-Cvxb11fJ.js";import"./Menu-sz0etGNE.js";import"./index--k-wotAr.js";import"./HomeCorner-Clyum8UY.js";import"./GithubCorner-Dujs8jns.js";import"./_commonjsHelpers-C932wzq6.js";import"./logo-BSSc2Qdb.js";/*!
+ * (C) Ionic http://ionicframework.com - MIT License
+ */const v=()=>{const o=window;o.addEventListener("statusTap",()=>{i(()=>{const n=o.innerWidth,r=o.innerHeight,e=document.elementFromPoint(n/2,r/2);if(!e)return;const t=a(e);t&&new Promise(s=>m(t,s)).then(()=>{p(async()=>{t.style.setProperty("--overflow","hidden"),await c(t,300),t.style.removeProperty("--overflow")})})})})};export{v as startStatusTap};
