@@ -60,7 +60,7 @@ export class StepPlugin extends Plugin {
 	private isMouseDown = false;
 	private currentTimeLabel!: HTMLSpanElement;
 	private durationLabel!: HTMLSpanElement;
-	private volumeSlider!: HTMLInputElement;
+	private volumeSlider!: HTMLDivElement;
 	private titleLabel!: HTMLDivElement;
 
 	initialize(player: NMPlayer<any>) {
@@ -398,34 +398,62 @@ export class StepPlugin extends Plugin {
 		});
 
 		this.volumeSlider = this.player
-			.createElement('input', 'volume-slider')
+			.createElement('div', 'volume-slider')
 			.addClasses([
+				'relative', 'h-1', 'rounded-full', 'bg-white/20',
+				'cursor-pointer', 'group/vol-slider',
 				'w-0', 'opacity-0',
 				'group-hover/volume:w-20', 'group-hover/volume:mx-2', 'group-hover/volume:opacity-100',
 				'group-focus-within/volume:w-20', 'group-focus-within/volume:mx-2', 'group-focus-within/volume:opacity-100',
 				'transition-all', 'duration-200',
-				'appearance-none', 'bg-white/30', 'rounded-full', 'h-1',
-				'cursor-pointer',
-				'[&::-webkit-slider-thumb]:appearance-none',
-				'[&::-webkit-slider-thumb]:w-3',
-				'[&::-webkit-slider-thumb]:h-3',
-				'[&::-webkit-slider-thumb]:bg-white',
-				'[&::-webkit-slider-thumb]:rounded-full',
 			])
 			.appendTo(volumeContainer)
 			.get();
 
-		this.volumeSlider.type = 'range';
-		this.volumeSlider.min = '0';
-		this.volumeSlider.max = '100';
-		this.volumeSlider.step = '1';
-		this.volumeSlider.value = String(this.player.getVolume());
+		const volumeProgress = this.player.createElement('div', 'volume-progress')
+			.addClasses(['absolute', 'top-0', 'left-0', 'h-full', 'bg-white', 'rounded-full', 'pointer-events-none'])
+			.appendTo(this.volumeSlider).get();
 
-		this.volumeSlider.addEventListener('input', (e) => {
-			e.stopPropagation();
-			const vol = parseInt(this.volumeSlider.value, 10);
+		const volumeNipple = this.player.createElement('div', 'volume-nipple')
+			.addClasses(['absolute', 'top-1/2', '-translate-y-1/2', '-translate-x-1/2', 'w-3', 'h-3', 'rounded-full', 'bg-white', 'pointer-events-none', 'z-20'])
+			.appendTo(this.volumeSlider).get();
+
+		const updateVolSliderUI = (vol: number) => {
+			const pct = Math.max(0, Math.min(vol, 100));
+			volumeProgress.style.width = `${pct}%`;
+			volumeNipple.style.left = `${pct}%`;
+		};
+
+		let volDragging = false;
+		const getVolFromEvent = (e: MouseEvent | TouchEvent): number => {
+			const rect = this.volumeSlider.getBoundingClientRect();
+			const clientX = ('clientX' in e ? e.clientX : undefined)
+				?? ('touches' in e ? e.touches?.[0]?.clientX : undefined)
+				?? ('changedTouches' in e ? e.changedTouches?.[0]?.clientX : undefined)
+				?? 0;
+			const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+			return Math.round((x / rect.width) * 100);
+		};
+
+		this.volumeSlider.addEventListener('mousedown', () => { volDragging = true; }, { passive: true });
+		this.volumeSlider.addEventListener('touchstart', () => { volDragging = true; }, { passive: true });
+		this.volumeSlider.addEventListener('click', (e: MouseEvent) => {
+			volDragging = false;
+			const vol = getVolFromEvent(e);
 			this.player.setVolume(vol);
+			updateVolSliderUI(vol);
 		});
+		['mousemove', 'touchmove'].forEach((evt) => {
+			this.volumeSlider.addEventListener(evt, (e: any) => {
+				if (!volDragging) return;
+				const vol = getVolFromEvent(e);
+				this.player.setVolume(vol);
+				updateVolSliderUI(vol);
+			}, { passive: true });
+		});
+		this.volumeSlider.addEventListener('mouseleave', () => { volDragging = false; }, { passive: true });
+		document.addEventListener('mouseup', () => { volDragging = false; }, { passive: true });
+		document.addEventListener('touchend', () => { volDragging = false; }, { passive: true });
 
 		const updateVolumeIcon = (volume: number, muted: boolean) => {
 			volHigh.style.display = 'none';
@@ -442,11 +470,13 @@ export class StepPlugin extends Plugin {
 		};
 
 		this.player.on('volume', (data: VolumeState) => {
-			this.volumeSlider.value = String(data.volume);
+			updateVolSliderUI(data.volume);
 			updateVolumeIcon(data.volume, data.muted);
 		});
 
-		updateVolumeIcon(this.player.getVolume(), this.player.isMuted());
+		const initialVol = this.player.getVolume();
+		updateVolSliderUI(initialVol);
+		updateVolumeIcon(initialVol, this.player.isMuted());
 	}
 }
 
