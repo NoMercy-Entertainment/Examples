@@ -49,10 +49,6 @@ async function createPlayer(step: number) {
 	const keyPlugin = new KeyHandlerPlugin();
 	player.value?.registerPlugin('keys', keyPlugin);
 	player.value?.usePlugin('keys');
-
-	player.value?.once('firstFrame', () => {
-		player.value?.pause();
-	});
 }
 
 onMounted(() => {
