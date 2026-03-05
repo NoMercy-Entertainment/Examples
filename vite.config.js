@@ -24,6 +24,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Resolve to TS source so Vite compiles it as ESM — the CJS dist has
+      // __esModule without exports.default, which breaks Rollup's default import.
+      // The stubCapacitorMediaSession plugin handles the native-only capacitor import.
+      '@nomercy-entertainment/media-session': fileURLToPath(
+        new URL('./node_modules/@nomercy-entertainment/media-session/src/index.ts', import.meta.url)
+      ),
     },
   },
   build: {
