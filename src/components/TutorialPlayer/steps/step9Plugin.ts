@@ -22,8 +22,8 @@ export class StepPlugin extends PlayerUIPlugin {
   private fetchPreviewTime() {
     if (this.previewTime.length > 0) return;
 
-    const imageFile = this.player.getSpriteFile();
-    const timeFile = this.player.getTimeFile();
+    const imageFile = this.player.spriteFile();
+    const timeFile = this.player.timeFile();
     if (!imageFile || !timeFile) return;
 
     this.sliderPopImage.style.backgroundImage = `url('${imageFile}')`;
@@ -104,7 +104,7 @@ export class StepPlugin extends PlayerUIPlugin {
       const rect = sliderBar.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
       const percent = x / rect.width;
-      const scrubTime = percent * this.player.getDuration();
+      const scrubTime = percent * this.player.duration();
 
       const preview = this.previewTime.find(
         (p) => scrubTime >= p.start && scrubTime < p.end

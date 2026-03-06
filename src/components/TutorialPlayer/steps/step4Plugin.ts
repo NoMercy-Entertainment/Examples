@@ -252,7 +252,7 @@ export class StepPlugin extends Plugin {
 		this.sliderBar.addEventListener('click', (e: MouseEvent) => {
 			this.isMouseDown = false;
 			const percent = getPercentFromEvent(e);
-			const duration = this.player.getDuration();
+			const duration = this.player.duration();
 			this.player.seek(duration * (percent / 100));
 			sliderNipple.style.left = `${percent}%`;
 		});
@@ -288,12 +288,12 @@ export class StepPlugin extends Plugin {
 		const skipBack = this.player.createUiButton(this.bottomRow, 'skip-back').get();
 		skipBack.ariaLabel = 'Skip back 10 seconds';
 		this.player.createSVGElement(skipBack, 'skip-back-icon', icons.seekBack, false, true);
-		skipBack.addEventListener('click', (e) => { e.stopPropagation(); this.player.rewindVideo(10); });
+		skipBack.addEventListener('click', (e) => { e.stopPropagation(); this.player.rewind(10); });
 
 		const skipForward = this.player.createUiButton(this.bottomRow, 'skip-forward').get();
 		skipForward.ariaLabel = 'Skip forward 10 seconds';
 		this.player.createSVGElement(skipForward, 'skip-forward-icon', icons.seekForward, false, true);
-		skipForward.addEventListener('click', (e) => { e.stopPropagation(); this.player.forwardVideo(10); });
+		skipForward.addEventListener('click', (e) => { e.stopPropagation(); this.player.forward(10); });
 	}
 
 	private createTimeDisplay() {

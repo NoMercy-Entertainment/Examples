@@ -269,7 +269,7 @@ export class StepPlugin extends Plugin {
 		this.sliderBar.addEventListener('click', (e: MouseEvent) => {
 			this.isMouseDown = false;
 			const percent = getPercentFromEvent(e);
-			const duration = this.player.getDuration();
+			const duration = this.player.duration();
 			this.player.seek(duration * (percent / 100));
 			sliderNipple.style.left = `${percent}%`;
 		});
@@ -340,7 +340,7 @@ export class StepPlugin extends Plugin {
 		this.player.createSVGElement(skipBack, 'skip-back-icon', icons.seekBack, false, true);
 		skipBack.addEventListener('click', (e) => {
 			e.stopPropagation();
-			this.player.rewindVideo(10);
+			this.player.rewind(10);
 		});
 
 		const skipForward = this.player.createUiButton(this.bottomRow, 'skip-forward').get();
@@ -348,7 +348,7 @@ export class StepPlugin extends Plugin {
 		this.player.createSVGElement(skipForward, 'skip-forward-icon', icons.seekForward, false, true);
 		skipForward.addEventListener('click', (e) => {
 			e.stopPropagation();
-			this.player.forwardVideo(10);
+			this.player.forward(10);
 		});
 	}
 
@@ -441,14 +441,14 @@ export class StepPlugin extends Plugin {
 		this.volumeSlider.addEventListener('click', (e: MouseEvent) => {
 			volDragging = false;
 			const vol = getVolFromEvent(e);
-			this.player.setVolume(vol);
+			this.player.volume(vol);
 			updateVolSliderUI(vol);
 		});
 		['mousemove', 'touchmove'].forEach((evt) => {
 			this.volumeSlider.addEventListener(evt, (e: any) => {
 				if (!volDragging) return;
 				const vol = getVolFromEvent(e);
-				this.player.setVolume(vol);
+				this.player.volume(vol);
 				updateVolSliderUI(vol);
 			}, { passive: true });
 		});
@@ -475,9 +475,9 @@ export class StepPlugin extends Plugin {
 			updateVolumeIcon(data.volume, data.muted);
 		});
 
-		const initialVol = this.player.getVolume();
+		const initialVol = this.player.volume();
 		updateVolSliderUI(initialVol);
-		updateVolumeIcon(initialVol, this.player.isMuted());
+		updateVolumeIcon(initialVol, this.player.muted());
 	}
 }
 

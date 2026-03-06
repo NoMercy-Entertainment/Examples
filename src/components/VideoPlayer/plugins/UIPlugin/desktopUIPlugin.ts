@@ -82,7 +82,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		this.bottomBar = this.createBottomBar(this.overlay);
 
 		this.bottomBar.onmouseleave = (e) => {
-			const playerRect = this.player.getVideoElement()?.getBoundingClientRect();
+			const playerRect = this.player.videoElement?.getBoundingClientRect();
 			if (!playerRect || (e.x > playerRect.left && e.x < playerRect.right && e.y > playerRect.top && e.y < playerRect.bottom)) return;
 			this.player.emit('hide-tooltip');
 		};
@@ -189,11 +189,11 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 	eventHandlers() {
 		// this.player.on('controls', (showing) => {
-		// 	if (this.player.getElement()) {
+		// 	if (this.player.element()) {
 		// 		if (showing) {
-		// 			this.player.getElement()?.setAttribute('active', 'true');
+		// 			this.player.element()?.setAttribute('active', 'true');
 		// 		} else {
-		// 			this.player.getElement()?.setAttribute('active', 'false');
+		// 			this.player.element()?.setAttribute('active', 'false');
 		// 		}
 		// 	}
 		// });
@@ -276,7 +276,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		['click'].forEach((event) => {
 			touchSeekBack.addEventListener(event, this.doubleTap(
 				() => {
-					this.player.rewindVideo();
+					this.player.rewind();
 				},
 				() => {
 					if (this.controlsVisible) {
@@ -327,7 +327,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		['mouseup', 'touchend'].forEach((event) => {
 			touchSeekForward.addEventListener(event, this.doubleTap(
 				() => {
-					this.player.forwardVideo();
+					this.player.forward();
 				},
 				() => {
 					if (this.controlsVisible) {
@@ -518,7 +518,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			if (this.pipEnabled) {
 				if (document.hidden) {
 					if (document.pictureInPictureEnabled) {
-						this.player.getVideoElement().requestPictureInPicture().then();
+						this.player.videoElement.requestPictureInPicture().then();
 					}
 				} else if (document.pictureInPictureElement) {
 					document.exitPictureInPicture().then();
@@ -551,7 +551,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		});
 
 		this.player.on('fullscreen', () => {
-			if (this.player.getFullscreen()) {
+			if (this.player.fullscreen()) {
 				pipButton.style.display = 'none';
 			} else {
 				pipButton.style.display = 'flex';
@@ -832,7 +832,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	sizeMenuFrame() {
-		const rect = this.player?.getElement()?.getBoundingClientRect();
+		const rect = this.player?.element()?.getBoundingClientRect();
 		if (!rect) return;
 
 		const {
@@ -1172,7 +1172,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			this.player.on('id', () => {
 				menuButton.style.display = 'none';
 			});
-			if (this.player.hasCaptions()) {
+			if (this.player.hasSubtitles()) {
 				menuButton.style.display = 'flex';
 			}
 			this.player.on('captionsList', (captions) => {
@@ -1233,7 +1233,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		});
 
 		if (this.player.hasAudioTracks()) {
-			Object.values(this.player.getAudioTracks()).forEach((track) => {
+			Object.values(this.player.audioTracks()).forEach((track) => {
 				this.createLanguageMenuButton(scrollContainer, {
 					language: track.language!,
 					label: track.label!,
@@ -1290,8 +1290,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			scrollContainer.innerHTML = '';
 		});
 
-		if (this.player.hasCaptions()) {
-			Object.values(this.player.getCaptionsList()).forEach((track) => {
+		if (this.player.hasSubtitles()) {
+			Object.values(this.player.subtitles()).forEach((track) => {
 				this.createLanguageMenuButton(scrollContainer, {
 					language: track.language!,
 					label: track.label!,
@@ -1397,7 +1397,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				this.player.emit('hide-subtitleSettings-menu');
 			}
 			else {
-				this.player.setSubtitleStyle(defaultSubtitleStyles);
+				this.player.subtitleStyle(defaultSubtitleStyles);
 			}
 		});
 
@@ -1556,7 +1556,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		const chevron = this.createSVGElement(subtitleSettingActionButton, 'checkmark', this.buttons.checkmark, false, false);
 		this.player.addClasses(chevron, ['ml-auto']);
 
-		if (data.value != this.player.getSubtitleStyle()[data.property as keyof SubtitleStyle]) {
+		if (data.value != this.player.subtitleStyle()[data.property as keyof SubtitleStyle]) {
 			chevron.classList.add('hidden');
 		}
 
@@ -1595,7 +1595,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		scrollContainer.style.transform = 'translateX(0)';
 
-		for (const speed of this.player.getSpeeds() ?? []) {
+		for (const speed of this.player.speeds() ?? []) {
 			const speedButton = this.player.createElement('button', `speed-button-${speed}`)
 				.addClasses(this.languageMenuStyles)
 				.appendTo(scrollContainer).get();
@@ -1627,10 +1627,10 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 			speedButton.addEventListener('click', () => {
 				this.player.emit('show-menu', false);
-				this.player.setSpeed(speed);
+				this.player.speed(speed);
 			});
 
-			if (speed == this.player.getSpeed()) {
+			if (speed == this.player.speed()) {
 				chevron.classList.remove('hidden');
 				speedButton.classList.add('bg-white/20');
 			}
@@ -1674,7 +1674,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		if (this.player.hasQualities()) {
 			addAutoButton(scrollContainer);
-			Object.values(this.player.getQualityLevels()).forEach((level) => {
+			Object.values(this.player.qualityLevels()).forEach((level) => {
 				this.createQualityMenuButton(scrollContainer, {
 					id: level.id,
 					width: level.width ?? 0,
@@ -1763,7 +1763,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			this.isAutoQuality = false;
 			this.highQuality = true;
 			this.selectedQualityIndex = data.id;
-			this.player.setCurrentQuality(data.id);
+			this.player.quality(data.id);
 			this.highlightCurrentQuality(parent);
 			this.updateQualityButtonIcon();
 
@@ -1787,8 +1787,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				autoButtonText.innerText = this.player.localize('auto');
 				return;
 			}
-			const levels = this.player.getQualityLevels();
-			const currentId = this.player.getCurrentQuality();
+			const levels = this.player.qualityLevels();
+			const currentId = this.player.quality();
 			const current = levels.find(l => l.id === currentId);
 			if (current?.label) {
 				autoButtonText.innerText = `${this.player.localize('auto')} (${this.player.localize(current.label)})`;
@@ -1809,7 +1809,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 			this.isAutoQuality = true;
 			this.highQuality = false;
-			this.player.setCurrentQuality(-1);
+			this.player.quality(-1);
 			this.highlightCurrentQuality(parent);
 			this.updateQualityButtonIcon();
 
@@ -1820,7 +1820,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	updateQualityButtonIcon() {
-		const qualityBtn = this.player.getContainer().querySelector('#quality');
+		const qualityBtn = this.player.container.querySelector('#quality');
 		const path = qualityBtn?.querySelector('path');
 		if (path) {
 			path.setAttribute('d', this.highQuality
@@ -2033,7 +2033,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(['chapter-text'])
 			.appendTo(sliderPop).get();
 
-		if (this.player.options.chapters && !this.player.isTv() && this.player.getChapters()?.length > 0) {
+		if (this.player.options.chapters && !this.player.isTv() && this.player.chapters()?.length > 0) {
 			this.sliderBar.style.background = '';
 		}
 
@@ -2071,7 +2071,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				const sliderPopOffsetX = this.getSliderPopOffsetX(sliderPop, scrubTime);
 				sliderPop.style.left = `${sliderPopOffsetX}%`;
 
-				if (!this.player.options.chapters || this.player.getChapters()?.length == 0) {
+				if (!this.player.options.chapters || this.player.chapters()?.length == 0) {
 					sliderHover.style.width = `${scrubTime.scrubTime}%`;
 				}
 
@@ -2129,7 +2129,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		});
 
 		this.player.on('chapters', () => {
-			if (this.player.getChapters()?.length > 0 && !this.player.isTv()) {
+			if (this.player.chapters()?.length > 0 && !this.player.isTv()) {
 				this.sliderBar.classList.remove('bg-white/20');
 			} else {
 				this.sliderBar.classList.add('bg-white/20');
@@ -2137,7 +2137,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		});
 
 		const updateBuffer = () => {
-			const video = this.player.getVideoElement();
+			const video = this.player.videoElement;
 			if (video && video.buffered.length > 0 && video.duration > 0) {
 				const bufferedEnd = video.buffered.end(video.buffered.length - 1);
 				const bufferPct = (bufferedEnd / video.duration) * 100;
@@ -2145,10 +2145,10 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			}
 		};
 
-		this.player.getVideoElement()?.addEventListener('progress', updateBuffer);
+		this.player.videoElement?.addEventListener('progress', updateBuffer);
 
 		this.player.on('time', (data) => {
-			if (this.player.getChapters()?.length == 0) {
+			if (this.player.chapters()?.length == 0) {
 				sliderProgress.style.width = `${data.percentage}%`;
 			}
 			if (!this.isScrubbing) {
@@ -2176,14 +2176,14 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	getChapterText(scrubTimePlayer: number): string | null {
-		if (this.player.getChapters().length == 0) return null;
+		if (this.player.chapters().length == 0) return null;
 
-		const index = this.player.getChapters()?.findIndex((chapter: Chapter) => {
+		const index = this.player.chapters()?.findIndex((chapter: Chapter) => {
 			return chapter.startTime > scrubTimePlayer;
 		});
 
-		return this.player.getChapters()[index - 1]?.title
-			?? this.player.getChapters()[this.player.getChapters()?.length - 1]?.title
+		return this.player.chapters()[index - 1]?.title
+			?? this.player.chapters()[this.player.chapters()?.length - 1]?.title
 			?? null;
 	}
 
@@ -2294,7 +2294,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			this.chapterBar.classList.add('bg-white/20');
 			element.remove();
 		});
-		this.player.getChapters()?.forEach((chapter: Chapter) => {
+		this.player.chapters()?.forEach((chapter: Chapter) => {
 			this.createChapterMarker(chapter);
 		});
 	}
@@ -2315,7 +2315,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	createEpisodeMenu(parent: HTMLDivElement) {
-		if (!this.player.getVideoElement()) return;
+		if (!this.player.videoElement) return;
 
 		const playlistMenu = this.player.createElement('div', 'playlist-menu')
 			.addClasses([
@@ -2342,7 +2342,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		seasonScrollContainer.style.transform = 'translateX(0)';
 
 		seasonScrollContainer.innerHTML = '';
-		for (const [, item] of unique(this.player.getPlaylist(), 'season').entries() ?? []) {
+		for (const [, item] of unique(this.player.playlist(), 'season').entries() ?? []) {
 			this.createSeasonMenuButton(seasonScrollContainer, item);
 		}
 
@@ -2368,7 +2368,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			(scrollContainer.firstChild as HTMLButtonElement)?.focus();
 		});
 
-		for (const [index, item] of this.player.getPlaylist().entries() ?? []) {
+		for (const [index, item] of this.player.playlist().entries() ?? []) {
 			this.createEpisodeMenuButton(scrollContainer, item, index);
 		}
 
@@ -2788,14 +2788,14 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	getTipDataIndex(direction: string) {
-		let index: number = this.player.getPlaylistIndex();
+		let index: number = this.player.playlistIndex();
 		if (direction == 'previous') {
 			index -= 1;
 		} else {
 			index += 1;
 		}
 
-		return this.player.getPlaylist().at(index);
+		return this.player.playlist().at(index);
 	}
 
 	getTipData({ direction, header, title, image }: { direction: string; header: HTMLSpanElement; title: HTMLSpanElement; image: HTMLImageElement; }) {

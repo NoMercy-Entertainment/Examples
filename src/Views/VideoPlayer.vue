@@ -159,7 +159,7 @@ watch(videoPlayerRef, (value) => {
     audioOptions.value = [{
       label: track.name,
       active: true,
-      action: () => player.setCurrentAudioTrack(0),
+      action: () => player.audioTrack(0),
     }]
   });
   player.on('audioTracks', (tracks) => {
@@ -167,7 +167,7 @@ watch(videoPlayerRef, (value) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
         active: true,
-        action: () => player.setCurrentAudioTrack(track.id!),
+        action: () => player.audioTrack(track.id!),
       };
     });
   });
@@ -176,8 +176,8 @@ watch(videoPlayerRef, (value) => {
     subtitleOptions.value = tracks.map((track, index) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
-        active: tracks.indexOf(player.getCurrentCaption()!) == index,
-        action: () => player.setCurrentCaption(track.id!),
+        active: tracks.indexOf(player.subtitle()!) == index,
+        action: () => player.subtitle(track.id!),
       };
     });
   });

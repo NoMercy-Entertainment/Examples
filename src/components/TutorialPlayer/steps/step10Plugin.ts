@@ -109,7 +109,7 @@ export class StepPlugin extends Step9Plugin {
 		const el = this.createTouchBox(parent, 'touchSeekBack', pos);
 
 		el.addEventListener('click', this.doubleTap(
-			() => this.player.rewindVideo(),
+			() => this.player.rewind(),
 			() => {
 				if (this.controlsVisible) {
 					this.player.emit('hideControls');
@@ -125,7 +125,7 @@ export class StepPlugin extends Step9Plugin {
 
 		['mouseup', 'touchend'].forEach((event) => {
 			el.addEventListener(event, this.doubleTap(
-				() => this.player.forwardVideo(),
+				() => this.player.forward(),
 				() => {
 					if (this.controlsVisible) {
 						this.player.emit('hideControls');

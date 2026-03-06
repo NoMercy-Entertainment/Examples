@@ -14,7 +14,7 @@ function calculateLogVolume(sliderValue: number, p = 1.5) {
 
 watch(volumePercentage, (value) => {
   const volume = calculateLogVolume(value);
-  musicPlayer.setVolume(volume);
+  musicPlayer.volume(volume);
 });
 
 </script>

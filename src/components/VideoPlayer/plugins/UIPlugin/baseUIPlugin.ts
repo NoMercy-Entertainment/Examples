@@ -211,10 +211,10 @@ export class BaseUIPlugin extends Plugin {
 			parent.addEventListener('mouseenter', () => {
 				if (icon.title.length == 0 || (['Next', 'Previous'].includes(icon.title) && this.player.hasNextTip)) return;
 
-				if (icon.title == 'Fullscreen' && this.player.getFullscreen()) {
+				if (icon.title == 'Fullscreen' && this.player.fullscreen()) {
 					return;
 				}
-				if (icon.title == 'Exit fullscreen' && !this.player.getFullscreen()) {
+				if (icon.title == 'Exit fullscreen' && !this.player.fullscreen()) {
 					return;
 				}
 				if (icon.title == 'Play' && this.player.isPlaying) {
@@ -223,16 +223,16 @@ export class BaseUIPlugin extends Plugin {
 				if (icon.title == 'Pause' && !this.player.isPlaying) {
 					return;
 				}
-				if (icon.title == 'Mute' && this.player.isMuted()) {
+				if (icon.title == 'Mute' && this.player.muted()) {
 					return;
 				}
-				if (icon.title == 'Unmute' && !this.player.isMuted()) {
+				if (icon.title == 'Unmute' && !this.player.muted()) {
 					return;
 				}
 
 				const text = `${this.player.localize(icon.title)} ${this.getButtonKeyCode(id)}`;
 
-				const playerRect = this.player.getElement().getBoundingClientRect();
+				const playerRect = this.player.element().getBoundingClientRect();
 				const menuTipRect = parent.getBoundingClientRect();
 
 				let x = Math.abs(playerRect.left - (menuTipRect.left + (menuTipRect.width * 0.5)) - (text.length * 0.5));
@@ -445,7 +445,7 @@ export class BaseUIPlugin extends Plugin {
 
 	fetchPreviewTime() {
 		if (this.previewTime.length === 0) {
-			const imageFile = this.player.getSpriteFile();
+			const imageFile = this.player.spriteFile();
 
 			const img = new Image();
 			this.player.once('item', () => {
@@ -490,7 +490,7 @@ export class BaseUIPlugin extends Plugin {
 				}
 			}
 
-			const timeFile = this.player.getTimeFile();
+			const timeFile = this.player.timeFile();
 			if (timeFile && this.currentTimeFile !== timeFile) {
 				this.player.currentTimeFile = timeFile;
 
@@ -629,7 +629,7 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createSettingsButton(parent: HTMLDivElement, hovered = false) {
-		if (!this.player.hasSpeeds() && !this.player.hasAudioTracks() && !this.player.hasCaptions()) return;
+		if (!this.player.hasSpeeds() && !this.player.hasAudioTracks() && !this.player.hasSubtitles()) return;
 
 		const settingsButton = this.createUiButton(
 			parent,
@@ -712,9 +712,9 @@ export class BaseUIPlugin extends Plugin {
 
 		this.playbackButton.addEventListener('keydown', () => this.player.emit.bind(this)('dynamicControls'));
 
-		this.player.getVideoElement().addEventListener('focus', () => {
+		this.player.videoElement.addEventListener('focus', () => {
 			this.player.emit('dynamicControls');
-			this.player.getVideoElement().scrollIntoView();
+			this.player.videoElement.scrollIntoView();
 		});
 
 		this.player.on('pause', () => {
@@ -741,7 +741,7 @@ export class BaseUIPlugin extends Plugin {
 
 		seekBack.addEventListener('click', () => {
 			this.player.emit('hide-tooltip');
-			this.player.rewindVideo();
+			this.player.rewind();
 		});
 
 		this.player.on('pip-internal', (data) => {
@@ -767,7 +767,7 @@ export class BaseUIPlugin extends Plugin {
 
 		seekForward.addEventListener('click', () => {
 			this.player.emit('hide-tooltip');
-			this.player.forwardVideo();
+			this.player.forward();
 		});
 
 		this.player.on('pip-internal', (data) => {
@@ -876,7 +876,7 @@ export class BaseUIPlugin extends Plugin {
 			])
 			.appendTo(parent).get();
 
-		time.innerText = humanTime(this.player.getDuration());
+		time.innerText = humanTime(this.player.duration());
 
 		switch (type) {
 			case 'current':
@@ -1000,8 +1000,8 @@ export class BaseUIPlugin extends Plugin {
 		volumeSlider.min = '0';
 		volumeSlider.max = '100';
 		volumeSlider.step = '1';
-		volumeSlider.value = this.player.getVolume().toString();
-		volumeSlider.style.backgroundSize = `${this.player.getVolume()}% 100%`;
+		volumeSlider.value = this.player.volume().toString();
+		volumeSlider.style.backgroundSize = `${this.player.volume()}% 100%`;
 
 		const mutedButton = this.createSVGElement(volumeButton, 'volumeMuted', this.buttons.volumeMuted, true, hovered);
 		const lowButton = this.createSVGElement(volumeButton, 'volumeLow', this.buttons.volumeLow, true, hovered);
@@ -1018,7 +1018,7 @@ export class BaseUIPlugin extends Plugin {
 			event.stopPropagation();
 			const newVolume = Math.floor(parseInt(volumeSlider.value, 10));
 			volumeSlider.style.backgroundSize = `${newVolume}% 100%`;
-			this.player.setVolume(newVolume);
+			this.player.volume(newVolume);
 		});
 
 		volumeContainer.addEventListener('wheel', (event) => {
@@ -1030,7 +1030,7 @@ export class BaseUIPlugin extends Plugin {
 
 			volumeSlider.style.backgroundSize = `${volumeSlider.value}% 100%`;
 			volumeSlider.value = (parseFloat(volumeSlider.value) + (delta * 0.50)).toString();
-			this.player.setVolume(parseFloat(volumeSlider.value));
+			this.player.volume(parseFloat(volumeSlider.value));
 		}, {
 			passive: true,
 		});
@@ -1047,8 +1047,8 @@ export class BaseUIPlugin extends Plugin {
 				volumeSlider.style.backgroundSize = `${0}% 100%`;
 				volumeSlider.value = '0';
 			} else {
-				volumeSlider.style.backgroundSize = `${this.player.getVolume()}% 100%`;
-				volumeSlider.value = this.player.getVolume().toString();
+				volumeSlider.style.backgroundSize = `${this.player.volume()}% 100%`;
+				volumeSlider.value = this.player.volume().toString();
 			}
 		});
 
@@ -1062,7 +1062,7 @@ export class BaseUIPlugin extends Plugin {
 		mediumButton: SVGSVGElement,
 		highButton: SVGSVGElement
 	) {
-		if (this.player.getMute() || data.volume == 0) {
+		if (this.player.muted() || data.volume == 0) {
 			lowButton.style.display = 'none';
 			mediumButton.style.display = 'none';
 			highButton.style.display = 'none';
@@ -1086,7 +1086,7 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	getClosestSeekableInterval() {
-		const scrubTime = this.player.getCurrentTime();
+		const scrubTime = this.player.currentTime();
 		const interval = this.previewTime.find((interval) => {
 			return scrubTime >= interval.start && scrubTime < interval.end;
 		})!;
@@ -1111,14 +1111,14 @@ export class BaseUIPlugin extends Plugin {
 			this.player.emit('hide-tooltip');
 		});
 
-		if (this.player.getPlaylistIndex() > 0) {
+		if (this.player.playlistIndex() > 0) {
 			previousButton.style.display = 'flex';
 		} else {
 			previousButton.style.display = 'none';
 		}
 
 		this.player.on('item', () => {
-			if (this.player.getPlaylistIndex() > 0) {
+			if (this.player.playlistIndex() > 0) {
 				previousButton.style.display = 'flex';
 			} else {
 				previousButton.style.display = 'none';
@@ -1269,7 +1269,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		if (this.player.hasCaptions()) {
+		if (this.player.hasSubtitles()) {
 			captionButton.style.display = 'flex';
 		} else {
 			captionButton.style.display = 'none';
@@ -1300,7 +1300,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('pip-internal', (data) => {
 			if (data) {
 				captionButton.style.display = 'none';
-			} else if (this.player.hasCaptions()) {
+			} else if (this.player.hasSubtitles()) {
 				captionButton.style.display = 'flex';
 			}
 		});
@@ -1468,7 +1468,7 @@ export class BaseUIPlugin extends Plugin {
 		});
 
 		this.player.on('fullscreen', () => {
-			if (this.player.getFullscreen()) {
+			if (this.player.fullscreen()) {
 				theaterButton.style.display = 'none';
 			} else {
 				theaterButton.style.display = 'flex';
@@ -1742,7 +1742,7 @@ export class BaseUIPlugin extends Plugin {
 				this.player.once('time', () => {
 					this.currentScrubTime = this.getClosestSeekableInterval();
 					this.player.emit('currentScrubTime', {
-						...this.player.getTimeData(),
+						...this.player.timeData(),
 						currentTime: this.getClosestSeekableInterval(),
 					});
 				});
@@ -1752,7 +1752,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('lastTimeTrigger', () => {
 			this.currentScrubTime = this.getClosestSeekableInterval();
 			this.player.emit('currentScrubTime', {
-				...this.player.getTimeData(),
+				...this.player.timeData(),
 				currentTime: this.getClosestSeekableInterval(),
 			});
 		});
@@ -1760,8 +1760,8 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('currentScrubTime', (data: TimeData) => {
 			if (data.currentTime <= 0) {
 				data.currentTime = 0;
-			} else if (data.currentTime >= this.player.getDuration()) {
-				data.currentTime = this.player.getDuration();
+			} else if (data.currentTime >= this.player.duration()) {
+				data.currentTime = this.player.duration();
 			}
 
 			const thumb = this.thumbs.find((thumb) => {
@@ -1932,11 +1932,11 @@ export class BaseUIPlugin extends Plugin {
 
 			languageButton.addEventListener('click', (event) => {
 				event.stopPropagation();
-				this.player.setCurrentAudioTrack(data.id);
+				this.player.audioTrack(data.id);
 				this.player.emit('show-menu', false);
 			});
 		} else if (data.buttonType == 'subtitle') {
-			if (data.id === this.player.getCaptionIndex()) {
+			if (data.id === this.player.subtitleIndex()) {
 				chevron.classList.remove('hidden');
 				languageButton.classList.add('bg-white/20');
 			} else {
@@ -1956,7 +1956,7 @@ export class BaseUIPlugin extends Plugin {
 
 			languageButton.addEventListener('click', (event) => {
 				event.stopPropagation();
-				this.player.setCurrentCaption(data.id);
+				this.player.subtitle(data.id);
 				this.player.emit('show-menu', false);
 			});
 		}
@@ -2086,7 +2086,7 @@ export class BaseUIPlugin extends Plugin {
 
 		return {
 			scrubTime: (offsetX / parent.offsetWidth) * 100,
-			scrubTimePlayer: (offsetX / parent.offsetWidth) * this.player.getDuration(),
+			scrubTimePlayer: (offsetX / parent.offsetWidth) * this.player.duration(),
 		};
 	}
 
@@ -2097,7 +2097,7 @@ export class BaseUIPlugin extends Plugin {
 	 * @param episode - The episode number to play.
 	 */
 	setEpisode(season: number, episode: number) {
-		const item = this.player.getPlaylist().findIndex((l: any) => l.season == season && l.episode == episode);
+		const item = this.player.playlist().findIndex((l: any) => l.season == season && l.episode == episode);
 		if (item == -1) {
 			this.player.playlistItem(0);
 		} else {
