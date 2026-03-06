@@ -48,11 +48,10 @@
 
 		<div class="controls">
 			<button onclick="player.togglePlayback()">Play / Pause</button>
-			<button id="sub-toggle" onclick="toggleSub()">Enable Subtitles</button>
 		</div>
 
-		<h2>Subtitle Status</h2>
-		<p id="sub-status" style="color:#a1a1aa; margin-bottom:8px;">Subtitles: off</p>
+		<h2>Subtitles</h2>
+		<div class="controls" id="subtitle-controls"></div>
 
 		<h2>Event Log</h2>
 		<pre id="log"></pre>
@@ -62,6 +61,7 @@
 	<script>
 		// Get the OctopusPlugin from the IIFE bundle
 		var OctopusPlugin = nmplayer.OctopusPlugin;
+		var subtitleControls = document.getElementById('subtitle-controls');
 
 		var player = nmplayer('player').setup({
 			playlist: [{
@@ -100,21 +100,50 @@
 			logEl.scrollTop = logEl.scrollHeight;
 		}
 
-		var subEnabled = false;
-		var subBtn = document.getElementById('sub-toggle');
-		var subStatus = document.getElementById('sub-status');
+		// Build subtitle buttons dynamically from the captionsList event
+		// captionsList emits SubtitleTrack[] (the real subtitle tracks, without "Off")
+		player.on('captionsList', function (tracks) {
+			log('[captionsList] ' + tracks.length + ' subtitle tracks available');
 
-		function toggleSub() {
-			if (subEnabled) {
-				player.subtitle(-1);
-			} else {
-				player.subtitle(0);
-			}
+			// Add an "Off" button first — subtitle(0) = off
+			var offBtn = document.createElement('button');
+			offBtn.textContent = 'Off';
+			offBtn.classList.add('active');
+			offBtn.onclick = function () { setSubtitle(0); };
+			subtitleControls.appendChild(offBtn);
+
+			// Add a button for each real track — subtitle(i+1) = track at index i
+			tracks.forEach(function (track, i) {
+				var btn = document.createElement('button');
+				btn.textContent = track.label || track.language || ('Track ' + (i + 1));
+				btn.onclick = function () { setSubtitle(i + 1); };
+				subtitleControls.appendChild(btn);
+			});
+		});
+
+		function setSubtitle(index) {
+			player.subtitle(index);
+			log('[setSubtitle] Set subtitle → ' + (index === 0 ? 'Off' : index));
+		}
+
+		// captionsChanged emits a SubtitleTrack object (always defined)
+		// track.id === -1 means "Off", otherwise it's the active track
+		player.on('captionsChanged', function (track) {
+			var isOff = track.id === -1;
+			log('[captionsChanged] ' + (isOff ? 'Off' : track.label + ' (ASS rendered via OctopusPlugin)'));
+			updateSubtitleButtons(isOff ? 0 : track.id + 1);
+		});
+
+		function updateSubtitleButtons(activeIndex) {
+			var buttons = subtitleControls.querySelectorAll('button');
+			buttons.forEach(function (btn, i) {
+				btn.classList.toggle('active', i === activeIndex);
+			});
 		}
 
 		player.on('ready', function () {
 			log('[ready] Player is ready — OctopusPlugin active');
-			log('[ready] Click "Enable Subtitles" to see styled ASS rendering');
+			log('[ready] Select a subtitle track to see styled ASS rendering');
 		});
 
 		player.on('play', function () {
@@ -123,17 +152,6 @@
 
 		player.on('pause', function () {
 			log('[pause] Playback paused');
-		});
-
-		// captionsChanged emits SubtitleTrack or undefined (when off)
-		player.on('captionsChanged', function (track) {
-			subEnabled = !!track;
-			subBtn.textContent = subEnabled ? 'Disable Subtitles' : 'Enable Subtitles';
-			subBtn.className = subEnabled ? 'active' : '';
-			subStatus.textContent = subEnabled
-				? 'Subtitles: ' + track.label + ' (ASS rendered via OctopusPlugin)'
-				: 'Subtitles: off';
-			log('[captionsChanged] ' + (subEnabled ? track.label : 'disabled'));
 		});
 	</script>
 </body>
