@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Multi-Item Playlist — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+		#now-playing {
+			margin-top: 16px;
+			background: #27272a;
+			border-radius: 8px;
+			padding: 16px;
+		}
+		#now-playing h3 {
+			font-size: 0.95rem;
+			font-weight: 600;
+			margin-bottom: 4px;
+		}
+		#now-playing .meta {
+			font-size: 0.8rem;
+			color: #a78bfa;
+			margin-bottom: 8px;
+		}
+		#now-playing .desc {
+			font-size: 0.85rem;
+			color: #a1a1aa;
+			line-height: 1.4;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>Multi-Item Playlist</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Configuration" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			A three-item playlist with Previous / Next navigation, episode metadata, and playlist event logging.
+			The player fires <code>item</code>, <code>playlist</code>, and <code>playlistComplete</code> events
+			as you navigate between items.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="controls">
+			<button onclick="player.previous()">⏮ Previous</button>
+			<button onclick="player.togglePlayback()">⏯ Play / Pause</button>
+			<button onclick="player.next()">⏭ Next</button>
+		</div>
+
+		<div id="now-playing">
+			<h3 id="np-title">—</h3>
+			<div class="meta" id="np-meta"></div>
+			<div class="desc" id="np-desc"></div>
+		</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var player = nmplayer('player').setup({
+			playlist: [
+				{
+					id: 'sintel',
+					title: 'Sintel',
+					description: 'A girl searches for her lost dragon in a fantasy world.',
+					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					duration: '14:48',
+					year: 2010,
+					episode: 1,
+					season: 1,
+					show: 'Blender Films',
+				},
+				{
+					id: 'cosmos-laundromat',
+					title: 'Cosmos Laundromat',
+					description: 'On a desolate island, a suicidal sheep meets a strange demon who offers him the chance to live multiple lives.',
+					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
+					duration: '12:10',
+					year: 2015,
+					episode: 2,
+					season: 1,
+					show: 'Blender Films',
+				},
+				{
+					id: 'big-buck-bunny',
+					title: 'Big Buck Bunny',
+					description: 'A giant rabbit takes revenge on three bullying rodents.',
+					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+					duration: '9:56',
+					year: 2008,
+					episode: 3,
+					season: 1,
+					show: 'Blender Films',
+				},
+			],
+		});
+
+		// Now-playing info
+		var npTitle = document.getElementById('np-title');
+		var npMeta = document.getElementById('np-meta');
+		var npDesc = document.getElementById('np-desc');
+
+		function updateNowPlaying(item) {
+			npTitle.textContent = item.title;
+			npMeta.textContent = 'S' + item.season + ' E' + item.episode + ' · ' + item.show + ' · ' + item.year;
+			npDesc.textContent = item.description;
+		}
+
+		// Event log
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		player.on('item', function (data) {
+			log('[item] Now playing: ' + data.title + ' (E' + data.episode + ')');
+			updateNowPlaying(data);
+		});
+
+		player.on('playlist', function (data) {
+			log('[playlist] Playlist loaded — ' + data.length + ' items');
+		});
+
+		player.on('playlistComplete', function () {
+			log('[playlistComplete] All items have finished playing');
+		});
+
+		player.on('play', function () {
+			log('[play] Playback started');
+		});
+
+		player.on('pause', function () {
+			log('[pause] Playback paused');
+		});
+
+		player.on('ready', function () {
+			log('[ready] Player is ready');
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Custom Storage — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>Custom Storage (IndexedDB)</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Configuration" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			A custom <code>StorageInterface</code> backed by IndexedDB instead of the default
+			localStorage. All storage operations are logged below so you can see exactly when
+			the player reads and writes data. Use the buttons to manually save and load the
+			playback position.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="controls">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+			<button onclick="savePosition()">Save Position</button>
+			<button onclick="loadPosition()">Load Position</button>
+		</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		// ── IndexedDB Storage Adapter ──────────────────────────────
+		var DB_NAME = 'nmplayer-storage';
+		var STORE_NAME = 'keyval';
+		var dbReady;
+
+		function openDB() {
+			if (dbReady) return dbReady;
+			dbReady = new Promise(function (resolve, reject) {
+				var request = indexedDB.open(DB_NAME, 1);
+				request.onupgradeneeded = function () {
+					request.result.createObjectStore(STORE_NAME);
+				};
+				request.onsuccess = function () {
+					log('[idb] Database opened');
+					resolve(request.result);
+				};
+				request.onerror = function () {
+					reject(request.error);
+				};
+			});
+			return dbReady;
+		}
+
+		var idbStorage = {
+			get: function (key) {
+				return openDB().then(function (db) {
+					return new Promise(function (resolve, reject) {
+						var tx = db.transaction(STORE_NAME, 'readonly');
+						var req = tx.objectStore(STORE_NAME).get(key);
+						req.onsuccess = function () {
+							var val = req.result !== undefined ? req.result : null;
+							log('[idb:get] "' + key + '" → ' + JSON.stringify(val));
+							resolve(val);
+						};
+						req.onerror = function () { reject(req.error); };
+					});
+				});
+			},
+			set: function (key, value) {
+				return openDB().then(function (db) {
+					return new Promise(function (resolve, reject) {
+						var tx = db.transaction(STORE_NAME, 'readwrite');
+						tx.objectStore(STORE_NAME).put(value, key);
+						tx.oncomplete = function () {
+							log('[idb:set] "' + key + '" ← ' + JSON.stringify(value));
+							resolve();
+						};
+						tx.onerror = function () { reject(tx.error); };
+					});
+				});
+			},
+			remove: function (key) {
+				return openDB().then(function (db) {
+					return new Promise(function (resolve, reject) {
+						var tx = db.transaction(STORE_NAME, 'readwrite');
+						tx.objectStore(STORE_NAME).delete(key);
+						tx.oncomplete = function () {
+							log('[idb:remove] "' + key + '"');
+							resolve();
+						};
+						tx.onerror = function () { reject(tx.error); };
+					});
+				});
+			},
+		};
+
+		// ── Player Setup ───────────────────────────────────────────
+		var player = nmplayer('player').setup({
+			customStorage: idbStorage,
+			playlist: [{
+				id: 'sintel',
+				title: 'Sintel',
+				description: 'A girl searches for her lost dragon in a fantasy world.',
+				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				duration: '14:48',
+			}],
+		});
+
+		player.on('ready', function () {
+			log('[ready] Player is ready with IndexedDB storage');
+		});
+
+		player.on('play', function () {
+			log('[play] Playback started');
+		});
+
+		player.on('pause', function () {
+			log('[pause] Playback paused');
+		});
+
+		// ── Manual Save / Load ─────────────────────────────────────
+		function savePosition() {
+			var time = player.currentTime();
+			idbStorage.set('savedPosition', time).then(function () {
+				log('[save] Position saved: ' + time.toFixed(2) + 's');
+			});
+		}
+
+		function loadPosition() {
+			idbStorage.get('savedPosition').then(function (time) {
+				if (time !== null && time !== undefined) {
+					player.seek(time);
+					log('[load] Seeking to saved position: ' + time.toFixed(2) + 's');
+				} else {
+					log('[load] No saved position found');
+				}
+			});
+		}
+	</script>
+</body>
+</html>

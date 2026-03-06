@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Wiki Examples — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		h2 {
+			font-size: 1rem; font-weight: 600; margin-top: 32px; margin-bottom: 12px;
+			color: #a78bfa; text-transform: uppercase; letter-spacing: 0.05em;
+		}
+		h2:first-of-type { margin-top: 8px; }
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 12px;
+			margin-bottom: 8px;
+		}
+		@media (max-width: 640px) {
+			.grid { grid-template-columns: 1fr; }
+		}
+		.card {
+			display: block;
+			background: #18181b;
+			border: 1px solid #27272a;
+			border-radius: 8px;
+			padding: 16px;
+			text-decoration: none;
+			color: #e4e4e7;
+			transition: border-color 0.15s, background 0.15s;
+		}
+		.card:hover {
+			border-color: #a78bfa;
+			background: #1f1f23;
+		}
+		.card h3 {
+			font-size: 0.95rem;
+			font-weight: 600;
+			margin-bottom: 4px;
+		}
+		.card p {
+			font-size: 0.8rem;
+			color: #a1a1aa;
+			line-height: 1.4;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<h1>Wiki Examples</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			Standalone, copy-paste-ready examples for every feature of the NoMercy Video Player.
+			Each page works without a build step — just save the HTML and open it in your browser.
+		</p>
+
+		<h2>Getting Started</h2>
+		<div class="grid">
+			<a class="card" href="basic-setup.html">
+				<h3>Basic Setup</h3>
+				<p>The simplest player: one container, one video, a few event listeners.</p>
+			</a>
+			<a class="card" href="playlist.html">
+				<h3>Multi-Item Playlist</h3>
+				<p>Three-item playlist with show/season/episode metadata and navigation.</p>
+			</a>
+			<a class="card" href="ass-subtitles.html">
+				<h3>ASS Subtitles (OctopusPlugin)</h3>
+				<p>Styled ASS/SSA subtitles rendered via libass WebAssembly with custom fonts.</p>
+			</a>
+		</div>
+
+		<h2>Configuration</h2>
+		<div class="grid">
+			<a class="card" href="external-playlist.html">
+				<h3>External Playlist URL</h3>
+				<p>Load a playlist from a remote JSON file instead of inline config.</p>
+			</a>
+			<a class="card" href="url-resolution.html">
+				<h3>URL Resolution</h3>
+				<p>How basePath and imageBasePath resolve relative media and image URLs.</p>
+			</a>
+			<a class="card" href="custom-storage.html">
+				<h3>Custom Storage (IndexedDB)</h3>
+				<p>Replace localStorage with a custom IndexedDB storage adapter.</p>
+			</a>
+			<a class="card" href="access-token.html">
+				<h3>Access Token Authentication</h3>
+				<p>Attach a Bearer token to all media requests for authenticated playback.</p>
+			</a>
+			<a class="card" href="resume-playback.html">
+				<h3>Resume Playback</h3>
+				<p>Auto-resume from a saved position using the progress field.</p>
+			</a>
+			<a class="card" href="playback-rates.html">
+				<h3>Playback Rates</h3>
+				<p>Custom playback speed selector with 0.25x to 2x options.</p>
+			</a>
+		</div>
+
+		<h2>Plugin System</h2>
+		<div class="grid">
+			<a class="card" href="custom-plugin.html">
+				<h3>Custom Plugin</h3>
+				<p>Create and register a plugin that adds a time overlay to the player.</p>
+			</a>
+			<a class="card" href="keyboard-shortcuts.html">
+				<h3>Keyboard Shortcuts</h3>
+				<p>KeyHandlerPlugin with a live display of pressed keys and all shortcuts.</p>
+			</a>
+		</div>
+
+		<h2>Playback &amp; Controls</h2>
+		<div class="grid">
+			<a class="card" href="seeking-controls.html">
+				<h3>Seeking &amp; Navigation</h3>
+				<p>Seek by time, percentage, forward/rewind with live position display.</p>
+			</a>
+			<a class="card" href="volume-audio.html">
+				<h3>Volume &amp; Audio Control</h3>
+				<p>Volume slider, mute toggle, gain control, and audio track selection.</p>
+			</a>
+			<a class="card" href="display-modes.html">
+				<h3>Display Modes</h3>
+				<p>Fullscreen, Picture-in-Picture, and aspect ratio cycling.</p>
+			</a>
+		</div>
+
+		<h2>Tracks &amp; Events</h2>
+		<div class="grid">
+			<a class="card" href="tracks.html">
+				<h3>Quality, Subtitles &amp; Audio</h3>
+				<p>Dynamic quality level, subtitle, and audio track selection with events.</p>
+			</a>
+			<a class="card" href="events.html">
+				<h3>Event System</h3>
+				<p>Live event log with category filters and color-coded output.</p>
+			</a>
+		</div>
+
+		<h2>Advanced</h2>
+		<div class="grid">
+			<a class="card" href="advanced.html">
+				<h3>Chapters, Localization &amp; Messages</h3>
+				<p>Chapter navigation, custom translations, and display message API.</p>
+			</a>
+		</div>
+	</main>
+</body>
+</html>

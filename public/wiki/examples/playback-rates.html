@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Playback Rates — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+		#current-speed {
+			margin-top: 12px; font-size: 0.9rem; color: #a78bfa; font-weight: 600;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>Playback Rates</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Configuration" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			Configure available playback speeds with the <code>playbackRates</code> option.
+			Click any speed button below to change the rate. The active speed is highlighted
+			and the <code>speed</code> event is logged.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="controls">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+		</div>
+
+		<div class="controls" id="speed-buttons"></div>
+
+		<div id="current-speed">Current speed: 1x</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		var rates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
+		var player = nmplayer('player').setup({
+			playbackRates: rates,
+			playlist: [{
+				id: 'sintel',
+				title: 'Sintel',
+				description: 'A girl searches for her lost dragon in a fantasy world.',
+				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				duration: '14:48',
+			}],
+		});
+
+		// ── Build speed buttons ────────────────────────────────────
+		var container = document.getElementById('speed-buttons');
+
+		rates.forEach(function (rate) {
+			var btn = document.createElement('button');
+			btn.textContent = rate + 'x';
+			btn.setAttribute('data-rate', rate);
+			if (rate === 1) btn.classList.add('active');
+			btn.addEventListener('click', function () {
+				player.playbackRate(rate);
+			});
+			container.appendChild(btn);
+		});
+
+		function updateActiveButton(activeRate) {
+			var buttons = container.querySelectorAll('button');
+			buttons.forEach(function (btn) {
+				var btnRate = parseFloat(btn.getAttribute('data-rate'));
+				if (btnRate === activeRate) {
+					btn.classList.add('active');
+				} else {
+					btn.classList.remove('active');
+				}
+			});
+			document.getElementById('current-speed').textContent = 'Current speed: ' + activeRate + 'x';
+		}
+
+		// ── Events ─────────────────────────────────────────────────
+		player.on('ready', function () {
+			log('[ready] Player is ready');
+			log('[ready] Available rates: ' + rates.join(', '));
+		});
+
+		player.on('speed', function (data) {
+			log('[speed] Playback rate changed to ' + data.speed + 'x');
+			updateActiveButton(data.speed);
+		});
+
+		player.on('play', function () {
+			log('[play] Playback started');
+		});
+
+		player.on('pause', function () {
+			log('[pause] Playback paused');
+		});
+	</script>
+</body>
+</html>

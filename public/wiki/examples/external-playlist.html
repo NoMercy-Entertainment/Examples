@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>External Playlist URL — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>External Playlist URL</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Configuration" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			Instead of defining playlist items inline, pass a URL string to the <code>playlist</code> option.
+			The player fetches the JSON array at startup and loads the items automatically.
+			Check the event log below to see the loaded playlist data.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="controls">
+			<button onclick="player.togglePlayback()">⏯ Play / Pause</button>
+		</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		// Load playlist from an external JSON file
+		var player = nmplayer('player').setup({
+			playlist: '/wiki/examples/playlist.json',
+		});
+
+		// Event log
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		player.on('ready', function () {
+			log('[ready] Player is ready — playlist loaded from external URL');
+		});
+
+		player.on('playlist', function (data) {
+			log('[playlist] Loaded ' + data.length + ' items from playlist.json:');
+			data.forEach(function (item, i) {
+				log('  ' + (i + 1) + '. ' + item.title + ' (' + item.duration + ')');
+			});
+		});
+
+		player.on('item', function (data) {
+			log('[item] Now playing: ' + data.title);
+		});
+
+		player.on('play', function () {
+			log('[play] Playback started');
+		});
+
+		player.on('pause', function () {
+			log('[pause] Playback paused');
+		});
+	</script>
+</body>
+</html>

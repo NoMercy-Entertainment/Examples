@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Volume &amp; Audio Control — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+		#volumeDisplay {
+			background: #27272a; border: 1px solid #3f3f46; border-radius: 6px;
+			padding: 12px 16px; margin-top: 16px; font-size: 0.9rem;
+		}
+		#volumeDisplay strong { color: #a78bfa; }
+		input[type="range"] {
+			-webkit-appearance: none; appearance: none;
+			width: 200px; height: 6px; background: #3f3f46; border-radius: 3px;
+			outline: none; cursor: pointer;
+		}
+		input[type="range"]::-webkit-slider-thumb {
+			-webkit-appearance: none; appearance: none;
+			width: 16px; height: 16px; background: #a78bfa; border-radius: 50%;
+			cursor: pointer;
+		}
+		input[type="range"]::-moz-range-thumb {
+			width: 16px; height: 16px; background: #a78bfa; border-radius: 50%;
+			cursor: pointer; border: none;
+		}
+		.slider-label {
+			font-size: 0.85rem; color: #a1a1aa; min-width: 40px; text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>Volume &amp; Audio Control</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/API-Reference-Methods" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			Control the player's volume with a slider, buttons, and mute toggle.
+			The display updates in real time as volume and mute state change.
+		</p>
+
+		<div id="player"></div>
+
+		<div id="volumeDisplay">Volume: <strong>100%</strong> | Muted: <strong>No</strong></div>
+
+		<h2>Volume Slider</h2>
+		<div class="controls">
+			<span class="slider-label">0</span>
+			<input type="range" id="volumeSlider" min="0" max="100" value="100" oninput="setVolume(this.value)" />
+			<span class="slider-label">100</span>
+			<span class="slider-label" id="sliderValue">100%</span>
+		</div>
+
+		<h2>Volume Controls</h2>
+		<div class="controls">
+			<button id="btnMute" onclick="toggleMute()">Mute</button>
+			<button onclick="changeVolume(5)">Volume Up (+5)</button>
+			<button onclick="changeVolume(-5)">Volume Down (-5)</button>
+		</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		var volumeDisplayEl = document.getElementById('volumeDisplay');
+		var volumeSlider = document.getElementById('volumeSlider');
+		var sliderValueEl = document.getElementById('sliderValue');
+		var btnMute = document.getElementById('btnMute');
+		var isMuted = false;
+
+		// Initialize the player
+		var player = nmplayer('player').setup({
+			playlist: [{
+				id: 'sintel',
+				title: 'Sintel',
+				description: 'A girl searches for her lost dragon in a fantasy world.',
+				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				duration: '14:48',
+			}],
+		});
+
+		function setVolume(value) {
+			player.volume(parseInt(value, 10));
+		}
+
+		function changeVolume(delta) {
+			var current = player.volume();
+			var newVal = Math.max(0, Math.min(100, current + delta));
+			player.volume(newVal);
+		}
+
+		function toggleMute() {
+			player.toggleMute();
+		}
+
+		function updateDisplay(vol, muted) {
+			volumeDisplayEl.innerHTML = 'Volume: <strong>' + Math.round(vol) + '%</strong> | Muted: <strong>' + (muted ? 'Yes' : 'No') + '</strong>';
+			volumeSlider.value = Math.round(vol);
+			sliderValueEl.textContent = Math.round(vol) + '%';
+			if (muted) {
+				btnMute.textContent = 'Unmute';
+				btnMute.classList.add('active');
+			} else {
+				btnMute.textContent = 'Mute';
+				btnMute.classList.remove('active');
+			}
+		}
+
+		player.on('ready', function () {
+			log('[ready] Player is ready');
+		});
+
+		player.on('volume', function (data) {
+			isMuted = false;
+			updateDisplay(data.volume, isMuted);
+			log('[volume] Volume set to ' + Math.round(data.volume) + '%');
+		});
+
+		player.on('mute', function (data) {
+			isMuted = data.mute;
+			updateDisplay(player.volume(), isMuted);
+			log('[mute] Muted: ' + data.mute);
+		});
+	</script>
+</body>
+</html>

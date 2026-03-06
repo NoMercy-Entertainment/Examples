@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Custom Plugin — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+		.controls button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+		}
+		.controls button:hover { background: #3f3f46; }
+		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
+		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		pre#log {
+			background: #27272a; padding: 16px; border-radius: 8px;
+			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
+			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.4; white-space: pre-wrap;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← All Examples</a>
+		<h1>Custom Plugin</h1>
+		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Plugin-Development" target="_blank" rel="noopener">Wiki ↗</a>
+	</header>
+
+	<main>
+		<p>
+			Demonstrates how to create a custom plugin using the Plugin base class.
+			This example builds a "TimeOverlayPlugin" that displays the current playback time
+			as an overlay in the top-right corner of the player.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="controls">
+			<button id="btnEnable" onclick="enablePlugin()">Enable Plugin</button>
+			<button id="btnDisable" onclick="disablePlugin()">Disable Plugin</button>
+		</div>
+
+		<h2>Event Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@latest/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		function log(msg) {
+			logEl.textContent += msg + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		// Get the Plugin base class from the IIFE bundle
+		var Plugin = nmplayer.Plugin;
+
+		// Define a custom TimeOverlayPlugin
+		function TimeOverlayPlugin() {
+			Plugin.call(this);
+			this.overlay = null;
+			this._timeHandler = null;
+		}
+
+		TimeOverlayPlugin.prototype = Object.create(Plugin.prototype);
+		TimeOverlayPlugin.prototype.constructor = TimeOverlayPlugin;
+
+		TimeOverlayPlugin.prototype.use = function () {
+			var self = this;
+			var container = this.player.getContainer();
+
+			// Create the overlay element
+			this.overlay = document.createElement('div');
+			this.overlay.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.7);' +
+				'color:#e4e4e7;padding:6px 12px;border-radius:6px;font-size:14px;font-family:monospace;' +
+				'pointer-events:none;z-index:10;';
+			this.overlay.textContent = '0:00';
+			container.style.position = 'relative';
+			container.appendChild(this.overlay);
+
+			// Listen to time updates
+			this._timeHandler = function (data) {
+				if (self.overlay) {
+					self.overlay.textContent = data.currentTimeHuman + ' / ' + data.durationHuman;
+				}
+			};
+			this.player.on('time', this._timeHandler);
+
+			log('[plugin] TimeOverlayPlugin enabled (use)');
+		};
+
+		TimeOverlayPlugin.prototype.dispose = function () {
+			// Remove the overlay
+			if (this.overlay && this.overlay.parentNode) {
+				this.overlay.parentNode.removeChild(this.overlay);
+			}
+			this.overlay = null;
+
+			// Remove the event listener
+			if (this._timeHandler) {
+				this.player.off('time', this._timeHandler);
+				this._timeHandler = null;
+			}
+
+			log('[plugin] TimeOverlayPlugin disabled (dispose)');
+		};
+
+		// Initialize the player
+		var player = nmplayer('player').setup({
+			playlist: [{
+				id: 'sintel',
+				title: 'Sintel',
+				description: 'A girl searches for her lost dragon in a fantasy world.',
+				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				duration: '14:48',
+			}],
+		});
+
+		// Register the plugin
+		var timeOverlay = new TimeOverlayPlugin();
+		player.registerPlugin('timeOverlay', timeOverlay);
+		log('[plugin] TimeOverlayPlugin registered');
+
+		var pluginEnabled = false;
+
+		function enablePlugin() {
+			if (!pluginEnabled) {
+				player.usePlugin('timeOverlay');
+				pluginEnabled = true;
+				document.getElementById('btnEnable').classList.add('active');
+				document.getElementById('btnDisable').classList.remove('active');
+				log('[plugin] Plugin enabled by user');
+			}
+		}
+
+		function disablePlugin() {
+			if (pluginEnabled) {
+				timeOverlay.dispose();
+				pluginEnabled = false;
+				document.getElementById('btnDisable').classList.add('active');
+				document.getElementById('btnEnable').classList.remove('active');
+				log('[plugin] Plugin disabled by user');
+			}
+		}
+
+		player.on('ready', function () {
+			log('[ready] Player is ready');
+		});
+	</script>
+</body>
+</html>
