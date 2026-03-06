@@ -9,7 +9,7 @@ import {
 	humanTime,
 	nearestValue,
 	unique
-} from '@nomercy-entertainment/nomercy-video-player/src/helpers';
+} from '@nomercy-entertainment/nomercy-video-player/src/player/utils';
 import { buttons, type Icon } from './buttons';
 import { TimeData } from "@nomercy-entertainment/nomercy-video-player/src/types";
 

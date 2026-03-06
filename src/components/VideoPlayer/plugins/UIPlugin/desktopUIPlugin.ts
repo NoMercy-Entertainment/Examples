@@ -4,7 +4,7 @@ import {
 	limitSentenceByCharacters,
 	lineBreakShowTitle,
 	unique
-} from '@nomercy-entertainment/nomercy-video-player/src/helpers';
+} from '@nomercy-entertainment/nomercy-video-player/src/player/utils';
 
 import { BaseUIPlugin } from "./baseUIPlugin";
 

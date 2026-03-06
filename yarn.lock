@@ -621,10 +621,10 @@
     "@capacitor/core" "^6.1.2"
     "@jofr/capacitor-media-session" "^4.0.0"
 
-"@nomercy-entertainment/media-session@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@nomercy-entertainment/media-session/-/media-session-1.0.0.tgz"
-  integrity sha512-5tMQ8KhuLzWFEiLS04vQjrab9JDRNO4h4SOOMBmXDcJ1KGUe8PGeqVcZqafQazgavVyCqCoNQQuOLS+F4tmM/w==
+"@nomercy-entertainment/media-session@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/@nomercy-entertainment/media-session/-/media-session-1.0.1.tgz"
+  integrity sha512-acyisRbJRnI7997HlgxwEdGR9jATUVif/DljeYxFy4eTBUVzjUqn/XcDX4dMqVCy3Lu4AnruQkjUaJ1gXBzLHg==
 
 "@nomercy-entertainment/nomercy-music-player@^0.1.6":
   version "0.1.6"
@@ -634,12 +634,12 @@
     audiomotion-analyzer "^4.5.0"
     hls.js "^1.5.13"
 
-"@nomercy-entertainment/nomercy-video-player@^1.0.0-beta.4":
-  version "1.0.0-beta.4"
-  resolved "https://registry.npmjs.org/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.0.0-beta.4.tgz"
-  integrity sha512-Iwc5Tb2kN0+VJttVwpzpsrnvxQylFW2fA2mVaUN+9I6wmceTdVzbKpAxw4C087jo1/xsD9iTkjGFjQJaXD1Amg==
+"@nomercy-entertainment/nomercy-video-player@^1.0.0-beta.12":
+  version "1.0.0-beta.12"
+  resolved "https://registry.npmjs.org/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.0.0-beta.12.tgz"
+  integrity sha512-7zTd2VeXmeF0byxFbCSbZJ6P8hbhR1gKt4FzVXP/xRgG0HlzH87PWiakidDYu/z7pO0haxKDNCPXrPN4kB2gyg==
   dependencies:
-    "@nomercy-entertainment/media-session" "^1.0.0"
+    "@nomercy-entertainment/media-session" "^1.0.1"
     "@types/webvtt-parser" "2.2.0"
     hls.js "1.6.15"
     tailwind-merge "3.5.0"
