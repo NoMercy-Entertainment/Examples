@@ -101,22 +101,16 @@
 		}
 
 		// Build subtitle buttons dynamically from the captionsList event
-		// captionsList emits SubtitleTrack[] (the real subtitle tracks, without "Off")
+		// captionsList emits subtitles() which includes "Off" (id: -1) at index 0
 		player.on('captionsList', function (tracks) {
-			log('[captionsList] ' + tracks.length + ' subtitle tracks available');
+			log('[captionsList] ' + tracks.length + ' entries (including Off)');
+			subtitleControls.innerHTML = '';
 
-			// Add an "Off" button first — subtitle(0) = off
-			var offBtn = document.createElement('button');
-			offBtn.textContent = 'Off';
-			offBtn.classList.add('active');
-			offBtn.onclick = function () { setSubtitle(0); };
-			subtitleControls.appendChild(offBtn);
-
-			// Add a button for each real track — subtitle(i+1) = track at index i
 			tracks.forEach(function (track, i) {
 				var btn = document.createElement('button');
-				btn.textContent = track.label || track.language || ('Track ' + (i + 1));
-				btn.onclick = function () { setSubtitle(i + 1); };
+				btn.textContent = track.label || track.language || ('Track ' + i);
+				if (i === 0) btn.classList.add('active');
+				btn.onclick = function () { setSubtitle(i); };
 				subtitleControls.appendChild(btn);
 			});
 		});

@@ -56,9 +56,7 @@
 		</div>
 
 		<h2>Subtitles</h2>
-		<div class="controls" id="subtitle-controls">
-			<button class="active" onclick="setSubtitle(0)">Off</button>
-		</div>
+		<div class="controls" id="subtitle-controls"></div>
 
 		<h2>Audio Tracks</h2>
 		<div class="controls" id="audio-controls"></div>
@@ -148,22 +146,25 @@
 				});
 			}
 
-			// Subtitle tracks (captionsList emits SubtitleTrack[] directly)
+			// Subtitle tracks — captionsList emits subtitles() which includes "Off" (id: -1) at index 0
 			player.on('captionsList', function (tracks) {
-				log('captionsList → ' + tracks.length + ' subtitle tracks');
+				log('captionsList → ' + tracks.length + ' entries (including Off)');
+				subtitleControls.innerHTML = '';
 				tracks.forEach(function (track, i) {
 					var btn = document.createElement('button');
-					btn.textContent = track.label || track.language || ('Track ' + (i + 1));
-					btn.onclick = function () { setSubtitle(i + 1); };
+					btn.textContent = track.label || track.language || ('Track ' + i);
+					if (i === 0) btn.classList.add('active');
+					btn.onclick = function () { setSubtitle(i); };
 					subtitleControls.appendChild(btn);
 				});
 			});
 
-			// captionsChanged emits the SubtitleTrack object or undefined (when off)
+			// captionsChanged always emits a SubtitleTrack object (id: -1 = Off)
 			player.on('captionsChanged', function (track) {
-				var trackIndex = track ? track.id : 0;
-				log('captionsChanged → ' + (track ? track.label : 'off'));
-				updateSubtitleButtons(trackIndex != null ? trackIndex : 0);
+				var isOff = track.id === -1;
+				var activeIndex = isOff ? 0 : track.id + 1;
+				log('captionsChanged → ' + (isOff ? 'Off' : track.label));
+				updateSubtitleButtons(activeIndex);
 			});
 
 			function setSubtitle(index) {
