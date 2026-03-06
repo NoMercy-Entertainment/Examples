@@ -160,10 +160,10 @@
 
 			// Time event (throttled to every 5 seconds)
 			player.on('time', function (data) {
-				var now = Math.floor(data.position);
+				var now = Math.floor(data.currentTime);
 				if (now - lastTimeLog >= 5) {
 					lastTimeLog = now;
-					log('time', { position: data.position, duration: data.duration });
+					log('time', { currentTime: data.currentTime, duration: data.duration, percentage: data.percentage });
 				}
 			});
 

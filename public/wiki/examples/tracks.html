@@ -114,10 +114,10 @@
 				chapters: true
 			});
 
-			// Quality levels
-			player.on('levels', function (data) {
-				log('levels → ' + data.levels.length + ' quality levels available');
-				data.levels.forEach(function (level, i) {
+			// Quality levels (levels event emits Level[] directly)
+			player.on('levels', function (levels) {
+				log('levels → ' + levels.length + ' quality levels available');
+				levels.forEach(function (level, i) {
 					var btn = document.createElement('button');
 					btn.textContent = level.height + 'p';
 					btn.onclick = function () { setQuality(i); };
@@ -126,8 +126,8 @@
 			});
 
 			player.on('levelsChanged', function (data) {
-				log('levelsChanged → index: ' + data.currentQuality);
-				updateQualityButtons(data.currentQuality);
+				log('levelsChanged → id: ' + data.id + ', name: ' + data.name);
+				updateQualityButtons(data.id);
 			});
 
 			function setQuality(index) {
@@ -148,10 +148,10 @@
 				});
 			}
 
-			// Subtitle tracks
-			player.on('captionsList', function (data) {
-				log('captionsList → ' + data.tracks.length + ' subtitle tracks');
-				data.tracks.forEach(function (track, i) {
+			// Subtitle tracks (captionsList emits SubtitleTrack[] directly)
+			player.on('captionsList', function (tracks) {
+				log('captionsList → ' + tracks.length + ' subtitle tracks');
+				tracks.forEach(function (track, i) {
 					var btn = document.createElement('button');
 					btn.textContent = track.label || track.language || ('Track ' + (i + 1));
 					btn.onclick = function () { setSubtitle(i + 1); };
@@ -159,9 +159,11 @@
 				});
 			});
 
-			player.on('captionsChanged', function (data) {
-				log('captionsChanged → track: ' + data.currentTrack);
-				updateSubtitleButtons(data.currentTrack);
+			// captionsChanged emits the SubtitleTrack object or undefined (when off)
+			player.on('captionsChanged', function (track) {
+				var trackIndex = track ? track.id : 0;
+				log('captionsChanged → ' + (track ? track.label : 'off'));
+				updateSubtitleButtons(trackIndex != null ? trackIndex : 0);
 			});
 
 			function setSubtitle(index) {
@@ -176,11 +178,11 @@
 				});
 			}
 
-			// Audio tracks
-			player.on('audioTracks', function (data) {
-				log('audioTracks → ' + data.tracks.length + ' audio tracks');
+			// Audio tracks (audioTracks emits AudioTrack[] directly)
+			player.on('audioTracks', function (tracks) {
+				log('audioTracks → ' + tracks.length + ' audio tracks');
 				audioControls.innerHTML = '';
-				data.tracks.forEach(function (track, i) {
+				tracks.forEach(function (track, i) {
 					var btn = document.createElement('button');
 					btn.textContent = track.language || track.label || ('Audio ' + (i + 1));
 					btn.onclick = function () { setAudioTrack(i); };
@@ -190,8 +192,8 @@
 			});
 
 			player.on('audioTrackChanged', function (data) {
-				log('audioTrackChanged → track: ' + data.currentTrack);
-				updateAudioButtons(data.currentTrack);
+				log('audioTrackChanged → id: ' + data.id + ', name: ' + data.name);
+				updateAudioButtons(data.id);
 			});
 
 			function setAudioTrack(index) {

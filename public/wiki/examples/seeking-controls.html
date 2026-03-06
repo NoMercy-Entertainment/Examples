@@ -117,19 +117,20 @@
 				' (' + Math.round(data.percentage) + '%)</strong>';
 		});
 
-		player.on('seek', function (data) {
-			log('[seek] Seeking to ' + Math.round(data.position) + 's');
+		// seek and seeked events emit no data payload
+		player.on('seek', function () {
+			log('[seek] Seeking...');
 		});
 
-		player.on('seeked', function (data) {
-			log('[seeked] Seeked to ' + Math.round(data.currentTime) + 's');
+		player.on('seeked', function () {
+			log('[seeked] Seek complete');
 		});
 
-		player.on('forward', function (data) {
+		player.on('forward', function () {
 			log('[forward] Forwarding');
 		});
 
-		player.on('rewind', function (data) {
+		player.on('rewind', function () {
 			log('[rewind] Rewinding');
 		});
 	</script>

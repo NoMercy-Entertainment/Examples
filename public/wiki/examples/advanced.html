@@ -165,7 +165,7 @@
 
 			player.on('time', function (data) {
 				if (chaptersData.length === 0) return;
-				var chapter = player.chapter(data.position);
+				var chapter = player.chapter(data.currentTime);
 				if (chapter) {
 					var newIndex = chaptersData.indexOf(chapter);
 					if (newIndex !== currentChapterIndex) {

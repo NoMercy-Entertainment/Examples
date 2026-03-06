@@ -65,58 +65,52 @@
 			logEl.scrollTop = logEl.scrollHeight;
 		}
 
-		// Get the Plugin base class from the IIFE bundle
-		var Plugin = nmplayer.Plugin;
-
-		// Define a custom TimeOverlayPlugin
-		function TimeOverlayPlugin() {
-			Plugin.call(this);
-			this.overlay = null;
-			this._timeHandler = null;
-		}
-
-		TimeOverlayPlugin.prototype = Object.create(Plugin.prototype);
-		TimeOverlayPlugin.prototype.constructor = TimeOverlayPlugin;
-
-		TimeOverlayPlugin.prototype.use = function () {
-			var self = this;
-			var container = this.player.getContainer();
-
-			// Create the overlay element
-			this.overlay = document.createElement('div');
-			this.overlay.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.7);' +
-				'color:#e4e4e7;padding:6px 12px;border-radius:6px;font-size:14px;font-family:monospace;' +
-				'pointer-events:none;z-index:10;';
-			this.overlay.textContent = '0:00';
-			container.style.position = 'relative';
-			container.appendChild(this.overlay);
-
-			// Listen to time updates
-			this._timeHandler = function (data) {
-				if (self.overlay) {
-					self.overlay.textContent = data.currentTimeHuman + ' / ' + data.durationHuman;
-				}
-			};
-			this.player.on('time', this._timeHandler);
-
-			log('[plugin] TimeOverlayPlugin enabled (use)');
-		};
-
-		TimeOverlayPlugin.prototype.dispose = function () {
-			// Remove the overlay
-			if (this.overlay && this.overlay.parentNode) {
-				this.overlay.parentNode.removeChild(this.overlay);
-			}
-			this.overlay = null;
-
-			// Remove the event listener
-			if (this._timeHandler) {
-				this.player.off('time', this._timeHandler);
+		// Define a custom TimeOverlayPlugin using ES class syntax
+		class TimeOverlayPlugin extends nmplayer.Plugin {
+			constructor() {
+				super();
+				this.overlay = null;
 				this._timeHandler = null;
 			}
 
-			log('[plugin] TimeOverlayPlugin disabled (dispose)');
-		};
+			use() {
+				var self = this;
+				var container = this.player.getContainer();
+
+				// Create the overlay element
+				this.overlay = document.createElement('div');
+				this.overlay.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.7);' +
+					'color:#e4e4e7;padding:6px 12px;border-radius:6px;font-size:14px;font-family:monospace;' +
+					'pointer-events:none;z-index:10;';
+				this.overlay.textContent = '0:00';
+				container.style.position = 'relative';
+				container.appendChild(this.overlay);
+
+				// Listen to time updates
+				this._timeHandler = function (data) {
+					if (self.overlay) {
+						self.overlay.textContent = data.currentTimeHuman + ' / ' + data.durationHuman;
+					}
+				};
+				this.player.on('time', this._timeHandler);
+
+				log('[plugin] TimeOverlayPlugin enabled (use)');
+			}
+
+			dispose() {
+				if (this.overlay && this.overlay.parentNode) {
+					this.overlay.parentNode.removeChild(this.overlay);
+				}
+				this.overlay = null;
+
+				if (this._timeHandler) {
+					this.player.off('time', this._timeHandler);
+					this._timeHandler = null;
+				}
+
+				log('[plugin] TimeOverlayPlugin disabled (dispose)');
+			}
+		}
 
 		// Initialize the player
 		var player = nmplayer('player').setup({
