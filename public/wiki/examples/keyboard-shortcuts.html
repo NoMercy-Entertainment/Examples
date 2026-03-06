@@ -121,7 +121,7 @@
 		<pre id="log"></pre>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.12/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.13/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
 		function log(msg) {
@@ -159,16 +159,17 @@
 			log('[ready] Player is ready');
 		});
 
-		player.on('forward', function (data) {
+		player.on('forward', function () {
 			log('[forward] Seeking forward');
 		});
 
-		player.on('rewind', function (data) {
+		player.on('rewind', function () {
 			log('[rewind] Seeking backward');
 		});
 
-		player.on('speed', function (data) {
-			log('[speed] Playback speed changed to ' + data.speed + 'x');
+		// speed event emits the rate as a number directly
+		player.on('speed', function (rate) {
+			log('[speed] Playback speed changed to ' + rate + 'x');
 		});
 
 		player.on('play', function () {
@@ -179,16 +180,18 @@
 			log('[pause] Playback paused');
 		});
 
+		// volume and mute events emit VolumeState { volume, muted }
 		player.on('volume', function (data) {
 			log('[volume] Volume: ' + Math.round(data.volume) + '%');
 		});
 
 		player.on('mute', function (data) {
-			log('[mute] Muted: ' + data.mute);
+			log('[mute] Muted: ' + data.muted);
 		});
 
-		player.on('fullscreen', function (data) {
-			log('[fullscreen] Fullscreen: ' + data.fullscreen);
+		// fullscreen event emits a boolean directly
+		player.on('fullscreen', function (isFullscreen) {
+			log('[fullscreen] Fullscreen: ' + isFullscreen);
 		});
 	</script>
 </body>
