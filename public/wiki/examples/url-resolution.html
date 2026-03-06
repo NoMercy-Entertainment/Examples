@@ -115,14 +115,19 @@
 		}
 
 		player.on('ready', function () {
-			var src = player.currentSrc();
-			log('[ready] Player is ready');
-			log('[ready] Resolved source URL: ' + src);
+			var item = player.getPlaylistItem();
+			var basePath = 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films';
+			var imageBasePath = 'https://image.tmdb.org/t/p';
 
-			document.getElementById('resolved-file').textContent =
-				'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8';
-			document.getElementById('resolved-image').textContent =
-				'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg';
+			var resolvedFile = basePath + item.file;
+			var resolvedImage = imageBasePath + item.image;
+
+			document.getElementById('resolved-file').textContent = resolvedFile;
+			document.getElementById('resolved-image').textContent = resolvedImage;
+
+			log('[ready] Player is ready');
+			log('[ready] basePath + file = ' + resolvedFile);
+			log('[ready] imageBasePath + image = ' + resolvedImage);
 		});
 
 		player.on('play', function () {
