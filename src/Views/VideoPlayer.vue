@@ -107,6 +107,14 @@ watch(videoPlayerRef, (value) => {
     console.log('fullscreen', data);
   });
 
+  player.on('theaterMode', (data) => {
+    console.log('theaterMode', data);
+  });
+
+  player.on('pip', (data) => {
+    console.log('pip', data);
+  });
+
   player.on('resize', () => {
     console.log('resize');
   });
@@ -127,16 +135,16 @@ watch(videoPlayerRef, (value) => {
     console.log('audioTrackChanged', data);
   });
 
-  player.on('captionsList', (data) => {
-    console.log('captionsList', data);
+  player.on('subtitleList', (data) => {
+    console.log('subtitleList', data);
   });
 
-  player.on('captionsChanged', (data) => {
-    console.log('captionsChanged', data.id);
+  player.on('subtitleChanged', (data) => {
+    console.log('subtitleChanged', data.id);
   });
 
-  player.on('controls', (showing) => {
-    console.log('controls', showing);
+  player.on('active', (showing) => {
+    console.log('active', showing);
   });
 
   player.on('beforePlay', () => {
@@ -172,7 +180,7 @@ watch(videoPlayerRef, (value) => {
     });
   });
 
-  player.on('captionsList', (tracks) => {
+  player.on('subtitleList', (tracks) => {
     subtitleOptions.value = tracks.map((track, index) => {
       return {
         label: track.label ?? `Track ${index + 1}`,
@@ -182,7 +190,7 @@ watch(videoPlayerRef, (value) => {
     });
   });
 
-  player.on('captionsChanged', (track) => {
+  player.on('subtitleChanged', (track) => {
     subtitleOptions.value = subtitleOptions.value.map((option, index) => {
       option.active = index - 1 === track.id;
       return option;

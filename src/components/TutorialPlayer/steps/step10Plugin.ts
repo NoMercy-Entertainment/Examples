@@ -112,7 +112,7 @@ export class StepPlugin extends Step9Plugin {
 			() => this.player.rewind(),
 			() => {
 				if (this.controlsVisible) {
-					this.player.emit('hideControls');
+					this.player.ui_removeActiveClass();
 				}
 			},
 		));
@@ -128,7 +128,7 @@ export class StepPlugin extends Step9Plugin {
 				() => this.player.forward(),
 				() => {
 					if (this.controlsVisible) {
-						this.player.emit('hideControls');
+						this.player.ui_removeActiveClass();
 					}
 				},
 			));
@@ -177,7 +177,7 @@ export class StepPlugin extends Step9Plugin {
 			() => this.player.volumeUp(),
 			() => {
 				if (this.controlsVisible) {
-					this.player.emit('hideControls');
+					this.player.ui_removeActiveClass();
 				}
 			},
 		));
@@ -191,7 +191,7 @@ export class StepPlugin extends Step9Plugin {
 			() => this.player.volumeDown(),
 			() => {
 				if (this.controlsVisible) {
-					this.player.emit('hideControls');
+					this.player.ui_removeActiveClass();
 				}
 			},
 		));

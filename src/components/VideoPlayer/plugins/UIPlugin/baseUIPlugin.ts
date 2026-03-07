@@ -599,7 +599,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.emit('back');
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				backButton.style.display = 'none';
 			} else {
@@ -653,7 +653,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				settingsButton.style.display = 'none';
 			} else {
@@ -681,7 +681,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.emit('close');
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				closeButton.style.display = 'none';
 			} else {
@@ -744,7 +744,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.rewind();
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				seekBack.style.display = 'none';
 			} else {
@@ -770,7 +770,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.forward();
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				seekForward.style.display = 'none';
 			} else {
@@ -809,7 +809,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.previousChapter();
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				chapterBack.style.display = 'none';
 			} else {
@@ -848,7 +848,7 @@ export class BaseUIPlugin extends Plugin {
 			this.player.nextChapter();
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				chapterForward.style.display = 'none';
 			} else {
@@ -927,7 +927,7 @@ export class BaseUIPlugin extends Plugin {
 				break;
 		}
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				time.style.display = 'none';
 			} else {
@@ -1125,7 +1125,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				previousButton.style.display = 'none';
 			} else if (this.player.playlistItem().episode ?? -0 - 1 == 0) {
@@ -1199,7 +1199,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				nextButton.style.display = 'none';
 			} else if (this.player.isLastPlaylistItem()) {
@@ -1275,7 +1275,7 @@ export class BaseUIPlugin extends Plugin {
 			captionButton.style.display = 'none';
 		}
 
-		this.player.on('captionsList', (tracks) => {
+		this.player.on('subtitleList', (tracks) => {
 			if (tracks.length > 1) {
 				captionButton.style.display = 'flex';
 			} else {
@@ -1283,7 +1283,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('captionsChanged', (data) => {
+		this.player.on('subtitleChanged', (data) => {
 			if (!data || data.id == -1) {
 				onButton.classList.add('hidden');
 				onButton.classList.remove('flex');
@@ -1297,7 +1297,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				captionButton.style.display = 'none';
 			} else if (this.player.hasSubtitles()) {
@@ -1354,7 +1354,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				audioButton.style.display = 'none';
 			} else if (this.player.hasAudioTracks()) {
@@ -1423,7 +1423,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				qualityButton.style.display = 'none';
 			} else if (this.player.hasQualities()) {
@@ -1443,7 +1443,7 @@ export class BaseUIPlugin extends Plugin {
 			'theater'
 		);
 
-		this.createSVGElement(theaterButton, 'theater', this.buttons.theater, hovered);
+		this.createSVGElement(theaterButton, 'theater', this.buttons.theater, false, hovered);
 		this.createSVGElement(theaterButton, 'theater-enabled', this.buttons.theaterExit, true, hovered);
 
 		theaterButton.addEventListener('click', (event) => {
@@ -1474,7 +1474,7 @@ export class BaseUIPlugin extends Plugin {
 				theaterButton.style.display = 'flex';
 			}
 		});
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				theaterButton.style.display = 'none';
 			} else {
@@ -1510,7 +1510,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (enabled) => {
+		this.player.on('pip', (enabled) => {
 			if (enabled) {
 				fullscreenButton.style.display = 'none';
 			} else {
@@ -1569,7 +1569,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 		});
 
-		this.player.on('pip-internal', (data) => {
+		this.player.on('pip', (data) => {
 			if (data) {
 				playlistButton.style.display = 'none';
 			} else if (this.player.hasPlaylists()) {
@@ -1662,11 +1662,11 @@ export class BaseUIPlugin extends Plugin {
 			])
 			.appendTo(parent).get();
 
-		this.player.on('display-message', (val: string | null) => {
+		this.player.on('message', (val: string | null) => {
 			playerMessage.style.display = 'flex';
 			playerMessage.innerText = val ?? '';
 		});
-		this.player.on('remove-message', () => {
+		this.player.on('message-dismiss', () => {
 			playerMessage.style.display = 'none';
 			playerMessage.innerText = '';
 		});
@@ -1944,7 +1944,7 @@ export class BaseUIPlugin extends Plugin {
 				languageButton.classList.remove('bg-white/20');
 			}
 
-			this.player.on('captionsChanged', (track) => {
+			this.player.on('subtitleChanged', (track) => {
 				if (data.id === track.id) {
 					chevron.classList.remove('hidden');
 					languageButton.classList.add('bg-white/20');
