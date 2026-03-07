@@ -62,7 +62,7 @@
 		<pre id="log"></pre>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.13/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.14/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
 		function log(msg) {
@@ -112,22 +112,15 @@
 		}
 
 		// ── Events ─────────────────────────────────────────────────
-		var hasLoggedReady = false;
 		player.on('ready', function () {
-			if (hasLoggedReady) return;
-			hasLoggedReady = true;
 			log('[ready] Player is ready');
 			log('[ready] Available rates: ' + rates.join(', '));
 		});
 
 		// speed event emits the rate as a number directly
-		// Skip the initial speed event fired during setup
-		// Skip the initial speed event fired during setup
-		var initSpeed = true;
 		player.on('speed', function (rate) {
-			updateActiveButton(rate);
-			if (initSpeed) { initSpeed = false; return; }
 			log('[speed] Playback rate changed to ' + rate + 'x');
+			updateActiveButton(rate);
 		});
 
 		player.on('play', function () {
