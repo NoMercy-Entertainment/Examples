@@ -39,10 +39,10 @@
 
 	<main>
 		<p>
-			Demonstrates resuming from a saved position. The playlist item includes
-			<code>progress: { time: 120, date: '...' }</code>. The player's built-in
-			progress handling automatically seeks to the saved position on first play.
-			Use the buttons to save the current position or reset to the beginning.
+			Demonstrates resuming from a saved position using <code>localStorage</code>.
+			The saved time persists across page reloads. Click "Save Current Position"
+			while watching, then reload the page and click Play — it will seek to
+			your saved spot. "Reset to Start" clears the saved position.
 		</p>
 
 		<div id="player"></div>
@@ -66,7 +66,8 @@
 			logEl.scrollTop = logEl.scrollHeight;
 		}
 
-		var savedTime = 120;
+		var STORAGE_KEY = 'nmplayer-demo-resume-time';
+		var savedTime = parseFloat(localStorage.getItem(STORAGE_KEY)) || 0;
 
 		var player = nmplayer('player').setup({
 			playlist: [{
@@ -76,16 +77,24 @@
 				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
 				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 				duration: '14:48',
-				progress: {
-					time: 120,
-					date: '2024-01-15T10:30:00Z',
-				},
 			}],
 		});
 
 		player.on('ready', function () {
 			log('[ready] Player is ready');
-			log('[ready] progress.time = 120 → will seek to 2:00 on first play');
+			if (savedTime > 0) {
+				log('[ready] Saved position found: ' + savedTime.toFixed(1) + 's — will resume on play');
+			} else {
+				log('[ready] No saved position — playback starts from beginning');
+			}
+		});
+
+		// Resume from saved position on first play
+		player.once('firstFrame', function () {
+			if (savedTime > 0) {
+				player.seek(savedTime);
+				log('[resume] Seeking to saved position: ' + savedTime.toFixed(1) + 's');
+			}
 		});
 
 		player.on('play', function () {
@@ -112,14 +121,16 @@
 
 		function saveCurrentPosition() {
 			savedTime = player.currentTime();
+			localStorage.setItem(STORAGE_KEY, savedTime.toString());
 			log('[save] Position saved: ' + savedTime.toFixed(2) + 's');
-			log('[save] To resume here next time, set progress.time to ' + Math.round(savedTime));
+			log('[save] Reload the page and click Play to resume from here');
 		}
 
 		function resetToStart() {
 			player.seek(0);
 			savedTime = 0;
-			log('[reset] Position reset to start');
+			localStorage.removeItem(STORAGE_KEY);
+			log('[reset] Position reset and saved position cleared');
 		}
 	</script>
 </body>
