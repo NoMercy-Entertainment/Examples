@@ -107,12 +107,30 @@ watch(videoPlayerRef, (value) => {
     console.log('fullscreen', data);
   });
 
-  player.on('theaterMode', (data) => {
-    console.log('theaterMode', data);
+  player.on('theaterMode', (enabled) => {
+    console.log('theaterMode', enabled);
+    const container = document.getElementById('container');
+    const menu = document.getElementById('menu');
+    const wrapper = document.getElementById('wrapper');
+    if (enabled) {
+      menu?.classList.add('!hidden');
+      wrapper?.classList.add('!max-w-none');
+      container?.classList.add('!px-0', '!gap-0');
+    } else {
+      menu?.classList.remove('!hidden');
+      wrapper?.classList.remove('!max-w-none');
+      container?.classList.remove('!px-0', '!gap-0');
+    }
   });
 
-  player.on('pip', (data) => {
-    console.log('pip', data);
+  player.on('pip', (enabled) => {
+    console.log('pip', enabled);
+    const wrapper = document.getElementById('wrapper');
+    if (enabled) {
+      wrapper?.classList.add('pip-float');
+    } else {
+      wrapper?.classList.remove('pip-float');
+    }
   });
 
   player.on('resize', () => {
@@ -362,5 +380,20 @@ pre {
 
 pre {
   line-height: 1.15;
+}
+
+.pip-float {
+  position: fixed !important;
+  bottom: 1rem;
+  right: 1rem;
+  width: 24rem !important;
+  max-width: 30vw !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9 !important;
+  z-index: 9999;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  max-height: none !important;
 }
 </style>
