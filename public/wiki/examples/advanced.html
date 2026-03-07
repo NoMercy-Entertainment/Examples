@@ -91,7 +91,7 @@
 		<h2>Messages</h2>
 		<div class="controls">
 			<button onclick="showTimedMessage()">Show Message (3s)</button>
-			<button onclick="showPersistentMessage()">Show Persistent Message</button>
+			<button onclick="showPersistentMessage()">Show Message (30s)</button>
 		</div>
 
 		<h2>Event Log</h2>
@@ -142,13 +142,15 @@
 				chapters: true
 			});
 
-			// Chapters
 			player.on('ready', function () {
 				log('ready — player initialized');
 				currentLanguageEl.textContent = 'Current language: ' + (navigator.language || 'unknown');
+			});
 
+			// Chapters are loaded async from the VTT file — use the 'chapters' event
+			player.on('chapters', function () {
 				chaptersData = player.chapters() || [];
-				log('chapters → ' + chaptersData.length + ' chapters found');
+				log('chapters → ' + chaptersData.length + ' chapters loaded from VTT');
 
 				chapterListEl.innerHTML = '';
 				chaptersData.forEach(function (chapter, i) {
@@ -165,19 +167,24 @@
 
 			player.on('time', function (data) {
 				if (chaptersData.length === 0) return;
-				var chapter = player.chapter(data.currentTime);
-				if (chapter) {
-					var newIndex = chaptersData.indexOf(chapter);
-					if (newIndex !== currentChapterIndex) {
-						currentChapterIndex = newIndex;
-						currentChapterEl.textContent = 'Current Chapter: ' + (chapter.title || 'Unknown') +
-							' (' + formatTime(chapter.startTime) + ' – ' + formatTime(chapter.endTime) + ')';
-
-						var buttons = chapterListEl.querySelectorAll('button');
-						buttons.forEach(function (btn, i) {
-							btn.classList.toggle('active', i === newIndex);
-						});
+				// Find which chapter we're in by checking time ranges
+				var newIndex = -1;
+				for (var i = 0; i < chaptersData.length; i++) {
+					if (data.currentTime >= chaptersData[i].startTime && data.currentTime < chaptersData[i].endTime) {
+						newIndex = i;
+						break;
 					}
+				}
+				if (newIndex !== -1 && newIndex !== currentChapterIndex) {
+					currentChapterIndex = newIndex;
+					var ch = chaptersData[newIndex];
+					currentChapterEl.textContent = 'Current Chapter: ' + (ch.title || 'Unknown') +
+						' (' + formatTime(ch.startTime) + ' – ' + formatTime(ch.endTime) + ')';
+
+					var buttons = chapterListEl.querySelectorAll('button');
+					buttons.forEach(function (btn, i) {
+						btn.classList.toggle('active', i === newIndex);
+					});
 				}
 			});
 
@@ -225,15 +232,15 @@
 				localizeResultEl.textContent = results.join('\n');
 			};
 
-			// Messages
+			// Messages — displayMessage(text, timeMs) shows an overlay that auto-dismisses
 			window.showTimedMessage = function () {
-				player.emit('display-message', { message: 'Hello from the API!' });
-				log('display-message → "Hello from the API!" (auto-dismiss)');
+				player.displayMessage('Hello from the API!', 3000);
+				log('displayMessage("Hello from the API!", 3000)');
 			};
 
 			window.showPersistentMessage = function () {
-				player.emit('display-message', { message: 'This message stays visible.', persistent: true });
-				log('display-message → "This message stays visible." (persistent)');
+				player.displayMessage('This message stays visible.', 30000);
+				log('displayMessage("This message stays visible.", 30000)');
 			};
 		})();
 	</script>

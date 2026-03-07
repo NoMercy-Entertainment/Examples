@@ -39,10 +39,10 @@
 
 	<main>
 		<p>
-			The player automatically resumes from a saved position using the
-			<code>progress</code> field on playlist items. In this example the playlist item
-			includes <code>progress: { time: 120 }</code>, so playback starts at the 2-minute
-			mark. Use the buttons to save the current position or reset to the beginning.
+			Demonstrates resuming from a saved position. The playlist item includes
+			<code>progress: { time: 120, date: '...' }</code>, and we use
+			<code>once('firstFrame')</code> to seek to the saved time when playback begins.
+			Use the buttons to save the current position or reset to the beginning.
 		</p>
 
 		<div id="player"></div>
@@ -85,8 +85,16 @@
 
 		player.on('ready', function () {
 			log('[ready] Player is ready');
-			log('[ready] Resume position set to 120s (2:00) from progress data');
-			log('[ready] Last watched: 2024-01-15T10:30:00Z');
+			log('[ready] progress.time = 120 → will seek to 2:00 on first play');
+		});
+
+		// Resume from saved position on first frame render
+		player.once('firstFrame', function () {
+			var item = player.playlistItem();
+			if (item.progress && item.progress.time > 0) {
+				player.seek(item.progress.time);
+				log('[resume] Seeking to saved position: ' + item.progress.time + 's');
+			}
 		});
 
 		player.on('play', function () {
