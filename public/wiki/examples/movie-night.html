@@ -65,6 +65,7 @@
 
 		var config = {
 			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films',
+			imageBasePath: 'https://image.tmdb.org/t/p/w780',
 			playlist: [
 				{
 					id: 'sintel',
@@ -74,7 +75,7 @@
 					episode: 1,
 					year: 2010,
 					description: 'A girl searches for her lost dragon in a fantasy world.',
-					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+					image: '/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
 					file: '/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 					duration: '14:48',
 					progress: { time: 120, date: '2024-01-15T10:30:00Z' },
@@ -87,7 +88,7 @@
 					episode: 2,
 					year: 2015,
 					description: 'On a desolate island, a suicidal sheep meets a strange demon.',
-					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
+					image: '/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
 					file: '/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
 					duration: '12:10',
 				},
@@ -99,7 +100,7 @@
 					episode: 3,
 					year: 2008,
 					description: 'A giant rabbit takes revenge on three bullying rodents.',
-					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
+					image: '/xtdybjRRZ15mCrPOvEld305myys.jpg',
 					file: '/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
 					duration: '09:56',
 				},
@@ -110,7 +111,7 @@
 
 		// Now Playing card
 		function updateNowPlaying(item) {
-			document.getElementById('np-img').src = item.image || '';
+			document.getElementById('np-img').src = player.resolveImageUrl(item.image) || '';
 			document.getElementById('np-title').textContent = item.title;
 			document.getElementById('np-meta').textContent =
 				'S' + item.season + ' E' + item.episode + ' · ' + item.show + ' · ' + item.year;
