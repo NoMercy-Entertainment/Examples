@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Styled Subtitles — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.info-card {
+			background: #1f1f23; border: 1px solid #27272a; border-radius: 8px;
+			padding: 16px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
+		}
+		.info-card img { width: 100px; border-radius: 6px; flex-shrink: 0; }
+		.info-card h3 { font-size: 1rem; margin-bottom: 4px; }
+		.info-card .meta { font-size: 0.75rem; color: #a78bfa; margin-bottom: 6px; }
+		.info-card .desc { font-size: 0.8rem; color: #a1a1aa; line-height: 1.4; }
+		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
+		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+		.row button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
+		}
+		.row button:hover { background: #3f3f46; }
+		.row button.active { background: #7c3aed; border-color: #7c3aed; }
+		.tech-note {
+			background: #1a1a2e; border: 1px solid #312e81; border-radius: 8px;
+			padding: 14px 16px; margin-top: 16px; font-size: 0.8rem; line-height: 1.5; color: #c4b5fd;
+		}
+		.tech-note strong { color: #e4e4e7; }
+		pre#log {
+			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
+			max-height: 140px; overflow-y: auto; font-size: 12px;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← Examples</a>
+		<h1>Styled Subtitles</h1>
+	</header>
+
+	<main>
+		<p>
+			Advanced ASS/SSA subtitle rendering using the OctopusPlugin WebAssembly engine.
+			Custom fonts are loaded from a remote <code>fonts.json</code> manifest — no local files needed.
+		</p>
+
+		<div id="player"></div>
+
+		<div class="info-card">
+			<img src="https://image.tmdb.org/t/p/w185/vH8NqN2LMcmtBv037iHGwcPOgCZ.jpg" alt="Rail Wars!" />
+			<div>
+				<h3>Rail Wars!</h3>
+				<div class="meta">2014 · Anime · OctopusPlugin Demo</div>
+				<div class="desc">
+					The opening sequence features styled Romaji and English lyrics rendered via ASS subtitles
+					with custom positioning, colors, and the "Negotiate Free" font loaded at runtime.
+				</div>
+			</div>
+		</div>
+
+		<h2>Playback</h2>
+		<div class="row">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+			<button onclick="player.seek(0)">Restart</button>
+		</div>
+
+		<h2>Subtitles</h2>
+		<div class="row" id="sub-row">
+			<button class="active" onclick="toggleSubs(true)">Subtitles On</button>
+			<button onclick="toggleSubs(false)">Subtitles Off</button>
+		</div>
+
+		<div class="tech-note">
+			<strong>How it works:</strong> The OctopusPlugin uses <code>libass</code> compiled to WebAssembly
+			to render ASS subtitles pixel-perfectly on a canvas overlay. A <code>fonts.json</code> manifest
+			tells the player which custom fonts to fetch, so styled typographic effects render correctly
+			even without the font installed on the viewer's machine.
+		</div>
+
+		<h2>Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		var logLines = [];
+		function log(msg) {
+			logLines.push(msg);
+			if (logLines.length > 30) logLines.shift();
+			logEl.textContent = logLines.join('\n');
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		var basePath = 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Anime/Anime/Rail.Wars!.(2014)/Rail.Wars!.S00E00';
+
+		var player = nmplayer('player').setup({
+			playlist: [{
+				id: 'railwars-op',
+				title: 'Rail Wars! — Opening',
+				description: 'Opening sequence with styled ASS subtitles and custom fonts.',
+				image: 'https://image.tmdb.org/t/p/w780/vH8NqN2LMcmtBv037iHGwcPOgCZ.jpg',
+				file: basePath + '/Rail.Wars!.(2014).S00E00.NoMercy.m3u8',
+				duration: '01:30',
+				subtitles: [{
+					id: 'eng-full',
+					language: 'eng',
+					label: 'English (Styled)',
+					type: 'ass',
+					src: basePath + '/subtitles/Rail.Wars!.(2014).S00E00.NoMercy.eng.full.ass',
+				}],
+				fonts: basePath + '/fonts.json',
+			}],
+		});
+
+		var subsEnabled = true;
+
+		function toggleSubs(on) {
+			subsEnabled = on;
+			var btns = document.querySelectorAll('#sub-row button');
+			btns[0].classList.toggle('active', on);
+			btns[1].classList.toggle('active', !on);
+
+			if (on) {
+				player.subtitle(0);
+				log('[subs] Subtitles enabled');
+			} else {
+				player.subtitle(-1);
+				log('[subs] Subtitles disabled');
+			}
+		}
+
+		// Events
+		player.on('ready', function () { log('[ready] Player ready'); });
+		player.on('play', function () { log('[play] Playing'); });
+		player.on('pause', function () { log('[pause] Paused'); });
+		player.on('subtitleTrackChanged', function (data) {
+			log('[subtitle] Track changed: ' + JSON.stringify(data));
+		});
+		player.on('fontsLoaded', function () {
+			log('[fonts] Custom fonts loaded successfully');
+		});
+		player.on('item', function (data) {
+			log('[item] ' + data.title);
+		});
+	</script>
+</body>
+</html>

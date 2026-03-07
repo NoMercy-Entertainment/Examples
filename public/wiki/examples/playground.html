@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>API Playground — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p.intro { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 8px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
+
+		/* Tabs */
+		.tabs { display: flex; gap: 2px; margin-top: 12px; background: #0f0f12; border-radius: 8px 8px 0 0; overflow: hidden; }
+		.tab {
+			padding: 10px 16px; cursor: pointer; font-size: 0.8rem; color: #71717a;
+			border: none; background: transparent; transition: all 0.15s;
+		}
+		.tab:hover { color: #e4e4e7; background: #1f1f23; }
+		.tab.active { color: #a78bfa; background: #1f1f23; border-bottom: 2px solid #7c3aed; }
+
+		/* Method panel */
+		.panel {
+			display: none; background: #1f1f23; border: 1px solid #27272a;
+			border-top: none; border-radius: 0 0 8px 8px; padding: 16px;
+		}
+		.panel.active { display: block; }
+		.method-row {
+			display: flex; align-items: center; gap: 8px; padding: 8px 0;
+			border-bottom: 1px solid #27272a;
+		}
+		.method-row:last-child { border-bottom: none; }
+		.method-name {
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			font-size: 0.8rem; color: #60a5fa; min-width: 140px; flex-shrink: 0;
+		}
+		.method-row input {
+			background: #27272a; border: 1px solid #3f3f46; border-radius: 4px;
+			color: #e4e4e7; padding: 5px 10px; font-size: 0.75rem; width: 120px;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+		}
+		.method-row input::placeholder { color: #52525b; }
+		.method-row .run-btn {
+			background: #27272a; color: #a78bfa; border: 1px solid #3f3f46;
+			border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 0.7rem;
+			font-weight: 600;
+		}
+		.method-row .run-btn:hover { background: #3f3f46; }
+		.method-row .result {
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			font-size: 0.7rem; color: #4ade80; flex: 1; overflow: hidden;
+			text-overflow: ellipsis; white-space: nowrap;
+		}
+
+		/* Live state */
+		.state-grid {
+			display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 8px; margin-top: 8px;
+		}
+		.state-item {
+			background: #27272a; border-radius: 6px; padding: 10px 12px;
+			display: flex; justify-content: space-between; align-items: center;
+		}
+		.state-item .label { font-size: 0.75rem; color: #a1a1aa; }
+		.state-item .value {
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			font-size: 0.8rem; color: #e4e4e7;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← Examples</a>
+		<h1>API Playground</h1>
+	</header>
+
+	<main>
+		<p class="intro">
+			Try every player method interactively. Click "Run" to call a method, see its return value,
+			and watch the live state panel update in real time.
+		</p>
+
+		<div id="player"></div>
+
+		<h2>Methods</h2>
+		<div class="tabs" id="tabs"></div>
+		<div id="panels"></div>
+
+		<h2>Live State</h2>
+		<div class="state-grid" id="state-grid"></div>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		// Player setup
+		var player = nmplayer('player').setup({
+			playlist: [
+				{
+					id: 'sintel',
+					title: 'Sintel',
+					show: 'Blender Open Movies',
+					season: 1,
+					episode: 1,
+					year: 2010,
+					description: 'A girl searches for her lost dragon in a fantasy world.',
+					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					duration: '14:48',
+				},
+				{
+					id: 'bbb',
+					title: 'Big Buck Bunny',
+					show: 'Blender Open Movies',
+					season: 1,
+					episode: 2,
+					year: 2008,
+					description: 'A giant rabbit takes revenge on three bullying rodents.',
+					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+					duration: '09:56',
+				},
+			],
+		});
+
+		// Method definitions by category
+		var methodTabs = {
+			Playback: [
+				{ name: 'play', args: false },
+				{ name: 'pause', args: false },
+				{ name: 'stop', args: false },
+				{ name: 'state', args: false },
+				{ name: 'seek', args: true, placeholder: 'seconds (e.g. 30)' },
+				{ name: 'currentTime', args: false },
+				{ name: 'duration', args: false },
+			],
+			Volume: [
+				{ name: 'volume', args: true, placeholder: '0–100' },
+				{ name: 'mute', args: true, placeholder: 'true / false' },
+			],
+			Display: [
+				{ name: 'aspect', args: true, placeholder: 'uniform, fill, 16:9...' },
+				{ name: 'cycleAspectRatio', args: false },
+				{ name: 'fullscreen', args: true, placeholder: 'true / false' },
+			],
+			Playlist: [
+				{ name: 'next', args: false },
+				{ name: 'previous', args: false },
+				{ name: 'playlistItem', args: true, placeholder: 'index (0, 1, ...)' },
+				{ name: 'playlistIndex', args: false },
+				{ name: 'playlist', args: false },
+			],
+			Tracks: [
+				{ name: 'audioTrack', args: true, placeholder: 'index' },
+				{ name: 'audioTracks', args: false },
+				{ name: 'subtitle', args: true, placeholder: 'index (-1 = off)' },
+				{ name: 'subtitles', args: false },
+				{ name: 'quality', args: true, placeholder: 'index (-1 = auto)' },
+				{ name: 'qualities', args: false },
+			],
+			Info: [
+				{ name: 'container', args: false },
+				{ name: 'element', args: false },
+				{ name: 'version', args: false },
+			],
+		};
+
+		// Build tabs and panels
+		var tabsEl = document.getElementById('tabs');
+		var panelsEl = document.getElementById('panels');
+		var tabKeys = Object.keys(methodTabs);
+		var firstTab = true;
+
+		tabKeys.forEach(function (tabName) {
+			var tab = document.createElement('button');
+			tab.className = 'tab' + (firstTab ? ' active' : '');
+			tab.textContent = tabName;
+			tab.onclick = function () {
+				document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+				document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+				tab.classList.add('active');
+				document.getElementById('panel-' + tabName).classList.add('active');
+			};
+			tabsEl.appendChild(tab);
+
+			var panel = document.createElement('div');
+			panel.className = 'panel' + (firstTab ? ' active' : '');
+			panel.id = 'panel-' + tabName;
+
+			methodTabs[tabName].forEach(function (m) {
+				var row = document.createElement('div');
+				row.className = 'method-row';
+
+				var nameSpan = document.createElement('span');
+				nameSpan.className = 'method-name';
+				nameSpan.textContent = m.name + '()';
+				row.appendChild(nameSpan);
+
+				var input = null;
+				if (m.args) {
+					input = document.createElement('input');
+					input.type = 'text';
+					input.placeholder = m.placeholder || 'value';
+					input.onkeydown = function (e) {
+						if (e.key === 'Enter') runMethod(m.name, input, resultSpan);
+					};
+					row.appendChild(input);
+				}
+
+				var btn = document.createElement('button');
+				btn.className = 'run-btn';
+				btn.textContent = 'Run';
+				btn.onclick = function () { runMethod(m.name, input, resultSpan); };
+				row.appendChild(btn);
+
+				var resultSpan = document.createElement('span');
+				resultSpan.className = 'result';
+				row.appendChild(resultSpan);
+
+				panel.appendChild(row);
+			});
+
+			panelsEl.appendChild(panel);
+			firstTab = false;
+		});
+
+		function runMethod(name, input, resultEl) {
+			try {
+				var val;
+				if (input && input.value.trim() !== '') {
+					var arg = input.value.trim();
+					// Parse the argument
+					if (arg === 'true') arg = true;
+					else if (arg === 'false') arg = false;
+					else if (!isNaN(arg) && arg !== '') arg = Number(arg);
+					val = player[name](arg);
+				} else {
+					val = player[name]();
+				}
+				// Format result
+				if (val === undefined) {
+					resultEl.textContent = '→ void';
+					resultEl.style.color = '#71717a';
+				} else if (val !== null && typeof val === 'object') {
+					if (val instanceof HTMLElement) {
+						resultEl.textContent = '→ <' + val.tagName.toLowerCase() + '>';
+					} else {
+						try {
+							var str = JSON.stringify(val);
+							resultEl.textContent = '→ ' + (str.length > 80 ? str.slice(0, 80) + '…' : str);
+						} catch (e) {
+							resultEl.textContent = '→ [Object]';
+						}
+					}
+					resultEl.style.color = '#60a5fa';
+				} else {
+					resultEl.textContent = '→ ' + String(val);
+					resultEl.style.color = '#4ade80';
+				}
+			} catch (e) {
+				resultEl.textContent = '✗ ' + e.message;
+				resultEl.style.color = '#f87171';
+			}
+		}
+
+		// Live state panel
+		var stateFields = [
+			{ label: 'State', fn: function () { return player.state(); } },
+			{ label: 'Time', fn: function () { var t = player.currentTime(); return t != null ? t.toFixed(1) + 's' : '—'; } },
+			{ label: 'Duration', fn: function () { var d = player.duration(); return d != null ? d.toFixed(1) + 's' : '—'; } },
+			{ label: 'Volume', fn: function () { return player.volume(); } },
+			{ label: 'Muted', fn: function () { return player.mute(); } },
+			{ label: 'Aspect', fn: function () { return player.aspect(); } },
+			{ label: 'Playlist #', fn: function () { return player.playlistIndex(); } },
+			{ label: 'Fullscreen', fn: function () { return player.fullscreen(); } },
+		];
+
+		var stateGridEl = document.getElementById('state-grid');
+		var stateValueEls = [];
+
+		stateFields.forEach(function (field) {
+			var item = document.createElement('div');
+			item.className = 'state-item';
+			var label = document.createElement('span');
+			label.className = 'label';
+			label.textContent = field.label;
+			var value = document.createElement('span');
+			value.className = 'value';
+			value.textContent = '—';
+			item.appendChild(label);
+			item.appendChild(value);
+			stateGridEl.appendChild(item);
+			stateValueEls.push(value);
+		});
+
+		function updateState() {
+			stateFields.forEach(function (field, i) {
+				try {
+					var v = field.fn();
+					stateValueEls[i].textContent = v != null ? String(v) : '—';
+				} catch (e) {
+					stateValueEls[i].textContent = '—';
+				}
+			});
+		}
+
+		setInterval(updateState, 500);
+		player.on('ready', updateState);
+	</script>
+</body>
+</html>

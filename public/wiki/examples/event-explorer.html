@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Event Explorer — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
+		.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+		.toolbar button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 0.75rem;
+		}
+		.toolbar button:hover { background: #3f3f46; }
+		.toolbar button.active { border-color: #7c3aed; }
+
+		.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+		.chip {
+			display: inline-flex; align-items: center; gap: 4px;
+			padding: 4px 10px; border-radius: 12px; font-size: 0.7rem;
+			cursor: pointer; border: 1px solid transparent; user-select: none;
+			transition: opacity 0.15s;
+		}
+		.chip.off { opacity: 0.35; }
+		.chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+		.chip .badge {
+			background: rgba(255,255,255,0.15); padding: 1px 5px;
+			border-radius: 8px; font-size: 0.6rem; min-width: 18px; text-align: center;
+		}
+
+		#stream {
+			background: #0f0f12; border: 1px solid #27272a; border-radius: 8px; margin-top: 10px;
+			max-height: 400px; overflow-y: auto; font-size: 12px;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+		}
+		.evt {
+			padding: 6px 12px; border-bottom: 1px solid #1a1a1f;
+			display: flex; gap: 10px; align-items: flex-start; cursor: pointer;
+		}
+		.evt:hover { background: #1a1a1f; }
+		.evt .time { color: #52525b; font-size: 11px; min-width: 65px; flex-shrink: 0; }
+		.evt .name { font-weight: 600; min-width: 140px; flex-shrink: 0; }
+		.evt .preview { color: #71717a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+		.evt-data {
+			display: none; padding: 8px 12px 8px 87px;
+			background: #141418; border-bottom: 1px solid #1a1a1f;
+			font-size: 11px; white-space: pre-wrap; color: #a1a1aa;
+		}
+		.evt-data.open { display: block; }
+		.counter { font-size: 0.7rem; color: #71717a; margin-left: auto; }
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← Examples</a>
+		<h1>Event Explorer</h1>
+	</header>
+
+	<main>
+		<p>
+			Watch every event the player fires in a live, color-coded stream.
+			Click any event row to inspect its data. Use the filter chips to focus on specific categories.
+		</p>
+
+		<div id="player"></div>
+
+		<h2>Controls</h2>
+		<div class="toolbar">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+			<button onclick="player.next()">Next</button>
+			<button onclick="player.previous()">Previous</button>
+			<button onclick="togglePause()" id="btnPause">Pause Log</button>
+			<button onclick="clearLog()">Clear</button>
+			<span class="counter" id="total">0 events</span>
+		</div>
+
+		<h2>Filters</h2>
+		<div class="filters" id="filters"></div>
+
+		<h2>Event Stream</h2>
+		<div id="stream"></div>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		// Category definitions
+		var categories = {
+			playback: { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
+			media:    { color: '#60a5fa', events: ['bufferChange', 'levelsChanged', 'audioTracks', 'subtitleTracks'] },
+			time:     { color: '#facc15', events: ['time'] },
+			playlist: { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem', 'playlist'] },
+			display:  { color: '#22d3ee', events: ['fullscreen', 'resize', 'aspectRatio'] },
+			errors:   { color: '#f87171', events: ['error', 'warning', 'setupError'] },
+			lifecycle:{ color: '#a1a1aa', events: ['ready', 'beforePlay', 'beforeComplete', 'idle'] },
+		};
+
+		// Build reverse lookup: event name → category
+		var eventCategory = {};
+		Object.keys(categories).forEach(function (cat) {
+			categories[cat].events.forEach(function (evt) {
+				eventCategory[evt] = cat;
+			});
+			categories[cat].count = 0;
+			categories[cat].visible = true;
+		});
+
+		// Build filter chips
+		var filtersEl = document.getElementById('filters');
+		Object.keys(categories).forEach(function (cat) {
+			var chip = document.createElement('span');
+			chip.className = 'chip';
+			chip.dataset.cat = cat;
+			chip.style.background = categories[cat].color + '18';
+			chip.style.borderColor = categories[cat].color + '40';
+			chip.innerHTML = '<span class="dot" style="background:' + categories[cat].color + '"></span>' +
+				cat + '<span class="badge" id="badge-' + cat + '">0</span>';
+			chip.onclick = function () {
+				categories[cat].visible = !categories[cat].visible;
+				chip.classList.toggle('off', !categories[cat].visible);
+				refreshVisibility();
+			};
+			filtersEl.appendChild(chip);
+		});
+
+		var streamEl = document.getElementById('stream');
+		var totalEl = document.getElementById('total');
+		var paused = false;
+		var totalCount = 0;
+		var pendingEvents = [];
+
+		function togglePause() {
+			paused = !paused;
+			document.getElementById('btnPause').textContent = paused ? 'Resume Log' : 'Pause Log';
+			if (!paused) {
+				pendingEvents.forEach(function (e) { appendEvent(e.name, e.data, e.cat, e.ts); });
+				pendingEvents = [];
+			}
+		}
+
+		function clearLog() {
+			streamEl.innerHTML = '';
+			totalCount = 0;
+			totalEl.textContent = '0 events';
+			Object.keys(categories).forEach(function (cat) {
+				categories[cat].count = 0;
+				document.getElementById('badge-' + cat).textContent = '0';
+			});
+		}
+
+		function refreshVisibility() {
+			var rows = streamEl.querySelectorAll('[data-cat]');
+			rows.forEach(function (row) {
+				var cat = row.dataset.cat;
+				var show = categories[cat] && categories[cat].visible;
+				row.style.display = show ? '' : 'none';
+				// Also hide associated data row
+				var next = row.nextElementSibling;
+				if (next && next.classList.contains('evt-data')) {
+					next.style.display = show && next.classList.contains('open') ? 'block' : 'none';
+				}
+			});
+		}
+
+		function formatTime(d) {
+			var h = d.getHours().toString().padStart(2, '0');
+			var m = d.getMinutes().toString().padStart(2, '0');
+			var s = d.getSeconds().toString().padStart(2, '0');
+			var ms = d.getMilliseconds().toString().padStart(3, '0');
+			return h + ':' + m + ':' + s + '.' + ms;
+		}
+
+		function appendEvent(name, data, cat, ts) {
+			var color = categories[cat] ? categories[cat].color : '#a1a1aa';
+			var preview = '';
+			if (data != null) {
+				try { preview = JSON.stringify(data); } catch (e) { preview = String(data); }
+				if (preview.length > 120) preview = preview.slice(0, 120) + '…';
+			}
+
+			var row = document.createElement('div');
+			row.className = 'evt';
+			row.dataset.cat = cat;
+			row.innerHTML = '<span class="time">' + formatTime(ts) + '</span>' +
+				'<span class="name" style="color:' + color + '">' + name + '</span>' +
+				'<span class="preview">' + preview + '</span>';
+
+			var dataRow = document.createElement('div');
+			dataRow.className = 'evt-data';
+			try {
+				dataRow.textContent = data != null ? JSON.stringify(data, null, 2) : '(no data)';
+			} catch (e) {
+				dataRow.textContent = String(data);
+			}
+
+			row.onclick = function () {
+				dataRow.classList.toggle('open');
+				dataRow.style.display = dataRow.classList.contains('open') ? 'block' : 'none';
+			};
+
+			if (categories[cat] && !categories[cat].visible) {
+				row.style.display = 'none';
+			}
+
+			streamEl.appendChild(row);
+			streamEl.appendChild(dataRow);
+			streamEl.scrollTop = streamEl.scrollHeight;
+
+			// Update counters
+			totalCount++;
+			totalEl.textContent = totalCount + ' events';
+			if (categories[cat]) {
+				categories[cat].count++;
+				document.getElementById('badge-' + cat).textContent = categories[cat].count;
+			}
+		}
+
+		function logEvent(name, data) {
+			var cat = eventCategory[name] || 'lifecycle';
+			var ts = new Date();
+			if (paused) {
+				pendingEvents.push({ name: name, data: data, cat: cat, ts: ts });
+			} else {
+				appendEvent(name, data, cat, ts);
+			}
+		}
+
+		// Player setup
+		var player = nmplayer('player').setup({
+			playlist: [
+				{
+					id: 'sintel',
+					title: 'Sintel',
+					description: 'A girl searches for her lost dragon in a fantasy world.',
+					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					duration: '14:48',
+				},
+				{
+					id: 'cosmos',
+					title: 'Cosmos Laundromat',
+					description: 'On a desolate island, a suicidal sheep meets a strange demon.',
+					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
+					duration: '12:10',
+				},
+			],
+		});
+
+		// Subscribe to all events
+		var allEvents = [];
+		Object.keys(categories).forEach(function (cat) {
+			allEvents = allEvents.concat(categories[cat].events);
+		});
+		allEvents.forEach(function (evt) {
+			player.on(evt, function (data) { logEvent(evt, data); });
+		});
+	</script>
+</body>
+</html>

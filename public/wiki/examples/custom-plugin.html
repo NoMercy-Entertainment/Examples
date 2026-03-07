@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Custom Plugin — NoMercy Video Player</title>
+	<title>Build a Plugin — NoMercy Video Player</title>
 	<style>
 		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
@@ -14,105 +14,178 @@
 		main { max-width: 960px; margin: 0 auto; padding: 24px; }
 		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
 		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		.controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-		.controls button {
+		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
+		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+		.row button {
 			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.875rem;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
 		}
-		.controls button:hover { background: #3f3f46; }
-		.controls button.active { background: #7c3aed; border-color: #7c3aed; }
-		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+		.row button:hover { background: #3f3f46; }
+		.row button.active { background: #7c3aed; border-color: #7c3aed; }
+		.source-block {
+			background: #0f0f12; border: 1px solid #27272a; border-radius: 8px;
+			margin-top: 12px; overflow: hidden;
+		}
+		.source-block .source-header {
+			background: #1f1f23; padding: 8px 14px; font-size: 0.75rem; color: #a78bfa;
+			border-bottom: 1px solid #27272a; display: flex; justify-content: space-between; align-items: center;
+		}
+		.source-block .source-header button {
+			background: #27272a; color: #a1a1aa; border: 1px solid #3f3f46;
+			border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 0.65rem;
+		}
+		.source-block .source-header button:hover { background: #3f3f46; color: #e4e4e7; }
+		.source-block pre {
+			padding: 14px; font-size: 12px; line-height: 1.5; overflow-x: auto;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			color: #a1a1aa; white-space: pre; margin: 0;
+		}
+		.source-block pre .kw { color: #c084fc; }
+		.source-block pre .fn { color: #60a5fa; }
+		.source-block pre .str { color: #4ade80; }
+		.source-block pre .cmt { color: #52525b; }
+		.kbd-hints { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+		.kbd-hints span { font-size: 0.75rem; color: #a1a1aa; }
+		.kbd-hints kbd {
+			display: inline-block; background: #27272a; border: 1px solid #3f3f46;
+			border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: inherit;
+			color: #e4e4e7; margin-right: 4px;
+		}
 		pre#log {
-			background: #27272a; padding: 16px; border-radius: 8px;
-			max-height: 200px; overflow-y: auto; font-size: 13px; margin-top: 8px;
-			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-			line-height: 1.4; white-space: pre-wrap;
+			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
+			max-height: 120px; overflow-y: auto; font-size: 12px;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
 		}
 	</style>
 </head>
 <body>
 	<header>
-		<a href="/wiki/examples/">← All Examples</a>
-		<h1>Custom Plugin</h1>
-		<a href="https://github.com/NoMercy-Entertainment/NoMercyVideoPlayer/wiki/Plugin-Development" target="_blank" rel="noopener">Wiki ↗</a>
+		<a href="/wiki/examples/">← Examples</a>
+		<h1>Build a Plugin</h1>
 	</header>
 
 	<main>
 		<p>
-			Demonstrates how to create a custom plugin using the Plugin base class.
-			This example builds a "TimeOverlayPlugin" that displays the current playback time
-			as an overlay in the top-right corner of the player.
+			A custom "CinemaOverlay" plugin that adds a floating info bar, keyboard shortcuts,
+			and play/pause on click. The full source is shown below the player so you can study and copy it.
 		</p>
 
 		<div id="player"></div>
 
-		<div class="controls">
+		<h2>Plugin Controls</h2>
+		<div class="row">
 			<button onclick="player.play()">Play</button>
 			<button onclick="player.pause()">Pause</button>
-			<button id="btnEnable" onclick="enablePlugin()">Enable Plugin</button>
-			<button id="btnDisable" onclick="disablePlugin()">Disable Plugin</button>
+			<button id="btnToggle" class="active" onclick="togglePlugin()">Plugin: On</button>
 		</div>
 
-		<h2>Event Log</h2>
+		<h2>Plugin Keyboard Shortcuts</h2>
+		<div class="kbd-hints">
+			<span><kbd>I</kbd> Toggle info overlay</span>
+			<span><kbd>T</kbd> Change overlay position</span>
+		</div>
+
+		<h2>Plugin Source Code</h2>
+		<div class="source-block">
+			<div class="source-header">
+				<span>CinemaOverlayPlugin.js</span>
+				<button onclick="copySource()">Copy</button>
+			</div>
+			<pre id="source-code"></pre>
+		</div>
+
+		<h2>Log</h2>
 		<pre id="log"></pre>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
+		var logLines = [];
 		function log(msg) {
-			logEl.textContent += msg + '\n';
+			logLines.push(msg);
+			if (logLines.length > 20) logLines.shift();
+			logEl.textContent = logLines.join('\n');
 			logEl.scrollTop = logEl.scrollHeight;
 		}
 
-		// Define a custom TimeOverlayPlugin using ES class syntax
-		class TimeOverlayPlugin extends nmplayer.Plugin {
-			constructor() {
-				super();
-				this.overlay = null;
-				this._timeHandler = null;
-			}
+		// ─── CinemaOverlayPlugin ────────────────────────────
+		// This is the plugin source we also display below the player.
 
-			use() {
-				var self = this;
-				var container = this.player.element();
+		var pluginSource = [
+			'class CinemaOverlayPlugin extends nmplayer.Plugin {',
+			'  constructor() {',
+			'    super();',
+			'    this.bar = null;',
+			'    this._timeHandler = null;',
+			'    this._keyHandler = null;',
+			'    this._visible = true;',
+			'    this._position = 0; // 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left',
+			'    this._positions = [',
+			'      "top:12px;left:12px", "top:12px;right:12px",',
+			'      "bottom:12px;right:12px", "bottom:12px;left:12px"',
+			'    ];',
+			'  }',
+			'',
+			'  use() {',
+			'    var self = this;',
+			'    var container = this.player.element();',
+			'    container.style.position = "relative";',
+			'',
+			'    // Create floating info bar',
+			'    this.bar = document.createElement("div");',
+			'    this.bar.style.cssText = "position:absolute;" + this._positions[0] + ";background:rgba(0,0,0,0.75);" +',
+			'      "color:#e4e4e7;padding:8px 14px;border-radius:8px;font-size:13px;font-family:monospace;" +',
+			'      "pointer-events:none;z-index:10;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);";',
+			'    this.bar.textContent = "⏸ Ready";',
+			'    container.appendChild(this.bar);',
+			'',
+			'    // Update on time events',
+			'    this._timeHandler = function (data) {',
+			'      if (!self.bar || !self._visible) return;',
+			'      var icon = self.player.state() === "playing" ? "▶" : "⏸";',
+			'      self.bar.textContent = icon + " " + data.currentTimeHuman + " / " + data.durationHuman;',
+			'    };',
+			'    this.player.on("time", this._timeHandler);',
+			'',
+			'    // Keyboard shortcuts',
+			'    this._keyHandler = function (e) {',
+			'      if (e.key === "i" || e.key === "I") {',
+			'        self._visible = !self._visible;',
+			'        self.bar.style.display = self._visible ? "" : "none";',
+			'      }',
+			'      if (e.key === "t" || e.key === "T") {',
+			'        self._position = (self._position + 1) % 4;',
+			'        self.bar.style.cssText = self.bar.style.cssText',
+			'          .replace(/top:[^;]+;|bottom:[^;]+;|left:[^;]+;|right:[^;]+;/g, "")',
+			'          + ";" + self._positions[self._position];',
+			'      }',
+			'    };',
+			'    document.addEventListener("keydown", this._keyHandler);',
+			'  }',
+			'',
+			'  dispose() {',
+			'    if (this.bar && this.bar.parentNode) this.bar.parentNode.removeChild(this.bar);',
+			'    this.bar = null;',
+			'    if (this._timeHandler) this.player.off("time", this._timeHandler);',
+			'    if (this._keyHandler) document.removeEventListener("keydown", this._keyHandler);',
+			'  }',
+			'}',
+		].join('\n');
 
-				// Create the overlay element
-				this.overlay = document.createElement('div');
-				this.overlay.style.cssText = 'position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.7);' +
-					'color:#e4e4e7;padding:6px 12px;border-radius:6px;font-size:14px;font-family:monospace;' +
-					'pointer-events:none;z-index:10;';
-				this.overlay.textContent = '0:00';
-				container.style.position = 'relative';
-				container.appendChild(this.overlay);
+		// Display the source code
+		document.getElementById('source-code').textContent = pluginSource;
 
-				// Listen to time updates
-				this._timeHandler = function (data) {
-					if (self.overlay) {
-						self.overlay.textContent = data.currentTimeHuman + ' / ' + data.durationHuman;
-					}
-				};
-				this.player.on('time', this._timeHandler);
-
-				log('[plugin] TimeOverlayPlugin enabled (use)');
-			}
-
-			dispose() {
-				if (this.overlay && this.overlay.parentNode) {
-					this.overlay.parentNode.removeChild(this.overlay);
-				}
-				this.overlay = null;
-
-				if (this._timeHandler) {
-					this.player.off('time', this._timeHandler);
-					this._timeHandler = null;
-				}
-
-				log('[plugin] TimeOverlayPlugin disabled (dispose)');
-			}
+		function copySource() {
+			navigator.clipboard.writeText(pluginSource).then(function () {
+				log('[copy] Source copied to clipboard');
+			});
 		}
 
-		// Initialize the player
+		// Actually create and register the plugin by evaluating the source
+		eval(pluginSource);
+
 		var player = nmplayer('player').setup({
 			playlist: [{
 				id: 'sintel',
@@ -124,36 +197,32 @@
 			}],
 		});
 
-		// Register the plugin
-		var timeOverlay = new TimeOverlayPlugin();
-		player.registerPlugin('timeOverlay', timeOverlay);
-		log('[plugin] TimeOverlayPlugin registered');
+		var cinemaPlugin = new CinemaOverlayPlugin();
+		player.registerPlugin('cinema', cinemaPlugin);
+		player.usePlugin('cinema');
+		var pluginOn = true;
+		log('[plugin] CinemaOverlayPlugin registered and enabled');
 
-		var pluginEnabled = false;
-
-		function enablePlugin() {
-			if (!pluginEnabled) {
-				player.usePlugin('timeOverlay');
-				pluginEnabled = true;
-				document.getElementById('btnEnable').classList.add('active');
-				document.getElementById('btnDisable').classList.remove('active');
-				log('[plugin] Plugin enabled by user');
+		function togglePlugin() {
+			var btn = document.getElementById('btnToggle');
+			if (pluginOn) {
+				cinemaPlugin.dispose();
+				pluginOn = false;
+				btn.textContent = 'Plugin: Off';
+				btn.classList.remove('active');
+				log('[plugin] Disabled');
+			} else {
+				cinemaPlugin.use();
+				pluginOn = true;
+				btn.textContent = 'Plugin: On';
+				btn.classList.add('active');
+				log('[plugin] Enabled');
 			}
 		}
 
-		function disablePlugin() {
-			if (pluginEnabled) {
-				timeOverlay.dispose();
-				pluginEnabled = false;
-				document.getElementById('btnDisable').classList.add('active');
-				document.getElementById('btnEnable').classList.remove('active');
-				log('[plugin] Plugin disabled by user');
-			}
-		}
-
-		player.on('ready', function () {
-			log('[ready] Player is ready');
-		});
+		player.on('ready', function () { log('[ready] Player ready'); });
+		player.on('play', function () { log('[play] Playing'); });
+		player.on('pause', function () { log('[pause] Paused'); });
 	</script>
 </body>
 </html>

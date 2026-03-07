@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Movie Night — NoMercy Video Player</title>
+	<style>
+		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+		header a:hover { text-decoration: underline; }
+		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+		main { max-width: 960px; margin: 0 auto; padding: 24px; }
+		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+		.row button {
+			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
+		}
+		.row button:hover { background: #3f3f46; }
+		.row button.active { background: #7c3aed; border-color: #7c3aed; }
+		.now-playing {
+			background: #1f1f23; border: 1px solid #27272a; border-radius: 8px;
+			padding: 16px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
+		}
+		.now-playing img { width: 120px; border-radius: 6px; flex-shrink: 0; }
+		.now-playing h3 { font-size: 1rem; margin-bottom: 4px; }
+		.now-playing .meta { font-size: 0.75rem; color: #a78bfa; margin-bottom: 6px; }
+		.now-playing .desc { font-size: 0.8rem; color: #a1a1aa; line-height: 1.4; }
+		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
+		.kbd-hints { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+		.kbd-hints span { font-size: 0.75rem; color: #a1a1aa; }
+		.kbd-hints kbd {
+			display: inline-block; background: #27272a; border: 1px solid #3f3f46;
+			border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: inherit;
+			color: #e4e4e7; margin-right: 4px;
+		}
+		pre#log {
+			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
+			max-height: 140px; overflow-y: auto; font-size: 12px;
+			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<a href="/wiki/examples/">← Examples</a>
+		<h1>Movie Night</h1>
+	</header>
+
+	<main>
+		<div id="player"></div>
+
+		<div class="now-playing">
+			<img id="np-img" src="" alt="" />
+			<div>
+				<h3 id="np-title">Loading...</h3>
+				<div class="meta" id="np-meta"></div>
+				<div class="desc" id="np-desc"></div>
+			</div>
+		</div>
+
+		<h2>Playback</h2>
+		<div class="row">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+			<button onclick="player.previous()">Previous</button>
+			<button onclick="player.next()">Next</button>
+			<button onclick="savePosition()">Save Position</button>
+			<button onclick="resetPosition()">Reset Position</button>
+		</div>
+
+		<h2>Aspect Ratio</h2>
+		<div class="row" id="aspect-row">
+			<button onclick="player.cycleAspectRatio(); updateAspect()">Cycle</button>
+			<button class="active" onclick="setAspect('uniform')">Uniform</button>
+			<button onclick="setAspect('fill')">Fill</button>
+			<button onclick="setAspect('exactfit')">Exact Fit</button>
+			<button onclick="setAspect('16:9')">16:9</button>
+			<button onclick="setAspect('4:3')">4:3</button>
+		</div>
+
+		<h2>Keyboard Shortcuts</h2>
+		<div class="kbd-hints">
+			<span><kbd>Space</kbd> Play / Pause</span>
+			<span><kbd>←</kbd> -10s</span>
+			<span><kbd>→</kbd> +10s</span>
+			<span><kbd>M</kbd> Mute</span>
+			<span><kbd>↑</kbd> Volume up</span>
+			<span><kbd>↓</kbd> Volume down</span>
+		</div>
+
+		<h2>Log</h2>
+		<pre id="log"></pre>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script>
+		var logEl = document.getElementById('log');
+		var logLines = [];
+		function log(msg) {
+			logLines.push(msg);
+			if (logLines.length > 20) logLines.shift();
+			logEl.textContent = logLines.join('\n');
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		var player = nmplayer('player').setup({
+			playlist: [
+				{
+					id: 'sintel',
+					title: 'Sintel',
+					show: 'Blender Open Movies',
+					season: 1,
+					episode: 1,
+					year: 2010,
+					description: 'A girl searches for her lost dragon in a fantasy world.',
+					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					duration: '14:48',
+					progress: { time: 120, date: '2024-01-15T10:30:00Z' },
+				},
+				{
+					id: 'cosmos',
+					title: 'Cosmos Laundromat',
+					show: 'Blender Open Movies',
+					season: 1,
+					episode: 2,
+					year: 2015,
+					description: 'On a desolate island, a suicidal sheep meets a strange demon.',
+					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
+					duration: '12:10',
+				},
+				{
+					id: 'bbb',
+					title: 'Big Buck Bunny',
+					show: 'Blender Open Movies',
+					season: 1,
+					episode: 3,
+					year: 2008,
+					description: 'A giant rabbit takes revenge on three bullying rodents.',
+					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
+					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+					duration: '09:56',
+				},
+			],
+		});
+
+		// Now Playing card
+		function updateNowPlaying(item) {
+			document.getElementById('np-img').src = item.image || '';
+			document.getElementById('np-title').textContent = item.title;
+			document.getElementById('np-meta').textContent = 'S' + item.season + ' E' + item.episode + ' · ' + item.show + ' · ' + item.year;
+			document.getElementById('np-desc').textContent = item.description;
+		}
+
+		// Aspect buttons
+		function setAspect(mode) {
+			player.aspect(mode);
+			updateAspect();
+			log('[aspect] ' + mode);
+		}
+
+		function updateAspect() {
+			var current = player.aspect();
+			var btns = document.querySelectorAll('#aspect-row button');
+			var names = [null, 'uniform', 'fill', 'exactfit', '16:9', '4:3'];
+			btns.forEach(function (btn, i) {
+				btn.classList.toggle('active', names[i] === current);
+			});
+		}
+
+		// Save / Reset position
+		function savePosition() {
+			var time = player.currentTime();
+			var item = player.playlistItem();
+			item.progress = { time: Math.round(time), date: new Date().toISOString() };
+			log('[save] Position saved at ' + time.toFixed(1) + 's');
+		}
+
+		function resetPosition() {
+			var item = player.playlistItem();
+			delete item.progress;
+			player.seek(0);
+			log('[reset] Position reset');
+		}
+
+		// Keyboard shortcuts
+		document.addEventListener('keydown', function (e) {
+			if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+			switch (e.key) {
+				case ' ': e.preventDefault(); player.state() === 'playing' ? player.pause() : player.play(); break;
+				case 'ArrowLeft': player.seek(Math.max(0, player.currentTime() - 10)); break;
+				case 'ArrowRight': player.seek(player.currentTime() + 10); break;
+				case 'ArrowUp': e.preventDefault(); player.volume(Math.min(100, player.volume() + 10)); break;
+				case 'ArrowDown': e.preventDefault(); player.volume(Math.max(0, player.volume() - 10)); break;
+				case 'm': case 'M': player.mute(!player.mute()); break;
+			}
+		});
+
+		// Events
+		player.on('ready', function () { log('[ready] Player ready'); });
+		player.on('item', function (data) {
+			updateNowPlaying(data);
+			log('[item] ' + data.title);
+		});
+		player.on('play', function () { log('[play] Playing'); });
+		player.on('pause', function () { log('[pause] Paused'); });
+		player.on('seek', function () { log('[seek] → ' + player.currentTime().toFixed(1) + 's'); });
+		player.on('complete', function () { log('[complete] Item finished'); });
+		player.on('playlistComplete', function () { log('[playlistComplete] All done!'); });
+	</script>
+</body>
+</html>
