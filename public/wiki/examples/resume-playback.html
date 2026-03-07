@@ -39,10 +39,10 @@
 
 	<main>
 		<p>
-			Demonstrates resuming from a saved position using <code>localStorage</code>.
-			The saved time persists across page reloads. Click "Save Current Position"
-			while watching, then reload the page and click Play — it will seek to
-			your saved spot. "Reset to Start" clears the saved position.
+			Demonstrates resuming from a saved position. The playlist item includes
+			<code>progress: { time: 120, date: '...' }</code>, and the player's built-in
+			progress handling automatically seeks to the saved position on first play.
+			Use the buttons to save the current position or reset to the beginning.
 		</p>
 
 		<div id="player"></div>
@@ -66,9 +66,6 @@
 			logEl.scrollTop = logEl.scrollHeight;
 		}
 
-		var STORAGE_KEY = 'nmplayer-demo-resume-time';
-		var savedTime = parseFloat(localStorage.getItem(STORAGE_KEY)) || 0;
-
 		var player = nmplayer('player').setup({
 			playlist: [{
 				id: 'sintel',
@@ -77,23 +74,18 @@
 				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
 				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 				duration: '14:48',
+				progress: {
+					time: 120,
+					date: '2024-01-15T10:30:00Z',
+				},
 			}],
 		});
 
 		player.on('ready', function () {
+			var item = player.playlistItem();
 			log('[ready] Player is ready');
-			if (savedTime > 0) {
-				log('[ready] Saved position found: ' + savedTime.toFixed(1) + 's — will resume on play');
-			} else {
-				log('[ready] No saved position — playback starts from beginning');
-			}
-		});
-
-		// Resume from saved position on first play
-		player.once('firstFrame', function () {
-			if (savedTime > 0) {
-				player.seek(savedTime);
-				log('[resume] Seeking to saved position: ' + savedTime.toFixed(1) + 's');
+			if (item.progress && item.progress.time > 0) {
+				log('[ready] progress.time = ' + item.progress.time + ' → will seek to ' + Math.floor(item.progress.time / 60) + ':' + ('0' + (item.progress.time % 60)).slice(-2) + ' on first play');
 			}
 		});
 
@@ -120,17 +112,18 @@
 		});
 
 		function saveCurrentPosition() {
-			savedTime = player.currentTime();
-			localStorage.setItem(STORAGE_KEY, savedTime.toString());
-			log('[save] Position saved: ' + savedTime.toFixed(2) + 's');
-			log('[save] Reload the page and click Play to resume from here');
+			var time = player.currentTime();
+			var item = player.playlistItem();
+			item.progress = { time: Math.round(time), date: new Date().toISOString() };
+			log('[save] Position saved: ' + time.toFixed(2) + 's');
+			log('[save] progress updated → { time: ' + item.progress.time + ', date: "' + item.progress.date + '" }');
 		}
 
 		function resetToStart() {
+			var item = player.playlistItem();
+			delete item.progress;
 			player.seek(0);
-			savedTime = 0;
-			localStorage.removeItem(STORAGE_KEY);
-			log('[reset] Position reset and saved position cleared');
+			log('[reset] Position reset to start, progress cleared');
 		}
 	</script>
 </body>
