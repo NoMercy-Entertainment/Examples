@@ -14,7 +14,8 @@ import {
 	edgeStyles,
 	fontFamilies,
 	SubtitleSettingAction,
-	subtitleSettingActions, defaultSubtitleStyles
+	subtitleSettingActions, defaultSubtitleStyles,
+	textSizes
 } from './buttons';
 
 export class DesktopUIPlugin extends BaseUIPlugin {
@@ -165,6 +166,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		this.tooltip.remove();
 		this.episodeTip.remove();
 		this.loader.remove();
+		this.helpOverlay?.remove();
 	}
 
 	createTopRow(parent: HTMLDivElement) {
@@ -233,6 +235,213 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		window.addEventListener('resize', () => {
 			this.sizeMenuFrame();
+		});
+
+		// Subtitle size up/down via keyboard (+/-)
+		const sizeValues = textSizes.map(s => s.value);
+
+		this.player.on('subtitle-size-up', () => {
+			const current = this.player.subtitleStyle().fontSize;
+			const idx = sizeValues.indexOf(current);
+			if (idx < sizeValues.length - 1) {
+				const next = sizeValues[idx + 1];
+				this.player.subtitleStyle({ fontSize: next });
+				this.player.displayMessage(`${this.player.localize('Subtitle size')}: ${next}%`);
+			}
+		});
+
+		this.player.on('subtitle-size-down', () => {
+			const current = this.player.subtitleStyle().fontSize;
+			const idx = sizeValues.indexOf(current);
+			if (idx > 0) {
+				const next = sizeValues[idx - 1];
+				this.player.subtitleStyle({ fontSize: next });
+				this.player.displayMessage(`${this.player.localize('Subtitle size')}: ${next}%`);
+			}
+		});
+
+		// Keyboard shortcuts help overlay (? key)
+		this.initHelpOverlay();
+	}
+
+	private helpOverlay: HTMLDivElement | null = null;
+
+	private initHelpOverlay() {
+		const overlay = document.createElement('div');
+		overlay.id = 'keyboard-help-overlay';
+		Object.assign(overlay.style, {
+			position: 'absolute',
+			inset: '0',
+			width: '100%',
+			height: '100%',
+			maxWidth: '100%',
+			maxHeight: '100%',
+			background: 'rgba(0, 0, 0, 0.92)',
+			color: 'white',
+			padding: '2rem',
+			border: 'none',
+			zIndex: '10000',
+			overflow: 'auto',
+		});
+		this.helpOverlay = overlay;
+
+		const container = document.createElement('div');
+		Object.assign(container.style, {
+			maxWidth: '56rem',
+			margin: '0 auto',
+		});
+
+		const header = document.createElement('div');
+		Object.assign(header.style, {
+			display: 'flex',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginBottom: '1.5rem',
+		});
+
+		const title = document.createElement('h2');
+		title.textContent = this.player.localize('Keyboard Shortcuts');
+		Object.assign(title.style, { margin: '0', fontSize: '1.5rem', fontWeight: '600' });
+
+		const hint = document.createElement('span');
+		hint.textContent = this.player.localize('Press ? or Esc to close');
+		Object.assign(hint.style, { fontSize: '0.875rem', opacity: '0.6' });
+
+		header.append(title, hint);
+		container.appendChild(header);
+
+		const categories: Record<string, { key: string; label: string }[]> = {
+			'Playback': [
+				{ key: 'Space', label: 'Play / Pause' },
+				{ key: 'e', label: 'Next frame (paused)' },
+				{ key: ']', label: 'Speed up' },
+				{ key: '[', label: 'Speed down' },
+				{ key: '=', label: 'Normal speed' },
+				{ key: 't', label: 'Show time' },
+			],
+			'Volume': [
+				{ key: '↑', label: 'Volume up' },
+				{ key: '↓', label: 'Volume down' },
+				{ key: 'm', label: 'Mute / Unmute' },
+			],
+			'Seeking': [
+				{ key: '← / →', label: 'Seek back / forward' },
+				{ key: 'Shift + ← / →', label: 'Seek 3 seconds' },
+				{ key: 'Alt + ← / →', label: 'Seek 10 seconds' },
+				{ key: 'Ctrl + ← / →', label: 'Seek 1 minute' },
+			],
+			'Quick Seek': [
+				{ key: '3', label: 'Seek 30 seconds' },
+				{ key: '6', label: 'Seek 60 seconds' },
+				{ key: '9', label: 'Seek 90 seconds' },
+				{ key: '1', label: 'Seek 120 seconds' },
+			],
+			'Navigation': [
+				{ key: 'n', label: 'Next item' },
+				{ key: 'p', label: 'Previous item' },
+				{ key: 'Shift + N', label: 'Next chapter' },
+				{ key: 'Shift + P', label: 'Previous chapter' },
+			],
+			'Tracks & Subtitles': [
+				{ key: 'v / 5', label: 'Cycle subtitles' },
+				{ key: 'b / 2', label: 'Cycle audio' },
+				{ key: '+', label: 'Subtitle size up' },
+				{ key: '-', label: 'Subtitle size down' },
+			],
+			'Display': [
+				{ key: 'f / F11', label: 'Toggle fullscreen' },
+				{ key: 'Esc', label: 'Exit fullscreen' },
+				{ key: 'a', label: 'Cycle aspect ratio' },
+			],
+		};
+
+		const grid = document.createElement('div');
+		Object.assign(grid.style, {
+			display: 'grid',
+			gridTemplateColumns: 'repeat(auto-fill, minmax(20rem, 1fr))',
+			gap: '1.5rem',
+		});
+
+		for (const [category, shortcuts] of Object.entries(categories)) {
+			const section = document.createElement('div');
+
+			const catTitle = document.createElement('h3');
+			catTitle.textContent = this.player.localize(category);
+			Object.assign(catTitle.style, {
+				margin: '0 0 0.75rem 0',
+				fontSize: '0.9rem',
+				fontWeight: '600',
+				textTransform: 'uppercase',
+				letterSpacing: '0.05em',
+				opacity: '0.7',
+			});
+			section.appendChild(catTitle);
+
+			for (const shortcut of shortcuts) {
+				const row = document.createElement('div');
+				Object.assign(row.style, {
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					padding: '0.35rem 0',
+					borderBottom: '1px solid rgba(255,255,255,0.08)',
+				});
+
+				const label = document.createElement('span');
+				label.textContent = this.player.localize(shortcut.label);
+				Object.assign(label.style, { fontSize: '0.875rem' });
+
+				const kbd = document.createElement('kbd');
+				kbd.textContent = shortcut.key;
+				Object.assign(kbd.style, {
+					background: 'rgba(255,255,255,0.12)',
+					borderRadius: '0.25rem',
+					padding: '0.15rem 0.5rem',
+					fontSize: '0.8rem',
+					fontFamily: 'monospace',
+					minWidth: '1.5rem',
+					textAlign: 'center',
+				});
+
+				row.append(label, kbd);
+				section.appendChild(row);
+			}
+
+			grid.appendChild(section);
+		}
+
+		container.appendChild(grid);
+		overlay.appendChild(container);
+		this.player.overlay.appendChild(overlay);
+
+		// Close on click outside content
+		overlay.addEventListener('click', (e) => {
+			if (e.target === overlay) {
+				overlay.style.display = 'none';
+				this.player.lockActive = false;
+			}
+		});
+
+		overlay.style.display = 'none';
+
+		// Listen for ? key to toggle
+		document.addEventListener('keyup', (e) => {
+			if (document.activeElement?.nodeName === 'INPUT') return;
+			if (this.player.container.getBoundingClientRect().width === 0) return;
+
+			if (e.key === '?') {
+				const isVisible = overlay.style.display !== 'none';
+				if (isVisible) {
+					overlay.style.display = 'none';
+					this.player.lockActive = false;
+				} else {
+					overlay.style.display = 'flex';
+					this.player.lockActive = true;
+				}
+			} else if (e.key === 'Escape' && overlay.style.display !== 'none') {
+				overlay.style.display = 'none';
+				this.player.lockActive = false;
+			}
 		});
 	}
 
