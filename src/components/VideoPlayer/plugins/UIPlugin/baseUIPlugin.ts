@@ -415,12 +415,10 @@ export class BaseUIPlugin extends Plugin {
 			case 'next':
 				return '(n)';
 			case 'theater':
-				return '(t)';
 			case 'theater-enabled':
-				return '(t)';
 			case 'pip-enter':
 			case 'pip-exit':
-				return '(i)';
+				return '';
 			case 'playlist':
 				return '';
 			case 'previous':
@@ -1128,7 +1126,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('pip', (data) => {
 			if (data) {
 				previousButton.style.display = 'none';
-			} else if (this.player.playlistItem().episode ?? -0 - 1 == 0) {
+			} else if (this.player.playlistIndex() > 0) {
 				previousButton.style.display = 'flex';
 			}
 		});
@@ -1202,7 +1200,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player.on('pip', (data) => {
 			if (data) {
 				nextButton.style.display = 'none';
-			} else if (this.player.isLastPlaylistItem()) {
+			} else if (!this.player.isLastPlaylistItem()) {
 				nextButton.style.display = 'flex';
 			}
 		});
