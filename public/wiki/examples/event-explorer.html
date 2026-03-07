@@ -83,7 +83,7 @@
 		<div id="stream"></div>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.24/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.25/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		// Category definitions
 		var categories = {
@@ -127,6 +127,7 @@
 		var paused = false;
 		var totalCount = 0;
 		var pendingEvents = [];
+		var lastEvent = { name: '', dataJSON: '', row: null, dataRow: null, count: 0 };
 
 		function togglePause() {
 			paused = !paused;
@@ -141,6 +142,7 @@
 			streamEl.innerHTML = '';
 			totalCount = 0;
 			totalEl.textContent = '0 events';
+			lastEvent = { name: '', dataJSON: '', row: null, dataRow: null, count: 0 };
 			Object.keys(categories).forEach(function (cat) {
 				categories[cat].count = 0;
 				document.getElementById('badge-' + cat).textContent = '0';
@@ -169,11 +171,34 @@
 
 		function appendEvent(name, data, cat, ts) {
 			var color = categories[cat] ? categories[cat].color : '#a1a1aa';
-			var preview = '';
-			if (data != null) {
-				try { preview = JSON.stringify(data); } catch (e) { preview = String(data); }
-				if (preview.length > 120) preview = preview.slice(0, 120) + '…';
+			var dataJSON = '';
+			try { dataJSON = data != null ? JSON.stringify(data) : ''; } catch (e) { dataJSON = String(data); }
+
+			// Chrome-style dedup: if same event name + same data, increment counter
+			if (name === lastEvent.name && dataJSON === lastEvent.dataJSON && lastEvent.row) {
+				lastEvent.count++;
+				var badge = lastEvent.row.querySelector('.repeat-badge');
+				if (!badge) {
+					badge = document.createElement('span');
+					badge.className = 'repeat-badge';
+					badge.style.cssText = 'background:#a78bfa33;color:#a78bfa;padding:1px 6px;border-radius:8px;font-size:10px;margin-left:auto;flex-shrink:0';
+					lastEvent.row.appendChild(badge);
+				}
+				badge.textContent = lastEvent.count;
+				// Update timestamp
+				lastEvent.row.querySelector('.time').textContent = formatTime(ts);
+				streamEl.scrollTop = streamEl.scrollHeight;
+				totalCount++;
+				totalEl.textContent = totalCount + ' events';
+				if (categories[cat]) {
+					categories[cat].count++;
+					document.getElementById('badge-' + cat).textContent = categories[cat].count;
+				}
+				return;
 			}
+
+			var preview = dataJSON;
+			if (preview.length > 120) preview = preview.slice(0, 120) + '…';
 
 			var row = document.createElement('div');
 			row.className = 'evt';
@@ -202,6 +227,8 @@
 			streamEl.appendChild(row);
 			streamEl.appendChild(dataRow);
 			streamEl.scrollTop = streamEl.scrollHeight;
+
+			lastEvent = { name: name, dataJSON: dataJSON, row: row, dataRow: dataRow, count: 1 };
 
 			totalCount++;
 			totalEl.textContent = totalCount + ' events';
