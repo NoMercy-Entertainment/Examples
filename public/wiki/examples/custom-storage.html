@@ -41,8 +41,8 @@
 		<p>
 			A custom <code>StorageInterface</code> backed by IndexedDB instead of the default
 			localStorage. All storage operations are logged below so you can see exactly when
-			the player reads and writes data. Use the buttons to manually save and load the
-			playback position.
+			the player reads and writes data. Position is saved every 5 seconds and
+			automatically restored when you reload the page.
 		</p>
 
 		<div id="player"></div>
@@ -149,6 +149,26 @@
 			log('[ready] Player is ready with IndexedDB storage');
 		});
 
+		// Auto-restore position from storage on first play
+		player.once('firstFrame', function () {
+			idbStorage.get('savedPosition').then(function (time) {
+				if (time !== null && time !== undefined) {
+					var t = parseFloat(time);
+					if (!isNaN(t) && t > 0) {
+						player.seek(t);
+						log('[auto-resume] Seeking to saved position: ' + t.toFixed(2) + 's');
+					}
+				}
+			});
+		});
+
+		// Auto-save position every 5 seconds during playback
+		player.on('time', function (data) {
+			if (Math.floor(data.currentTime) % 5 === 0 && data.currentTime > 1) {
+				idbStorage.set('savedPosition', String(data.currentTime));
+			}
+		});
+
 		player.on('play', function () {
 			log('[play] Playback started');
 		});
@@ -160,7 +180,7 @@
 		// ── Manual Save / Load ─────────────────────────────────────
 		function savePosition() {
 			var time = player.currentTime();
-			idbStorage.set('savedPosition', time).then(function () {
+			idbStorage.set('savedPosition', String(time)).then(function () {
 				log('[save] Position saved: ' + time.toFixed(2) + 's');
 			});
 		}
@@ -168,8 +188,13 @@
 		function loadPosition() {
 			idbStorage.get('savedPosition').then(function (time) {
 				if (time !== null && time !== undefined) {
-					player.seek(time);
-					log('[load] Seeking to saved position: ' + time.toFixed(2) + 's');
+					var t = parseFloat(time);
+					if (!isNaN(t)) {
+						player.seek(t);
+						log('[load] Seeking to saved position: ' + t.toFixed(2) + 's');
+					} else {
+						log('[load] No saved position found');
+					}
 				} else {
 					log('[load] No saved position found');
 				}
