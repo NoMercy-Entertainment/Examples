@@ -40,8 +40,8 @@
 	<main>
 		<p>
 			Demonstrates resuming from a saved position. The playlist item includes
-			<code>progress: { time: 120, date: '...' }</code>, and we use
-			<code>once('firstFrame')</code> to seek to the saved time when playback begins.
+			<code>progress: { time: 120, date: '...' }</code>. The player's built-in
+			progress handling automatically seeks to the saved position on first play.
 			Use the buttons to save the current position or reset to the beginning.
 		</p>
 
@@ -58,7 +58,7 @@
 		<pre id="log"></pre>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.14/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.15/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
 		function log(msg) {
@@ -88,15 +88,6 @@
 			log('[ready] progress.time = 120 → will seek to 2:00 on first play');
 		});
 
-		// Resume from saved position on first frame render
-		player.once('firstFrame', function () {
-			var item = player.playlistItem();
-			if (item.progress && item.progress.time > 0) {
-				player.seek(item.progress.time);
-				log('[resume] Seeking to saved position: ' + item.progress.time + 's');
-			}
-		});
-
 		player.on('play', function () {
 			log('[play] Playback started');
 		});
@@ -105,9 +96,12 @@
 			log('[pause] Playback paused');
 		});
 
-		// seek event emits no data — use currentTime() to read position
 		player.on('seek', function () {
-			log('[seek] Seeking...');
+			log('[seek] Seeking to ' + player.currentTime().toFixed(1) + 's');
+		});
+
+		player.on('seeked', function () {
+			log('[seeked] Now at ' + player.currentTime().toFixed(1) + 's');
 		});
 
 		player.on('time', function (data) {
