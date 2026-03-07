@@ -4,24 +4,8 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Build a Plugin — NoMercy Video Player</title>
+	<link rel="stylesheet" href="shared.css" />
 	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
-		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-		.row button {
-			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
-		}
-		.row button:hover { background: #3f3f46; }
-		.row button.active { background: #7c3aed; border-color: #7c3aed; }
 		.source-block {
 			background: #0f0f12; border: 1px solid #27272a; border-radius: 8px;
 			margin-top: 12px; overflow: hidden;
@@ -40,23 +24,6 @@
 			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
 			color: #a1a1aa; white-space: pre; margin: 0;
 		}
-		.source-block pre .kw { color: #c084fc; }
-		.source-block pre .fn { color: #60a5fa; }
-		.source-block pre .str { color: #4ade80; }
-		.source-block pre .cmt { color: #52525b; }
-		.kbd-hints { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-		.kbd-hints span { font-size: 0.75rem; color: #a1a1aa; }
-		.kbd-hints kbd {
-			display: inline-block; background: #27272a; border: 1px solid #3f3f46;
-			border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: inherit;
-			color: #e4e4e7; margin-right: 4px;
-		}
-		pre#log {
-			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
-			max-height: 120px; overflow-y: auto; font-size: 12px;
-			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
-		}
 	</style>
 </head>
 <body>
@@ -68,7 +35,7 @@
 	<main>
 		<p>
 			A custom "CinemaOverlay" plugin that adds a floating info bar, keyboard shortcuts,
-			and play/pause on click. The full source is shown below the player so you can study and copy it.
+			and position cycling. The full source is shown below the player so you can study and copy it.
 		</p>
 
 		<div id="player"></div>
@@ -100,15 +67,9 @@
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script src="shared.js"></script>
 	<script>
-		var logEl = document.getElementById('log');
-		var logLines = [];
-		function log(msg) {
-			logLines.push(msg);
-			if (logLines.length > 20) logLines.shift();
-			logEl.textContent = logLines.join('\n');
-			logEl.scrollTop = logEl.scrollHeight;
-		}
+		var { log } = createLogger();
 
 		// ─── CinemaOverlayPlugin ────────────────────────────
 		// This is the plugin source we also display below the player.
@@ -121,7 +82,7 @@
 			'    this._timeHandler = null;',
 			'    this._keyHandler = null;',
 			'    this._visible = true;',
-			'    this._position = 0; // 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left',
+			'    this._position = 0;',
 			'    this._positions = [',
 			'      "top:12px;left:12px", "top:12px;right:12px",',
 			'      "bottom:12px;right:12px", "bottom:12px;left:12px"',
@@ -133,23 +94,23 @@
 			'    var container = this.player.element();',
 			'    container.style.position = "relative";',
 			'',
-			'    // Create floating info bar',
 			'    this.bar = document.createElement("div");',
-			'    this.bar.style.cssText = "position:absolute;" + this._positions[0] + ";background:rgba(0,0,0,0.75);" +',
-			'      "color:#e4e4e7;padding:8px 14px;border-radius:8px;font-size:13px;font-family:monospace;" +',
-			'      "pointer-events:none;z-index:10;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);";',
+			'    this.bar.style.cssText = "position:absolute;" + this._positions[0] +',
+			'      ";background:rgba(0,0,0,0.75);color:#e4e4e7;padding:8px 14px;" +',
+			'      "border-radius:8px;font-size:13px;font-family:monospace;" +',
+			'      "pointer-events:none;z-index:10;backdrop-filter:blur(8px);" +',
+			'      "border:1px solid rgba(255,255,255,0.1);";',
 			'    this.bar.textContent = "⏸ Ready";',
 			'    container.appendChild(this.bar);',
 			'',
-			'    // Update on time events',
 			'    this._timeHandler = function (data) {',
 			'      if (!self.bar || !self._visible) return;',
 			'      var icon = self.player.state() === "playing" ? "▶" : "⏸";',
-			'      self.bar.textContent = icon + " " + data.currentTimeHuman + " / " + data.durationHuman;',
+			'      self.bar.textContent = icon + " " + data.currentTimeHuman +',
+			'        " / " + data.durationHuman;',
 			'    };',
 			'    this.player.on("time", this._timeHandler);',
 			'',
-			'    // Keyboard shortcuts',
 			'    this._keyHandler = function (e) {',
 			'      if (e.key === "i" || e.key === "I") {',
 			'        self._visible = !self._visible;',
@@ -183,19 +144,22 @@
 			});
 		}
 
-		// Actually create and register the plugin by evaluating the source
+		// Create the plugin from source
 		eval(pluginSource);
 
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)',
 			playlist: [{
 				id: 'sintel',
 				title: 'Sintel',
 				description: 'A girl searches for her lost dragon in a fantasy world.',
 				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
-				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				file: '/Sintel.(2010).NoMercy.m3u8',
 				duration: '14:48',
 			}],
-		});
+		};
+
+		var player = nmplayer('player').setup(config);
 
 		var cinemaPlugin = new CinemaOverlayPlugin();
 		player.registerPlugin('cinema', cinemaPlugin);

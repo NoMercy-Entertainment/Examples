@@ -4,31 +4,22 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Event Explorer — NoMercy Video Player</title>
+	<link rel="stylesheet" href="shared.css" />
 	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
 		.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
 		.toolbar button {
 			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
 			border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 0.75rem;
 		}
 		.toolbar button:hover { background: #3f3f46; }
-		.toolbar button.active { border-color: #7c3aed; }
 
 		.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 		.chip {
 			display: inline-flex; align-items: center; gap: 4px;
 			padding: 4px 10px; border-radius: 12px; font-size: 0.7rem;
-			cursor: pointer; border: 1px solid transparent; user-select: none;
+			cursor: pointer; border: 1px solid transparent;
 			transition: opacity 0.15s;
+			-webkit-user-select: none; user-select: none;
 		}
 		.chip.off { opacity: 0.35; }
 		.chip .dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -75,12 +66,12 @@
 
 		<h2>Controls</h2>
 		<div class="toolbar">
-			<button onclick="player.play()">Play</button>
-			<button onclick="player.pause()">Pause</button>
-			<button onclick="player.next()">Next</button>
-			<button onclick="player.previous()">Previous</button>
-			<button onclick="togglePause()" id="btnPause">Pause Log</button>
-			<button onclick="clearLog()">Clear</button>
+			<button type="button" onclick="player.play()">Play</button>
+			<button type="button" onclick="player.pause()">Pause</button>
+			<button type="button" onclick="player.next()">Next</button>
+			<button type="button" onclick="player.previous()">Previous</button>
+			<button type="button" onclick="togglePause()" id="btnPause">Pause Log</button>
+			<button type="button" onclick="clearLog()">Clear</button>
 			<span class="counter" id="total">0 events</span>
 		</div>
 
@@ -95,21 +86,19 @@
 	<script>
 		// Category definitions
 		var categories = {
-			playback: { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
-			media:    { color: '#60a5fa', events: ['bufferChange', 'levelsChanged', 'audioTracks', 'subtitleTracks'] },
-			time:     { color: '#facc15', events: ['time'] },
-			playlist: { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem', 'playlist'] },
-			display:  { color: '#22d3ee', events: ['fullscreen', 'resize', 'aspectRatio'] },
-			errors:   { color: '#f87171', events: ['error', 'warning', 'setupError'] },
-			lifecycle:{ color: '#a1a1aa', events: ['ready', 'beforePlay', 'beforeComplete', 'idle'] },
+			playback:  { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
+			media:     { color: '#60a5fa', events: ['bufferChange', 'levelsChanged', 'audioTracks', 'captionsList'] },
+			time:      { color: '#facc15', events: ['time'] },
+			playlist:  { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem', 'playlist'] },
+			display:   { color: '#22d3ee', events: ['fullscreen', 'resize'] },
+			errors:    { color: '#f87171', events: ['error', 'warning', 'setupError'] },
+			lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle'] },
 		};
 
 		// Build reverse lookup: event name → category
 		var eventCategory = {};
 		Object.keys(categories).forEach(function (cat) {
-			categories[cat].events.forEach(function (evt) {
-				eventCategory[evt] = cat;
-			});
+			categories[cat].events.forEach(function (evt) { eventCategory[evt] = cat; });
 			categories[cat].count = 0;
 			categories[cat].visible = true;
 		});
@@ -163,7 +152,6 @@
 				var cat = row.dataset.cat;
 				var show = categories[cat] && categories[cat].visible;
 				row.style.display = show ? '' : 'none';
-				// Also hide associated data row
 				var next = row.nextElementSibling;
 				if (next && next.classList.contains('evt-data')) {
 					next.style.display = show && next.classList.contains('open') ? 'block' : 'none';
@@ -172,11 +160,10 @@
 		}
 
 		function formatTime(d) {
-			var h = d.getHours().toString().padStart(2, '0');
-			var m = d.getMinutes().toString().padStart(2, '0');
-			var s = d.getSeconds().toString().padStart(2, '0');
-			var ms = d.getMilliseconds().toString().padStart(3, '0');
-			return h + ':' + m + ':' + s + '.' + ms;
+			return d.getHours().toString().padStart(2, '0') + ':' +
+				d.getMinutes().toString().padStart(2, '0') + ':' +
+				d.getSeconds().toString().padStart(2, '0') + '.' +
+				d.getMilliseconds().toString().padStart(3, '0');
 		}
 
 		function appendEvent(name, data, cat, ts) {
@@ -215,7 +202,6 @@
 			streamEl.appendChild(dataRow);
 			streamEl.scrollTop = streamEl.scrollHeight;
 
-			// Update counters
 			totalCount++;
 			totalEl.textContent = totalCount + ' events';
 			if (categories[cat]) {
@@ -235,14 +221,15 @@
 		}
 
 		// Player setup
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films',
 			playlist: [
 				{
 					id: 'sintel',
 					title: 'Sintel',
 					description: 'A girl searches for her lost dragon in a fantasy world.',
 					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					file: '/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 					duration: '14:48',
 				},
 				{
@@ -250,13 +237,15 @@
 					title: 'Cosmos Laundromat',
 					description: 'On a desolate island, a suicidal sheep meets a strange demon.',
 					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
+					file: '/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
 					duration: '12:10',
 				},
 			],
-		});
+		};
 
-		// Subscribe to all events
+		var player = nmplayer('player').setup(config);
+
+		// Subscribe to all known events
 		var allEvents = [];
 		Object.keys(categories).forEach(function (cat) {
 			allEvents = allEvents.concat(categories[cat].events);

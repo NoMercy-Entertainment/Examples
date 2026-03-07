@@ -4,43 +4,13 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Styled Subtitles — NoMercy Video Player</title>
+	<link rel="stylesheet" href="shared.css" />
 	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		.info-card {
-			background: #1f1f23; border: 1px solid #27272a; border-radius: 8px;
-			padding: 16px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
-		}
-		.info-card img { width: 100px; border-radius: 6px; flex-shrink: 0; }
-		.info-card h3 { font-size: 1rem; margin-bottom: 4px; }
-		.info-card .meta { font-size: 0.75rem; color: #a78bfa; margin-bottom: 6px; }
-		.info-card .desc { font-size: 0.8rem; color: #a1a1aa; line-height: 1.4; }
-		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
-		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-		.row button {
-			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
-		}
-		.row button:hover { background: #3f3f46; }
-		.row button.active { background: #7c3aed; border-color: #7c3aed; }
 		.tech-note {
 			background: #1a1a2e; border: 1px solid #312e81; border-radius: 8px;
 			padding: 14px 16px; margin-top: 16px; font-size: 0.8rem; line-height: 1.5; color: #c4b5fd;
 		}
 		.tech-note strong { color: #e4e4e7; }
-		pre#log {
-			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
-			max-height: 140px; overflow-y: auto; font-size: 12px;
-			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
-		}
 	</style>
 </head>
 <body>
@@ -94,41 +64,44 @@
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script src="shared.js"></script>
 	<script>
-		var logEl = document.getElementById('log');
-		var logLines = [];
-		function log(msg) {
-			logLines.push(msg);
-			if (logLines.length > 30) logLines.shift();
-			logEl.textContent = logLines.join('\n');
-			logEl.scrollTop = logEl.scrollHeight;
-		}
+		var { log } = createLogger(30);
 
-		var basePath = 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Anime/Anime/Rail.Wars!.(2014)/Rail.Wars!.S00E00';
-
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Anime/Anime/Rail.Wars!.(2014)/Rail.Wars!.S00E00',
 			playlist: [{
 				id: 'railwars-op',
 				title: 'Rail Wars! — Opening',
 				description: 'Opening sequence with styled ASS subtitles and custom fonts.',
 				image: 'https://image.tmdb.org/t/p/w780/vH8NqN2LMcmtBv037iHGwcPOgCZ.jpg',
-				file: basePath + '/Rail.Wars!.(2014).S00E00.NoMercy.m3u8',
-				duration: '01:30',
-				subtitles: [{
-					id: 'eng-full',
-					language: 'eng',
-					label: 'English (Styled)',
-					type: 'ass',
-					src: basePath + '/subtitles/Rail.Wars!.(2014).S00E00.NoMercy.eng.full.ass',
-				}],
-				fonts: basePath + '/fonts.json',
+				file: '/Rail.Wars!.(2014).S00E00.NoMercy.m3u8',
+				duration: '02:00',
+				tracks: [
+					{
+						id: 'ass-en',
+						kind: 'subtitles',
+						label: 'English',
+						language: 'eng',
+						file: '/subtitles/Rail.Wars!.(2014).S00E00.NoMercy.eng.full.ass',
+					},
+					{
+						id: 'fonts',
+						kind: 'fonts',
+						label: 'Fonts',
+						file: '/fonts.json',
+					},
+				],
 			}],
-		});
+		};
 
-		var subsEnabled = true;
+		var player = nmplayer('player').setup(config);
+
+		// Register and activate OctopusPlugin for ASS rendering
+		player.registerPlugin('octopus', new nmplayer.OctopusPlugin({ renderAhead: 10 }));
+		player.usePlugin('octopus');
 
 		function toggleSubs(on) {
-			subsEnabled = on;
 			var btns = document.querySelectorAll('#sub-row button');
 			btns[0].classList.toggle('active', on);
 			btns[1].classList.toggle('active', !on);
@@ -146,11 +119,11 @@
 		player.on('ready', function () { log('[ready] Player ready'); });
 		player.on('play', function () { log('[play] Playing'); });
 		player.on('pause', function () { log('[pause] Paused'); });
-		player.on('subtitleTrackChanged', function (data) {
-			log('[subtitle] Track changed: ' + JSON.stringify(data));
+		player.on('captionsList', function (tracks) {
+			log('[captions] Available: ' + JSON.stringify(tracks.map(function (t) { return t.label; })));
 		});
-		player.on('fontsLoaded', function () {
-			log('[fonts] Custom fonts loaded successfully');
+		player.on('captionsChanged', function (track) {
+			log('[captions] Changed to: ' + (track.id === -1 ? 'Off' : track.label));
 		});
 		player.on('item', function (data) {
 			log('[item] ' + data.title);

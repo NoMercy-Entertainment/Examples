@@ -4,18 +4,8 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>API Playground — NoMercy Video Player</title>
+	<link rel="stylesheet" href="shared.css" />
 	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		main > p.intro { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 8px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
-
 		/* Tabs */
 		.tabs { display: flex; gap: 2px; margin-top: 12px; background: #0f0f12; border-radius: 8px 8px 0 0; overflow: hidden; }
 		.tab {
@@ -38,7 +28,7 @@
 		.method-row:last-child { border-bottom: none; }
 		.method-name {
 			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			font-size: 0.8rem; color: #60a5fa; min-width: 140px; flex-shrink: 0;
+			font-size: 0.8rem; color: #60a5fa; min-width: 160px; flex-shrink: 0;
 		}
 		.method-row input {
 			background: #27272a; border: 1px solid #3f3f46; border-radius: 4px;
@@ -81,7 +71,7 @@
 	</header>
 
 	<main>
-		<p class="intro">
+		<p>
 			Try every player method interactively. Click "Run" to call a method, see its return value,
 			and watch the live state panel update in real time.
 		</p>
@@ -99,7 +89,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		// Player setup
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films',
 			playlist: [
 				{
 					id: 'sintel',
@@ -110,7 +101,7 @@
 					year: 2010,
 					description: 'A girl searches for her lost dragon in a fantasy world.',
 					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					file: '/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 					duration: '14:48',
 				},
 				{
@@ -122,11 +113,13 @@
 					year: 2008,
 					description: 'A giant rabbit takes revenge on three bullying rodents.',
 					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+					file: '/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
 					duration: '09:56',
 				},
 			],
-		});
+		};
+
+		var player = nmplayer('player').setup(config);
 
 		// Method definitions by category
 		var methodTabs = {
@@ -141,7 +134,7 @@
 			],
 			Volume: [
 				{ name: 'volume', args: true, placeholder: '0–100' },
-				{ name: 'mute', args: true, placeholder: 'true / false' },
+				{ name: 'muted', args: true, placeholder: 'true / false' },
 			],
 			Display: [
 				{ name: 'aspect', args: true, placeholder: 'uniform, fill, 16:9...' },
@@ -161,12 +154,7 @@
 				{ name: 'subtitle', args: true, placeholder: 'index (-1 = off)' },
 				{ name: 'subtitles', args: false },
 				{ name: 'quality', args: true, placeholder: 'index (-1 = auto)' },
-				{ name: 'qualities', args: false },
-			],
-			Info: [
-				{ name: 'container', args: false },
-				{ name: 'element', args: false },
-				{ name: 'version', args: false },
+				{ name: 'qualityLevels', args: false },
 			],
 		};
 
@@ -234,7 +222,6 @@
 				var val;
 				if (input && input.value.trim() !== '') {
 					var arg = input.value.trim();
-					// Parse the argument
 					if (arg === 'true') arg = true;
 					else if (arg === 'false') arg = false;
 					else if (!isNaN(arg) && arg !== '') arg = Number(arg);
@@ -242,7 +229,7 @@
 				} else {
 					val = player[name]();
 				}
-				// Format result
+
 				if (val === undefined) {
 					resultEl.textContent = '→ void';
 					resultEl.style.color = '#71717a';
@@ -274,7 +261,7 @@
 			{ label: 'Time', fn: function () { var t = player.currentTime(); return t != null ? t.toFixed(1) + 's' : '—'; } },
 			{ label: 'Duration', fn: function () { var d = player.duration(); return d != null ? d.toFixed(1) + 's' : '—'; } },
 			{ label: 'Volume', fn: function () { return player.volume(); } },
-			{ label: 'Muted', fn: function () { return player.mute(); } },
+			{ label: 'Muted', fn: function () { return player.muted(); } },
 			{ label: 'Aspect', fn: function () { return player.aspect(); } },
 			{ label: 'Playlist #', fn: function () { return player.playlistIndex(); } },
 			{ label: 'Fullscreen', fn: function () { return player.fullscreen(); } },

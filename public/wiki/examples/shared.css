@@ -1,0 +1,60 @@
+/* NoMercy Video Player — Shared Example Styles */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+
+/* Header */
+header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
+header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
+header a:hover { text-decoration: underline; }
+header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
+
+/* Layout */
+main { max-width: 960px; margin: 0 auto; padding: 24px; }
+main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
+
+/* Player container */
+#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+
+/* Section headings */
+h2 {
+	font-size: 0.85rem; font-weight: 600;
+	margin-top: 20px; margin-bottom: 6px;
+	color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+/* Button rows */
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.row button {
+	background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+	border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
+}
+.row button:hover { background: #3f3f46; }
+.row button.active { background: #7c3aed; border-color: #7c3aed; }
+
+/* Log panel */
+pre#log {
+	background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
+	max-height: 140px; overflow-y: auto; font-size: 12px;
+	font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+	line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
+}
+
+/* Info cards */
+.info-card {
+	background: #1f1f23; border: 1px solid #27272a; border-radius: 8px;
+	padding: 16px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
+}
+.info-card img { width: 120px; border-radius: 6px; flex-shrink: 0; }
+.info-card h3 { font-size: 1rem; margin-bottom: 4px; }
+.info-card .meta { font-size: 0.75rem; color: #a78bfa; margin-bottom: 6px; }
+.info-card .desc { font-size: 0.8rem; color: #a1a1aa; line-height: 1.4; }
+
+/* Keyboard hints */
+.kbd-hints { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.kbd-hints span { font-size: 0.75rem; color: #a1a1aa; }
+.kbd-hints kbd {
+	display: inline-block; background: #27272a; border: 1px solid #3f3f46;
+	border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: inherit;
+	color: #e4e4e7; margin-right: 4px;
+}

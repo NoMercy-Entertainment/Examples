@@ -4,45 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Movie Night — NoMercy Video Player</title>
-	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-		.row button {
-			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-			border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.8rem;
-		}
-		.row button:hover { background: #3f3f46; }
-		.row button.active { background: #7c3aed; border-color: #7c3aed; }
-		.now-playing {
-			background: #1f1f23; border: 1px solid #27272a; border-radius: 8px;
-			padding: 16px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
-		}
-		.now-playing img { width: 120px; border-radius: 6px; flex-shrink: 0; }
-		.now-playing h3 { font-size: 1rem; margin-bottom: 4px; }
-		.now-playing .meta { font-size: 0.75rem; color: #a78bfa; margin-bottom: 6px; }
-		.now-playing .desc { font-size: 0.8rem; color: #a1a1aa; line-height: 1.4; }
-		h2 { font-size: 0.85rem; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; }
-		.kbd-hints { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-		.kbd-hints span { font-size: 0.75rem; color: #a1a1aa; }
-		.kbd-hints kbd {
-			display: inline-block; background: #27272a; border: 1px solid #3f3f46;
-			border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: inherit;
-			color: #e4e4e7; margin-right: 4px;
-		}
-		pre#log {
-			background: #27272a; padding: 12px; border-radius: 8px; margin-top: 8px;
-			max-height: 140px; overflow-y: auto; font-size: 12px;
-			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			line-height: 1.4; white-space: pre-wrap; color: #a1a1aa;
-		}
-	</style>
+	<link rel="stylesheet" href="shared.css" />
 </head>
 <body>
 	<header>
@@ -53,7 +15,7 @@
 	<main>
 		<div id="player"></div>
 
-		<div class="now-playing">
+		<div class="info-card">
 			<img id="np-img" src="" alt="" />
 			<div>
 				<h3 id="np-title">Loading...</h3>
@@ -64,22 +26,22 @@
 
 		<h2>Playback</h2>
 		<div class="row">
-			<button onclick="player.play()">Play</button>
-			<button onclick="player.pause()">Pause</button>
-			<button onclick="player.previous()">Previous</button>
-			<button onclick="player.next()">Next</button>
-			<button onclick="savePosition()">Save Position</button>
-			<button onclick="resetPosition()">Reset Position</button>
+			<button type="button" onclick="player.play()">Play</button>
+			<button type="button" onclick="player.pause()">Pause</button>
+			<button type="button" onclick="player.previous()">Previous</button>
+			<button type="button" onclick="player.next()">Next</button>
+			<button type="button" onclick="savePosition()">Save Position</button>
+			<button type="button" onclick="resetPosition()">Reset Position</button>
 		</div>
 
 		<h2>Aspect Ratio</h2>
 		<div class="row" id="aspect-row">
-			<button onclick="player.cycleAspectRatio(); updateAspect()">Cycle</button>
-			<button class="active" onclick="setAspect('uniform')">Uniform</button>
-			<button onclick="setAspect('fill')">Fill</button>
-			<button onclick="setAspect('exactfit')">Exact Fit</button>
-			<button onclick="setAspect('16:9')">16:9</button>
-			<button onclick="setAspect('4:3')">4:3</button>
+			<button type="button" onclick="player.cycleAspectRatio(); updateAspect()">Cycle</button>
+			<button type="button" class="active" onclick="setAspect('uniform')">Uniform</button>
+			<button type="button" onclick="setAspect('fill')">Fill</button>
+			<button type="button" onclick="setAspect('exactfit')">Exact Fit</button>
+			<button type="button" onclick="setAspect('16:9')">16:9</button>
+			<button type="button" onclick="setAspect('4:3')">4:3</button>
 		</div>
 
 		<h2>Keyboard Shortcuts</h2>
@@ -97,17 +59,12 @@
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script src="shared.js"></script>
 	<script>
-		var logEl = document.getElementById('log');
-		var logLines = [];
-		function log(msg) {
-			logLines.push(msg);
-			if (logLines.length > 20) logLines.shift();
-			logEl.textContent = logLines.join('\n');
-			logEl.scrollTop = logEl.scrollHeight;
-		}
+		var { log } = createLogger();
 
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films',
 			playlist: [
 				{
 					id: 'sintel',
@@ -118,7 +75,7 @@
 					year: 2010,
 					description: 'A girl searches for her lost dragon in a fantasy world.',
 					image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+					file: '/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
 					duration: '14:48',
 					progress: { time: 120, date: '2024-01-15T10:30:00Z' },
 				},
@@ -131,7 +88,7 @@
 					year: 2015,
 					description: 'On a desolate island, a suicidal sheep meets a strange demon.',
 					image: 'https://image.tmdb.org/t/p/w780/f2wABsgj2lIR2dkDEfBZX8p4Iyk.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
+					file: '/Cosmos.Laundromat.(2015)/Cosmos.Laundromat.(2015).NoMercy.m3u8',
 					duration: '12:10',
 				},
 				{
@@ -143,17 +100,20 @@
 					year: 2008,
 					description: 'A giant rabbit takes revenge on three bullying rodents.',
 					image: 'https://image.tmdb.org/t/p/original/xtdybjRRZ15mCrPOvEld305myys.jpg',
-					file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
+					file: '/Big.Buck.Bunny.(2008)/Big.Buck.Bunny.(2008).NoMercy.m3u8',
 					duration: '09:56',
 				},
 			],
-		});
+		};
+
+		var player = nmplayer('player').setup(config);
 
 		// Now Playing card
 		function updateNowPlaying(item) {
 			document.getElementById('np-img').src = item.image || '';
 			document.getElementById('np-title').textContent = item.title;
-			document.getElementById('np-meta').textContent = 'S' + item.season + ' E' + item.episode + ' · ' + item.show + ' · ' + item.year;
+			document.getElementById('np-meta').textContent =
+				'S' + item.season + ' E' + item.episode + ' · ' + item.show + ' · ' + item.year;
 			document.getElementById('np-desc').textContent = item.description;
 		}
 
@@ -197,7 +157,7 @@
 				case 'ArrowRight': player.seek(player.currentTime() + 10); break;
 				case 'ArrowUp': e.preventDefault(); player.volume(Math.min(100, player.volume() + 10)); break;
 				case 'ArrowDown': e.preventDefault(); player.volume(Math.max(0, player.volume() - 10)); break;
-				case 'm': case 'M': player.mute(!player.mute()); break;
+				case 'm': case 'M': player.muted(!player.muted()); break;
 			}
 		});
 

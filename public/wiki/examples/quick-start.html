@@ -4,30 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Quick Start — NoMercy Video Player</title>
-	<style>
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		body { background: #18181b; color: #e4e4e7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
-		header { padding: 12px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #27272a; }
-		header a { color: #a78bfa; text-decoration: none; font-size: 0.875rem; }
-		header a:hover { text-decoration: underline; }
-		header h1 { font-size: 1.25rem; font-weight: 600; flex: 1; }
-		main { max-width: 960px; margin: 0 auto; padding: 24px; }
-		main > p { color: #a1a1aa; margin-bottom: 16px; line-height: 1.5; }
-		#player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
-		.controls { margin-top: 12px; display: flex; gap: 8px; }
-		.controls button {
-			background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-			border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.875rem;
-		}
-		.controls button:hover { background: #3f3f46; }
-		h2 { font-size: 1rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
-		pre#log {
-			background: #27272a; padding: 16px; border-radius: 8px;
-			max-height: 180px; overflow-y: auto; font-size: 13px;
-			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			line-height: 1.5; white-space: pre-wrap;
-		}
-	</style>
+	<link rel="stylesheet" href="shared.css" />
 </head>
 <body>
 	<header>
@@ -40,9 +17,9 @@
 
 		<div id="player"></div>
 
-		<div class="controls">
-			<button onclick="player.play()">Play</button>
-			<button onclick="player.pause()">Pause</button>
+		<div class="row">
+			<button type="button" onclick="player.play()">Play</button>
+			<button type="button" onclick="player.pause()">Pause</button>
 		</div>
 
 		<h2>Events</h2>
@@ -50,23 +27,23 @@
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script src="shared.js"></script>
 	<script>
-		var logEl = document.getElementById('log');
-		function log(msg) {
-			logEl.textContent += msg + '\n';
-			logEl.scrollTop = logEl.scrollHeight;
-		}
+		var { log } = createLogger();
 
-		var player = nmplayer('player').setup({
+		var config = {
+			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)',
 			playlist: [{
 				id: 'sintel',
 				title: 'Sintel',
 				description: 'A girl searches for her lost dragon in a fantasy world.',
 				image: 'https://image.tmdb.org/t/p/w780/q2bVM5z90tCGbmXYtq2J38T5hSX.jpg',
-				file: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)/Sintel.(2010).NoMercy.m3u8',
+				file: '/Sintel.(2010).NoMercy.m3u8',
 				duration: '14:48',
 			}],
-		});
+		};
+
+		var player = nmplayer('player').setup(config);
 
 		player.on('ready', function () { log('[ready] Player is ready'); });
 		player.on('play', function () { log('[play] Playing'); });
