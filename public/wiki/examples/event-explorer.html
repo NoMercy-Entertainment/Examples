@@ -83,7 +83,7 @@
 		<div id="stream"></div>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.26/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.27/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		// Category definitions
 		var categories = {
@@ -241,6 +241,7 @@
 		function logEvent(name, data) {
 			var cat = eventCategory[name] || 'lifecycle';
 			var ts = new Date();
+			console.log('%c[' + cat + ']%c ' + name, 'color:' + (categories[cat] ? categories[cat].color : '#a1a1aa') + ';font-weight:bold', 'color:inherit', data);
 			if (paused) {
 				pendingEvents.push({ name: name, data: data, cat: cat, ts: ts });
 			} else {
