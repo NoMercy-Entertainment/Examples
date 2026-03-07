@@ -28,6 +28,14 @@
 			font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 			line-height: 1.4; white-space: pre-wrap;
 		}
+		.storage-display {
+			background: #27272a; padding: 16px; border-radius: 8px; margin-top: 8px;
+			font-size: 13px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+			line-height: 1.6;
+		}
+		.storage-display .key { color: #a78bfa; }
+		.storage-display .val { color: #4ade80; }
+		.storage-display .empty { color: #71717a; font-style: italic; }
 	</style>
 </head>
 <body>
@@ -40,9 +48,10 @@
 	<main>
 		<p>
 			A custom <code>StorageInterface</code> backed by IndexedDB instead of the default
-			localStorage. All storage operations are logged below so you can see exactly when
-			the player reads and writes data. Position is saved every 5 seconds and
-			automatically restored when you reload the page.
+			localStorage. The player uses this adapter for all internal storage (volume, subtitle
+			preferences, audio language, etc.). Every <code>get</code>, <code>set</code>, and
+			<code>remove</code> call is logged below so you can see exactly what the player stores.
+			Use the buttons to manually exercise each storage operation.
 		</p>
 
 		<div id="player"></div>
@@ -50,17 +59,31 @@
 		<div class="controls">
 			<button onclick="player.play()">Play</button>
 			<button onclick="player.pause()">Pause</button>
-			<button onclick="savePosition()">Save Position</button>
-			<button onclick="loadPosition()">Load Position</button>
 		</div>
 
-		<h2>Event Log</h2>
+		<h2>Manual Storage Operations</h2>
+		<div class="controls">
+			<button onclick="manualSet()">Set "demo-key"</button>
+			<button onclick="manualGet()">Get "demo-key"</button>
+			<button onclick="manualRemove()">Remove "demo-key"</button>
+			<button onclick="dumpAll()">Dump All Keys</button>
+			<button onclick="clearAll()">Clear Database</button>
+		</div>
+
+		<h2>Stored Data</h2>
+		<div class="storage-display" id="storage-display">
+			<span class="empty">Click "Dump All Keys" to see stored data</span>
+		</div>
+
+		<h2>Storage Event Log</h2>
 		<pre id="log"></pre>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.14/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
+		var storageDisplayEl = document.getElementById('storage-display');
+
 		function log(msg) {
 			logEl.textContent += msg + '\n';
 			logEl.scrollTop = logEl.scrollHeight;
@@ -147,26 +170,7 @@
 
 		player.on('ready', function () {
 			log('[ready] Player is ready with IndexedDB storage');
-		});
-
-		// Auto-restore position from storage on first play
-		player.once('firstFrame', function () {
-			idbStorage.get('savedPosition').then(function (time) {
-				if (time !== null && time !== undefined) {
-					var t = parseFloat(time);
-					if (!isNaN(t) && t > 0) {
-						player.seek(t);
-						log('[auto-resume] Seeking to saved position: ' + t.toFixed(2) + 's');
-					}
-				}
-			});
-		});
-
-		// Auto-save position every 5 seconds during playback
-		player.on('time', function (data) {
-			if (Math.floor(data.currentTime) % 5 === 0 && data.currentTime > 1) {
-				idbStorage.set('savedPosition', String(data.currentTime));
-			}
+			log('[info] Change volume or subtitles — watch the storage log update');
 		});
 
 		player.on('play', function () {
@@ -177,27 +181,65 @@
 			log('[pause] Playback paused');
 		});
 
-		// ── Manual Save / Load ─────────────────────────────────────
-		function savePosition() {
-			var time = player.currentTime();
-			idbStorage.set('savedPosition', String(time)).then(function () {
-				log('[save] Position saved: ' + time.toFixed(2) + 's');
+		// ── Manual Storage Operations ─────────────────────────────
+		var demoCounter = 0;
+
+		function manualSet() {
+			demoCounter++;
+			var value = 'value-' + demoCounter;
+			idbStorage.set('demo-key', value).then(function () {
+				log('[manual] Set "demo-key" = ' + JSON.stringify(value));
 			});
 		}
 
-		function loadPosition() {
-			idbStorage.get('savedPosition').then(function (time) {
-				if (time !== null && time !== undefined) {
-					var t = parseFloat(time);
-					if (!isNaN(t)) {
-						player.seek(t);
-						log('[load] Seeking to saved position: ' + t.toFixed(2) + 's');
+		function manualGet() {
+			idbStorage.get('demo-key').then(function (val) {
+				log('[manual] Get "demo-key" → ' + JSON.stringify(val));
+			});
+		}
+
+		function manualRemove() {
+			idbStorage.remove('demo-key').then(function () {
+				log('[manual] Removed "demo-key"');
+			});
+		}
+
+		function dumpAll() {
+			openDB().then(function (db) {
+				var tx = db.transaction(STORE_NAME, 'readonly');
+				var store = tx.objectStore(STORE_NAME);
+				var req = store.openCursor();
+				var entries = [];
+				req.onsuccess = function () {
+					var cursor = req.result;
+					if (cursor) {
+						entries.push({ key: cursor.key, value: cursor.value });
+						cursor.continue();
 					} else {
-						log('[load] No saved position found');
+						if (entries.length === 0) {
+							storageDisplayEl.innerHTML = '<span class="empty">Database is empty</span>';
+							log('[dump] Database is empty');
+						} else {
+							var html = entries.map(function (e) {
+								return '<span class="key">' + e.key + '</span>: <span class="val">' +
+									JSON.stringify(e.value) + '</span>';
+							}).join('\n');
+							storageDisplayEl.innerHTML = html;
+							log('[dump] ' + entries.length + ' keys in database');
+						}
 					}
-				} else {
-					log('[load] No saved position found');
-				}
+				};
+			});
+		}
+
+		function clearAll() {
+			openDB().then(function (db) {
+				var tx = db.transaction(STORE_NAME, 'readwrite');
+				tx.objectStore(STORE_NAME).clear();
+				tx.oncomplete = function () {
+					storageDisplayEl.innerHTML = '<span class="empty">Database cleared</span>';
+					log('[clear] All keys removed from database');
+				};
 			});
 		}
 	</script>
