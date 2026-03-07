@@ -72,80 +72,75 @@
 		var { log } = createLogger();
 
 		// ─── CinemaOverlayPlugin ────────────────────────────
-		// This is the plugin source we also display below the player.
 
-		var pluginSource = [
-			'class CinemaOverlayPlugin extends nmplayer.Plugin {',
-			'  constructor() {',
-			'    super();',
-			'    this.bar = null;',
-			'    this._timeHandler = null;',
-			'    this._keyHandler = null;',
-			'    this._visible = true;',
-			'    this._position = 0;',
-			'    this._positions = [',
-			'      "top:12px;left:12px", "top:12px;right:12px",',
-			'      "bottom:12px;right:12px", "bottom:12px;left:12px"',
-			'    ];',
-			'  }',
-			'',
-			'  use() {',
-			'    var self = this;',
-			'    var container = this.player.element();',
-			'    container.style.position = "relative";',
-			'',
-			'    this.bar = document.createElement("div");',
-			'    this.bar.style.cssText = "position:absolute;" + this._positions[0] +',
-			'      ";background:rgba(0,0,0,0.75);color:#e4e4e7;padding:8px 14px;" +',
-			'      "border-radius:8px;font-size:13px;font-family:monospace;" +',
-			'      "pointer-events:none;z-index:10;backdrop-filter:blur(8px);" +',
-			'      "border:1px solid rgba(255,255,255,0.1);";',
-			'    this.bar.textContent = "⏸ Ready";',
-			'    container.appendChild(this.bar);',
-			'',
-			'    this._timeHandler = function (data) {',
-			'      if (!self.bar || !self._visible) return;',
-			'      var icon = self.player.state() === "playing" ? "▶" : "⏸";',
-			'      self.bar.textContent = icon + " " + data.currentTimeHuman +',
-			'        " / " + data.durationHuman;',
-			'    };',
-			'    this.player.on("time", this._timeHandler);',
-			'',
-			'    this._keyHandler = function (e) {',
-			'      if (e.key === "i" || e.key === "I") {',
-			'        self._visible = !self._visible;',
-			'        self.bar.style.display = self._visible ? "" : "none";',
-			'      }',
-			'      if (e.key === "t" || e.key === "T") {',
-			'        self._position = (self._position + 1) % 4;',
-			'        self.bar.style.cssText = self.bar.style.cssText',
-			'          .replace(/top:[^;]+;|bottom:[^;]+;|left:[^;]+;|right:[^;]+;/g, "")',
-			'          + ";" + self._positions[self._position];',
-			'      }',
-			'    };',
-			'    document.addEventListener("keydown", this._keyHandler);',
-			'  }',
-			'',
-			'  dispose() {',
-			'    if (this.bar && this.bar.parentNode) this.bar.parentNode.removeChild(this.bar);',
-			'    this.bar = null;',
-			'    if (this._timeHandler) this.player.off("time", this._timeHandler);',
-			'    if (this._keyHandler) document.removeEventListener("keydown", this._keyHandler);',
-			'  }',
-			'}',
-		].join('\n');
+		class CinemaOverlayPlugin extends nmplayer.Plugin {
+			constructor() {
+				super();
+				this.bar = null;
+				this._timeHandler = null;
+				this._keyHandler = null;
+				this._visible = true;
+				this._position = 0;
+				this._positions = [
+					'top:12px;left:12px', 'top:12px;right:12px',
+					'bottom:12px;right:12px', 'bottom:12px;left:12px',
+				];
+			}
 
-		// Display the source code
-		document.getElementById('source-code').textContent = pluginSource;
+			use() {
+				var self = this;
+				var container = this.player.element();
+				container.style.position = 'relative';
+
+				this.bar = document.createElement('div');
+				this.bar.style.cssText = 'position:absolute;' + this._positions[0] +
+					';background:rgba(0,0,0,0.75);color:#e4e4e7;padding:8px 14px;' +
+					'border-radius:8px;font-size:13px;font-family:monospace;' +
+					'pointer-events:none;z-index:10;backdrop-filter:blur(8px);' +
+					'border:1px solid rgba(255,255,255,0.1);';
+				this.bar.textContent = '\u23F8 Ready';
+				container.appendChild(this.bar);
+
+				this._timeHandler = function (data) {
+					if (!self.bar || !self._visible) return;
+					var icon = self.player.state() === 'playing' ? '\u25B6' : '\u23F8';
+					self.bar.textContent = icon + ' ' + data.currentTimeHuman + ' / ' + data.durationHuman;
+				};
+				this.player.on('time', this._timeHandler);
+
+				this._keyHandler = function (e) {
+					if (e.key === 'i' || e.key === 'I') {
+						self._visible = !self._visible;
+						self.bar.style.display = self._visible ? '' : 'none';
+					}
+					if (e.key === 't' || e.key === 'T') {
+						self._position = (self._position + 1) % 4;
+						self.bar.style.cssText = self.bar.style.cssText
+							.replace(/top:[^;]+;|bottom:[^;]+;|left:[^;]+;|right:[^;]+;/g, '')
+							+ ';' + self._positions[self._position];
+					}
+				};
+				document.addEventListener('keydown', this._keyHandler);
+			}
+
+			dispose() {
+				if (this.bar && this.bar.parentNode) this.bar.parentNode.removeChild(this.bar);
+				this.bar = null;
+				if (this._timeHandler) this.player.off('time', this._timeHandler);
+				if (this._keyHandler) document.removeEventListener('keydown', this._keyHandler);
+			}
+		}
+
+		// Show the source code in the pre block
+		document.getElementById('source-code').textContent =
+			CinemaOverlayPlugin.toString().replace(/^class /, 'class CinemaOverlayPlugin extends nmplayer.Plugin ');
 
 		function copySource() {
-			navigator.clipboard.writeText(pluginSource).then(function () {
+			var source = document.getElementById('source-code').textContent;
+			navigator.clipboard.writeText(source).then(function () {
 				log('[copy] Source copied to clipboard');
 			});
 		}
-
-		// Create the plugin from source
-		eval(pluginSource);
 
 		var config = {
 			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films/Sintel.(2010)',
