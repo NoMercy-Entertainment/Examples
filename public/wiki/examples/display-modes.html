@@ -80,11 +80,13 @@
 
 		<h2>Aspect Ratio</h2>
 		<div class="controls">
-			<button onclick="player.cycleAspectRatio()">Cycle Aspect Ratio</button>
+			<button onclick="cycleAspect()">Cycle Aspect Ratio</button>
 			<button id="btnUniform" class="active" onclick="setAspect('uniform')">Uniform</button>
 			<button id="btnFill" onclick="setAspect('fill')">Fill</button>
 			<button id="btnExactFit" onclick="setAspect('exactfit')">Exact Fit</button>
 			<button id="btnNone" onclick="setAspect('none')">None</button>
+			<button id="btn169" onclick="setAspect('16:9')">16:9</button>
+			<button id="btn43" onclick="setAspect('4:3')">4:3</button>
 		</div>
 
 		<h2>Event Log</h2>
@@ -150,6 +152,14 @@
 			updateStateDisplay();
 		});
 
+		function cycleAspect() {
+			player.cycleAspectRatio();
+			currentAspect = player.aspect();
+			updateAspectButtons();
+			updateStateDisplay();
+			log('[aspect] Cycled aspect ratio to ' + currentAspect);
+		}
+
 		function setAspect(mode) {
 			player.aspect(mode);
 			currentAspect = mode;
@@ -164,6 +174,8 @@
 				fill: document.getElementById('btnFill'),
 				exactfit: document.getElementById('btnExactFit'),
 				none: document.getElementById('btnNone'),
+				'16:9': document.getElementById('btn169'),
+				'4:3': document.getElementById('btn43'),
 			};
 			for (var key in buttons) {
 				if (buttons[key]) {
