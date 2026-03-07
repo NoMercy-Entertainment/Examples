@@ -83,7 +83,7 @@
 		<div id="stream"></div>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.27/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.28/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		// Category definitions
 		var categories = {
@@ -91,7 +91,8 @@
 			media:     { color: '#60a5fa', events: ['bufferChange', 'levels', 'levelsChanged', 'audioTracks', 'subtitleList'] },
 			time:      { color: '#facc15', events: ['time'] },
 			playlist:  { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem', 'playlist'] },
-			display:   { color: '#22d3ee', events: ['fullscreen', 'resize', 'controls', 'active'] },
+			display:   { color: '#22d3ee', events: ['fullscreen', 'resize', 'active', 'float', 'pip', 'theater'] },
+			ui:        { color: '#fb923c', events: ['interaction', 'player-click', 'player-dblclick', 'message', 'message-dismiss'] },
 			errors:    { color: '#f87171', events: ['error', 'warning', 'setupError'] },
 			lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle'] },
 		};
