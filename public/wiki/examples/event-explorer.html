@@ -70,6 +70,7 @@
 			<button type="button" onclick="player.pause()">Pause</button>
 			<button type="button" onclick="player.next()">Next</button>
 			<button type="button" onclick="player.previous()">Previous</button>
+			<button type="button" onclick="player.toggleFullscreen()">Fullscreen</button>
 			<button type="button" onclick="togglePause()" id="btnPause">Pause Log</button>
 			<button type="button" onclick="clearLog()">Clear</button>
 			<span class="counter" id="total">0 events</span>
@@ -90,7 +91,7 @@
 			media:     { color: '#60a5fa', events: ['bufferChange', 'levelsChanged', 'audioTracks', 'captionsList'] },
 			time:      { color: '#facc15', events: ['time'] },
 			playlist:  { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem', 'playlist'] },
-			display:   { color: '#22d3ee', events: ['fullscreen', 'resize'] },
+			display:   { color: '#22d3ee', events: ['fullscreen', 'resize', 'controls', 'showControls', 'hideControls', 'active'] },
 			errors:    { color: '#f87171', events: ['error', 'warning', 'setupError'] },
 			lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle'] },
 		};
