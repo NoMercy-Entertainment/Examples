@@ -381,19 +381,4 @@ pre {
 pre {
   line-height: 1.15;
 }
-
-.pip-float {
-  position: fixed !important;
-  bottom: 1rem;
-  right: 1rem;
-  width: 24rem !important;
-  max-width: 30vw !important;
-  height: auto !important;
-  aspect-ratio: 16 / 9 !important;
-  z-index: 9999;
-  border-radius: 0.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
-  max-height: none !important;
-}
 </style>
