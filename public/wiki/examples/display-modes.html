@@ -71,6 +71,12 @@
 
 		<div id="stateDisplay">Fullscreen: <strong>No</strong> | Aspect: <strong>uniform</strong> | Size: <strong>960x540</strong></div>
 
+		<h2>Playback</h2>
+		<div class="controls">
+			<button onclick="player.play()">Play</button>
+			<button onclick="player.pause()">Pause</button>
+		</div>
+
 		<h2>Fullscreen</h2>
 		<div class="controls">
 			<button onclick="enterFs()">Enter Fullscreen</button>
@@ -93,7 +99,7 @@
 		<pre id="log"></pre>
 	</main>
 
-	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.16/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.17/dist/nomercy-video-player.iife.js"></script>
 	<script>
 		var logEl = document.getElementById('log');
 		function log(msg) {
