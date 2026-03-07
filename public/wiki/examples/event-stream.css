@@ -1,0 +1,45 @@
+/* NoMercy Video Player — Event Stream Panel Styles */
+
+.event-stream-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+.event-stream-toolbar button {
+	background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+	border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 0.75rem;
+}
+.event-stream-toolbar button:hover { background: #3f3f46; }
+
+.event-stream-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.event-stream-chip {
+	display: inline-flex; align-items: center; gap: 4px;
+	padding: 4px 10px; border-radius: 12px; font-size: 0.7rem;
+	cursor: pointer; border: 1px solid transparent;
+	transition: opacity 0.15s;
+	-webkit-user-select: none; user-select: none;
+}
+.event-stream-chip.off { opacity: 0.35; }
+.event-stream-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+.event-stream-chip .badge {
+	background: rgba(255,255,255,0.15); padding: 1px 5px;
+	border-radius: 8px; font-size: 0.6rem; min-width: 18px; text-align: center;
+}
+
+.event-stream {
+	background: #0f0f12; border: 1px solid #27272a; border-radius: 8px; margin-top: 10px;
+	max-height: 400px; overflow-y: auto; font-size: 12px;
+	font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+}
+.event-stream .evt {
+	padding: 6px 12px; border-bottom: 1px solid #1a1a1f;
+	display: flex; gap: 10px; align-items: flex-start; cursor: pointer;
+}
+.event-stream .evt:hover { background: #1a1a1f; }
+.event-stream .evt .time { color: #52525b; font-size: 11px; min-width: 65px; flex-shrink: 0; }
+.event-stream .evt .name { font-weight: 600; min-width: 140px; flex-shrink: 0; }
+.event-stream .evt .preview { color: #71717a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.event-stream .evt-data {
+	display: none; padding: 8px 12px 8px 87px;
+	background: #141418; border-bottom: 1px solid #1a1a1f;
+	font-size: 11px; white-space: pre-wrap; color: #a1a1aa;
+}
+.event-stream .evt-data.open { display: block; }
+
+.event-stream-counter { font-size: 0.7rem; color: #71717a; margin-left: auto; }

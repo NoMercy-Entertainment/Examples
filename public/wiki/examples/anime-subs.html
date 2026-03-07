@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Styled Subtitles — NoMercy Video Player</title>
 	<link rel="stylesheet" href="shared.css" />
+	<link rel="stylesheet" href="event-stream.css" />
 	<style>
 		.tech-note {
 			background: #1a1a2e; border: 1px solid #312e81; border-radius: 8px;
@@ -59,15 +60,21 @@
 			even without the font installed on the viewer's machine.
 		</div>
 
-		<h2>Log</h2>
-		<pre id="log"></pre>
+		<h2>Filters</h2>
+		<div class="event-stream-filters" id="filters"></div>
+
+		<h2>Event Stream</h2>
+		<div class="event-stream-toolbar">
+			<button type="button" onclick="es.togglePause()" id="btnPause">Pause Log</button>
+			<button type="button" onclick="es.clearLog()">Clear</button>
+			<span class="event-stream-counter" id="total">0 events</span>
+		</div>
+		<div class="event-stream" id="stream"></div>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.28/dist/nomercy-video-player.iife.js"></script>
-	<script src="shared.js"></script>
+	<script src="event-stream.js"></script>
 	<script>
-		var { log } = createLogger(30);
-
 		var config = {
 			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Anime/Anime',
 			imageBasePath: 'https://image.tmdb.org/t/p/w780',
@@ -109,30 +116,22 @@
 			if (on) {
 				// subtitle(0) = first real subtitle track
 				player.subtitle(0);
-				log('[subs] Subtitles enabled');
 			} else {
 				// subtitle(-1) = Off
 				player.subtitle(-1);
-				log('[subs] Subtitles disabled');
 			}
 		}
 
-		// Events
-		player.on('ready', function () {
-			log('[ready] Player ready');
-			// Auto-enable subtitles once the player is ready
-			toggleSubs(true);
-		});
-		player.on('play', function () { log('[play] Playing'); });
-		player.on('pause', function () { log('[pause] Paused'); });
-		player.on('captionsList', function (tracks) {
-			log('[captions] Available: ' + JSON.stringify(tracks.map(function (t) { return t.label; })));
-		});
-		player.on('captionsChanged', function (track) {
-			log('[captions] Changed to: ' + (!track ? 'Off' : track.label));
-		});
-		player.on('item', function (data) {
-			log('[item] ' + data.title);
+		// Auto-enable subtitles once ready
+		player.on('ready', function () { toggleSubs(true); });
+
+		var es = createEventStream(player, {
+			categories: {
+				playback:  { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
+				time:      { color: '#facc15', events: ['time'] },
+				subtitles: { color: '#c084fc', events: ['subtitleList', 'subtitleChanged'] },
+				lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle', 'item'] },
+			},
 		});
 	</script>
 </body>

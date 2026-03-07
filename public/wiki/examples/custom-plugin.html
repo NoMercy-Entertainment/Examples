@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Build a Plugin — NoMercy Video Player</title>
 	<link rel="stylesheet" href="shared.css" />
+	<link rel="stylesheet" href="event-stream.css" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/atom-one-dark.min.css" />
 	<style>
 		.source-block {
@@ -66,16 +67,22 @@
 			<pre><code id="source-code" class="language-javascript"></code></pre>
 		</div>
 
-		<h2>Log</h2>
-		<pre id="log"></pre>
+		<h2>Filters</h2>
+		<div class="event-stream-filters" id="filters"></div>
+
+		<h2>Event Stream</h2>
+		<div class="event-stream-toolbar">
+			<button type="button" onclick="es.togglePause()" id="btnPause">Pause Log</button>
+			<button type="button" onclick="es.clearLog()">Clear</button>
+			<span class="event-stream-counter" id="total">0 events</span>
+		</div>
+		<div class="event-stream" id="stream"></div>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.28/dist/nomercy-video-player.iife.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
-	<script src="shared.js"></script>
+	<script src="event-stream.js"></script>
 	<script>
-		var { log } = createLogger();
-
 		// ─── CinemaOverlayPlugin ────────────────────────────
 
 		class CinemaOverlayPlugin extends nmplayer.Plugin {
@@ -158,9 +165,7 @@
 
 		function copySource() {
 			var source = document.getElementById('source-code').textContent;
-			navigator.clipboard.writeText(source).then(function () {
-				log('[copy] Source copied to clipboard');
-			});
+			navigator.clipboard.writeText(source);
 		}
 
 		var config = {
@@ -182,7 +187,6 @@
 		player.registerPlugin('cinema', cinemaPlugin);
 		player.usePlugin('cinema');
 		var pluginOn = true;
-		log('[plugin] CinemaOverlayPlugin registered and enabled');
 
 		function togglePlugin() {
 			var btn = document.getElementById('btnToggle');
@@ -191,19 +195,21 @@
 				pluginOn = false;
 				btn.textContent = 'Plugin: Off';
 				btn.classList.remove('active');
-				log('[plugin] Disabled');
 			} else {
 				cinemaPlugin.use();
 				pluginOn = true;
 				btn.textContent = 'Plugin: On';
 				btn.classList.add('active');
-				log('[plugin] Enabled');
 			}
 		}
 
-		player.on('ready', function () { log('[ready] Player ready'); });
-		player.on('play', function () { log('[play] Playing'); });
-		player.on('pause', function () { log('[pause] Paused'); });
+		var es = createEventStream(player, {
+			categories: {
+				playback:  { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
+				time:      { color: '#facc15', events: ['time'] },
+				lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle'] },
+			},
+		});
 	</script>
 </body>
 </html>

@@ -218,6 +218,29 @@
 			firstTab = false;
 		});
 
+		function displayResult(val, resultEl) {
+			if (val === undefined) {
+				resultEl.textContent = '→ void';
+				resultEl.style.color = '#71717a';
+			} else if (val !== null && typeof val === 'object') {
+				if (val instanceof HTMLElement) {
+					resultEl.textContent = '→ <' + val.tagName.toLowerCase() + '>';
+					resultEl.style.color = '#60a5fa';
+				} else {
+					try {
+						var str = JSON.stringify(val);
+						resultEl.textContent = '→ ' + (str.length > 80 ? str.slice(0, 80) + '…' : str);
+					} catch (e) {
+						resultEl.textContent = '→ [Object]';
+					}
+					resultEl.style.color = '#60a5fa';
+				}
+			} else {
+				resultEl.textContent = '→ ' + String(val);
+				resultEl.style.color = '#4ade80';
+			}
+		}
+
 		function runMethod(name, input, resultEl) {
 			try {
 				var val;
@@ -231,24 +254,18 @@
 					val = player[name]();
 				}
 
-				if (val === undefined) {
-					resultEl.textContent = '→ void';
-					resultEl.style.color = '#71717a';
-				} else if (val !== null && typeof val === 'object') {
-					if (val instanceof HTMLElement) {
-						resultEl.textContent = '→ <' + val.tagName.toLowerCase() + '>';
-					} else {
-						try {
-							var str = JSON.stringify(val);
-							resultEl.textContent = '→ ' + (str.length > 80 ? str.slice(0, 80) + '…' : str);
-						} catch (e) {
-							resultEl.textContent = '→ [Object]';
-						}
-					}
-					resultEl.style.color = '#60a5fa';
+				// Handle Promise return values (e.g. play() returns Promise<void>)
+				if (val != null && typeof val.then === 'function') {
+					resultEl.textContent = '→ pending…';
+					resultEl.style.color = '#facc15';
+					val.then(function (resolved) {
+						displayResult(resolved, resultEl);
+					}).catch(function (err) {
+						resultEl.textContent = '✗ ' + err.message;
+						resultEl.style.color = '#f87171';
+					});
 				} else {
-					resultEl.textContent = '→ ' + String(val);
-					resultEl.style.color = '#4ade80';
+					displayResult(val, resultEl);
 				}
 			} catch (e) {
 				resultEl.textContent = '✗ ' + e.message;

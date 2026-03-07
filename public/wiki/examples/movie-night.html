@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Movie Night — NoMercy Video Player</title>
 	<link rel="stylesheet" href="shared.css" />
+	<link rel="stylesheet" href="event-stream.css" />
 </head>
 <body>
 	<header>
@@ -54,15 +55,21 @@
 			<span><kbd>↓</kbd> Volume down</span>
 		</div>
 
-		<h2>Log</h2>
-		<pre id="log"></pre>
+		<h2>Filters</h2>
+		<div class="event-stream-filters" id="filters"></div>
+
+		<h2>Event Stream</h2>
+		<div class="event-stream-toolbar">
+			<button type="button" onclick="es.togglePause()" id="btnPause">Pause Log</button>
+			<button type="button" onclick="es.clearLog()">Clear</button>
+			<span class="event-stream-counter" id="total">0 events</span>
+		</div>
+		<div class="event-stream" id="stream"></div>
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.28/dist/nomercy-video-player.iife.js"></script>
-	<script src="shared.js"></script>
+	<script src="event-stream.js"></script>
 	<script>
-		var { log } = createLogger();
-
 		var config = {
 			basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films',
 			imageBasePath: 'https://image.tmdb.org/t/p/w780',
@@ -122,7 +129,6 @@
 		function setAspect(mode) {
 			player.aspect(mode);
 			updateAspect();
-			log('[aspect] ' + mode);
 		}
 
 		function updateAspect() {
@@ -139,14 +145,12 @@
 			var time = player.currentTime();
 			var item = player.playlistItem();
 			item.progress = { time: Math.round(time), date: new Date().toISOString() };
-			log('[save] Position saved at ' + time.toFixed(1) + 's');
 		}
 
 		function resetPosition() {
 			var item = player.playlistItem();
 			delete item.progress;
 			player.seek(0);
-			log('[reset] Position reset');
 		}
 
 		// Keyboard shortcuts
@@ -162,17 +166,18 @@
 			}
 		});
 
-		// Events
-		player.on('ready', function () { log('[ready] Player ready'); });
-		player.on('item', function (data) {
-			updateNowPlaying(data);
-			log('[item] ' + data.title);
+		// Update now playing card on item change
+		player.on('item', updateNowPlaying);
+
+		var es = createEventStream(player, {
+			categories: {
+				playback:  { color: '#4ade80', events: ['play', 'pause', 'seek', 'complete', 'firstFrame'] },
+				time:      { color: '#facc15', events: ['time'] },
+				playlist:  { color: '#c084fc', events: ['item', 'playlistComplete', 'playlistItem'] },
+				display:   { color: '#22d3ee', events: ['fullscreen', 'resize', 'active'] },
+				lifecycle: { color: '#a1a1aa', events: ['ready', 'beforePlay', 'idle'] },
+			},
 		});
-		player.on('play', function () { log('[play] Playing'); });
-		player.on('pause', function () { log('[pause] Paused'); });
-		player.on('seek', function () { log('[seek] → ' + player.currentTime().toFixed(1) + 's'); });
-		player.on('complete', function () { log('[complete] Item finished'); });
-		player.on('playlistComplete', function () { log('[playlistComplete] All done!'); });
 	</script>
 </body>
 </html>
