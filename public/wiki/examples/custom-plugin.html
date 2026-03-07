@@ -138,8 +138,22 @@
 
 		// Show the source code with syntax highlighting
 		var sourceEl = document.getElementById('source-code');
-		sourceEl.textContent = CinemaOverlayPlugin.toString()
-			.replace(/^class /, 'class CinemaOverlayPlugin extends nmplayer.Plugin ');
+		var source = CinemaOverlayPlugin.toString();
+		// Strip the extra leading tabs from being nested inside the <script> tag
+		var lines = source.split('\n');
+		var minIndent = Infinity;
+		lines.forEach(function (line, i) {
+			if (i === 0 || line.trim() === '') return;
+			var match = line.match(/^(\t+)/);
+			if (match && match[1].length < minIndent) minIndent = match[1].length;
+		});
+		if (minIndent < Infinity) {
+			var re = new RegExp('^\\t{' + minIndent + '}', '');
+			source = lines.map(function (line, i) {
+				return i === 0 ? line : line.replace(re, '');
+			}).join('\n');
+		}
+		sourceEl.textContent = source;
 		hljs.highlightElement(sourceEl);
 
 		function copySource() {

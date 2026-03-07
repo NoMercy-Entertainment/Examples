@@ -48,8 +48,8 @@
 
 		<h2>Subtitles</h2>
 		<div class="row" id="sub-row">
-			<button class="active" onclick="toggleSubs(true)">Subtitles On</button>
-			<button onclick="toggleSubs(false)">Subtitles Off</button>
+			<button onclick="toggleSubs(true)">Subtitles On</button>
+			<button class="active" onclick="toggleSubs(false)">Subtitles Off</button>
 		</div>
 
 		<div class="tech-note">
@@ -107,23 +107,29 @@
 			btns[1].classList.toggle('active', !on);
 
 			if (on) {
+				// subtitle(0) = first real subtitle track
 				player.subtitle(0);
 				log('[subs] Subtitles enabled');
 			} else {
+				// subtitle(-1) = Off
 				player.subtitle(-1);
 				log('[subs] Subtitles disabled');
 			}
 		}
 
 		// Events
-		player.on('ready', function () { log('[ready] Player ready'); });
+		player.on('ready', function () {
+			log('[ready] Player ready');
+			// Auto-enable subtitles once the player is ready
+			toggleSubs(true);
+		});
 		player.on('play', function () { log('[play] Playing'); });
 		player.on('pause', function () { log('[pause] Paused'); });
 		player.on('captionsList', function (tracks) {
 			log('[captions] Available: ' + JSON.stringify(tracks.map(function (t) { return t.label; })));
 		});
 		player.on('captionsChanged', function (track) {
-			log('[captions] Changed to: ' + (track.id === -1 ? 'Off' : track.label));
+			log('[captions] Changed to: ' + (!track ? 'Off' : track.label));
 		});
 		player.on('item', function (data) {
 			log('[item] ' + data.title);
