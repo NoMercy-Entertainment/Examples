@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Build a Plugin — NoMercy Video Player</title>
 	<link rel="stylesheet" href="shared.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" />
 	<style>
 		.source-block {
 			background: #0f0f12; border: 1px solid #27272a; border-radius: 8px;
@@ -20,9 +21,12 @@
 		}
 		.source-block .source-header button:hover { background: #3f3f46; color: #e4e4e7; }
 		.source-block pre {
-			padding: 14px; font-size: 12px; line-height: 1.5; overflow-x: auto;
+			padding: 0; margin: 0; overflow-x: auto;
+		}
+		.source-block pre code {
+			padding: 14px !important; font-size: 12px; line-height: 1.5;
 			font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-			color: #a1a1aa; white-space: pre; margin: 0;
+			background: #0f0f12 !important; border-radius: 0;
 		}
 	</style>
 </head>
@@ -59,7 +63,7 @@
 				<span>CinemaOverlayPlugin.js</span>
 				<button onclick="copySource()">Copy</button>
 			</div>
-			<pre id="source-code"></pre>
+			<pre><code id="source-code" class="language-javascript"></code></pre>
 		</div>
 
 		<h2>Log</h2>
@@ -67,6 +71,7 @@
 	</main>
 
 	<script src="https://cdn.jsdelivr.net/npm/@nomercy-entertainment/nomercy-video-player@1.0.0-beta.19/dist/nomercy-video-player.iife.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
 	<script src="shared.js"></script>
 	<script>
 		var { log } = createLogger();
@@ -131,9 +136,11 @@
 			}
 		}
 
-		// Show the source code in the pre block
-		document.getElementById('source-code').textContent =
-			CinemaOverlayPlugin.toString().replace(/^class /, 'class CinemaOverlayPlugin extends nmplayer.Plugin ');
+		// Show the source code with syntax highlighting
+		var sourceEl = document.getElementById('source-code');
+		sourceEl.textContent = CinemaOverlayPlugin.toString()
+			.replace(/^class /, 'class CinemaOverlayPlugin extends nmplayer.Plugin ');
+		hljs.highlightElement(sourceEl);
 
 		function copySource() {
 			var source = document.getElementById('source-code').textContent;
