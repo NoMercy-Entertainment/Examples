@@ -844,10 +844,10 @@
     audiomotion-analyzer "^4.5.0"
     hls.js "^1.5.13"
 
-"@nomercy-entertainment/nomercy-video-player@^1.0.0-beta.22":
-  version "1.0.0-beta.22"
-  resolved "https://registry.yarnpkg.com/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.0.0-beta.22.tgz#d844f6d3e24b02c19fcb4be3aefa1715f749dc3c"
-  integrity sha512-0ieFcRWkW5WW8/HD2cViDY3yRnatQSP17wTz71lWdUZ+5ZGYAYunnFhaqFqXAHlmeNDWfr2hTO7nNvi8GXXK0w==
+"@nomercy-entertainment/nomercy-video-player@^1.0.0-beta.23":
+  version "1.0.0-beta.23"
+  resolved "https://registry.yarnpkg.com/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.0.0-beta.23.tgz#fcbc64153ee376aa19538715e96c133ec866715c"
+  integrity sha512-qeMS1gNiYq1Ihni739jIWPeo8ZOPuK0Tx73lwEsYZRXeV+Py6k3oO2oAwfPWogiiPmSKHIbpmeMCjOMR5X5G7g==
   dependencies:
     "@nomercy-entertainment/media-session" "^1.0.1"
     "@types/webvtt-parser" "2.2.0"
