@@ -163,7 +163,7 @@ watch(videoPlayerRef, (value) => {
   });
 
   player.on('subtitleChanged', (data) => {
-    console.log('subtitleChanged', data.id);
+    console.log('subtitleChanged', data?.id);
   });
 
   player.on('active', (showing) => {
@@ -215,7 +215,7 @@ watch(videoPlayerRef, (value) => {
 
   player.on('subtitleChanged', (track) => {
     subtitleOptions.value = subtitleOptions.value.map((option, index) => {
-      option.active = index - 1 === track.id;
+      option.active = index - 1 === track?.id;
       return option;
     });
   });
