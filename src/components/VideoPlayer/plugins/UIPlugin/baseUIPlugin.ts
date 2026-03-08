@@ -636,7 +636,8 @@ export class BaseUIPlugin extends Plugin {
 
 		this.createSVGElement(settingsButton, 'settings', this.buttons.settings, false, hovered);
 
-		settingsButton.addEventListener('click', () => {
+		settingsButton.addEventListener('click', (event) => {
+			event.stopPropagation();
 			this.player.emit('hide-tooltip');
 			if (this.menuOpen && this.mainMenuOpen) {
 				this.player.emit('show-menu', false);
@@ -1448,21 +1449,18 @@ export class BaseUIPlugin extends Plugin {
 			event.stopPropagation();
 			this.player.emit('hide-tooltip');
 
+			this.theaterModeEnabled = !this.theaterModeEnabled;
+
 			if (this.theaterModeEnabled) {
-				this.theaterModeEnabled = false;
-				theaterButton.querySelector<any>('.theater-enabled-icon').style.display = 'none';
-				theaterButton.querySelector<any>('.theater-icon').style.display = 'flex';
-				this.player.emit('theaterMode', false);
-				this.player.emit('resize');
-			} else {
-				this.theaterModeEnabled = true;
 				theaterButton.querySelector<any>('.theater-icon').style.display = 'none';
 				theaterButton.querySelector<any>('.theater-enabled-icon').style.display = 'flex';
-				this.player.emit('theaterMode', true);
-				this.player.emit('resize');
+			} else {
+				theaterButton.querySelector<any>('.theater-enabled-icon').style.display = 'none';
+				theaterButton.querySelector<any>('.theater-icon').style.display = 'flex';
 			}
 
-			// this.player.toggleLanguage();
+			this.player.theater(this.theaterModeEnabled);
+			this.player.emit('resize');
 		});
 
 		this.player.on('fullscreen', () => {

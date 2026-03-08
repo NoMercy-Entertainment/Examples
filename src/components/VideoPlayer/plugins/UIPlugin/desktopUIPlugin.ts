@@ -753,22 +753,20 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 			this.player.ui_removeActiveClass();
 
+			this.pipEnabled = !this.pipEnabled;
+
 			if (this.pipEnabled) {
-				this.pipEnabled = false;
-				pipButton.querySelector<any>('.pip-exit-icon').style.display = 'none';
-				pipButton.querySelector<any>('.pip-enter-icon').style.display = 'flex';
-				pipButton.ariaLabel = this.buttons.pipEnter?.title;
-				this.player.emit('pip', false);
-				this.player.emit('pip', false);
-			} else {
-				this.pipEnabled = true;
 				pipButton.querySelector<any>('.pip-enter-icon').style.display = 'none';
 				pipButton.querySelector<any>('.pip-exit-icon').style.display = 'flex';
 				pipButton.ariaLabel = this.buttons.pipExit?.title;
-				this.player.emit('pip', true);
-				this.player.emit('pip', true);
 				this.player.emit('show-menu', false);
+			} else {
+				pipButton.querySelector<any>('.pip-exit-icon').style.display = 'none';
+				pipButton.querySelector<any>('.pip-enter-icon').style.display = 'flex';
+				pipButton.ariaLabel = this.buttons.pipEnter?.title;
 			}
+
+			this.player.emit('pip', this.pipEnabled);
 		});
 
 		this.player.on('fullscreen', () => {
@@ -801,6 +799,18 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'text-white',
 			])
 			.appendTo(this.menuFrame).get();
+
+		(document.body.parentElement as HTMLElement).addEventListener('click', () => {
+			this.player.emit('show-menu', false);
+			this.player.emit('show-main-menu', false);
+			this.player.emit('show-language-menu', false);
+			this.player.emit('show-subtitles-menu', false);
+			this.player.emit('show-subtitleSettings-menu', false);
+			this.player.emit('show-subtitleSetting-menu', false);
+			this.player.emit('show-quality-menu', false);
+			this.player.emit('show-speed-menu', false);
+			this.player.emit('show-playlist-menu', false);
+		});
 
 		const menuFrame = this.player.createElement('div', 'menu-frame')
 			.addClasses([

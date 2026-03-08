@@ -1,15 +1,15 @@
 ﻿<script setup lang="ts">
-import {nextTick, onMounted, onUnmounted, ref, watch} from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
-import type {NMPlayer, TimeData} from "@nomercy-entertainment/nomercy-video-player/src/types";
-import KeyHandlerPlugin from "@nomercy-entertainment/nomercy-video-player/src/plugins/keyHandlerPlugin";
-import {DesktopUIPlugin} from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
-import {OctopusPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
+import type { NMPlayer, TimeData } from "@nomercy-entertainment/nomercy-video-player/src/types";
+import { DesktopUIPlugin } from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
+import { OctopusPlugin } from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 
-import type {Option} from "@/types/types";
+import type { Option } from "@/types/types";
 
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer.vue';
 import Layout from "@/Views/Layout.vue";
+import KeyHandlerPlugin from "@/components/VideoPlayer/plugins/UIPlugin/keyHandlerPlugin";
 
 defineProps({
   theme: {
@@ -107,8 +107,8 @@ watch(videoPlayerRef, (value) => {
     console.log('fullscreen', data);
   });
 
-  player.on('theaterMode', (enabled) => {
-    console.log('theaterMode', enabled);
+  player.on('theater', (enabled) => {
+    console.log('theater', enabled);
     const container = document.getElementById('container');
     const menu = document.getElementById('menu');
     const wrapper = document.getElementById('wrapper');
@@ -126,10 +126,15 @@ watch(videoPlayerRef, (value) => {
   player.on('pip', (enabled) => {
     console.log('pip', enabled);
     const wrapper = document.getElementById('wrapper');
+    if (!wrapper) return;
     if (enabled) {
-      wrapper?.classList.add('pip-float');
+      wrapper.classList.add('pip-float');
     } else {
-      wrapper?.classList.remove('pip-float');
+      wrapper.classList.add('pip-float-exit');
+      wrapper.classList.remove('pip-float');
+      wrapper.addEventListener('animationend', () => {
+        wrapper.classList.remove('pip-float-exit');
+      }, { once: true });
     }
   });
 
@@ -227,8 +232,8 @@ const toggleUI = () => {
     videoPlayerRef.value?.player.usePlugin('desktopUI');
 
     setTimeout(() => {
-      const ui = window.nmplayer().plugins.get('desktopUI');
-      if (loadMenu.value && ui.mainMenu.childNodes.length == 1) {
+      const ui = videoPlayerRef.value?.player.plugins.get('desktopUI');
+      if (loadMenu.value && ui?.mainMenu.childNodes.length == 1) {
         ui.createMenuButton(ui.mainMenu, 'language');
         ui.createMenuButton(ui.mainMenu, 'subtitles');
         ui.createMenuButton(ui.mainMenu, 'subtitle settings');

@@ -1,19 +1,19 @@
 ﻿<script setup lang="ts">
-import {onMounted, onUnmounted, ref} from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
 // // @ts-ignore
 // import nmplayer from "http://localhost:5503/src/index.ts";
-import type {NMPlayer} from "@nomercy-entertainment/nomercy-video-player/src/types";
+import type { NMPlayer } from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 import config from "./config";
-import {OctopusPlugin} from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
+import { OctopusPlugin } from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 
 const player = ref<NMPlayer>();
 
 onMounted(() => {
     player.value = nmplayer('player1')
-        .setup(config) as unknown as NMPlayer;
+        .setup(config);
 
   const octopusPlugin = new OctopusPlugin({ renderAhead: 10 });
   player.value?.registerPlugin('octopus', octopusPlugin);

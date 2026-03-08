@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
-import {type PropType, ref} from 'vue';
-import {Option} from "@/types/types";
+import { type PropType } from 'vue';
+import { Option } from "@/types/types";
 import Menu from "@/components/Menu.vue";
 import HomeCorner from "@/components/HomeCorner.vue";
 import GithubCorner from "@/components/GithubCorner.vue";
@@ -42,7 +42,7 @@ defineProps({
     class="flex flex-nowrap landscape:flex-row landscape:h-screen landscape:max-h-screen flex-col-reverse justify-center sm:justify-evenly items-center w-full gap-4 landscape:gap-4 sm:gap-16 px-4 sm:px-16 sm:flex-row flex-1 max-h-[calc(100vh-16rem)] min-h-[calc(100vh-16rem)] overflow-clip landscape:mt-8">
 
     <aside id="menu"
-      class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full landscape:w-3/5 sm:w-1/3 max-w-sm min-h-[40dvh] sm:h-available max-h-[min(39.5vw,90vh)] border border-neutral-700 p-2 sm:p-4">
+      class="relative overflow-clip bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-lg shadow-lg flex flex-col w-full landscape:w-3/5 sm:w-1/3 max-w-sm min-h-[40dvh] sm:h-available max-h-[min(39.5vw,90vh)] border border-neutral-700 p-2 sm:p-4 sm:mr-auto">
       <Menu :options="options as Option[]" :class="theme" :style="`
                   --color-1: var(--color-${theme}-shadow);
                   --color-2: var(--color-${theme}-border);
