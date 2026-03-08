@@ -3036,7 +3036,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		const item = this.getTipDataIndex(direction);
 		if (!item) return;
 
-		image.src = item.image && item.image != '' ? `${this.imageBaseUrl}${item.image}` : '';
+		image.src = item.image && item.image != '' ? `${item.image.startsWith('http') ? '' : this.imageBaseUrl}${item.image}` : '';
 		header.innerText = `${this.player.localize(`${direction.toTitleCase()} Episode`)} ${this.getButtonKeyCode(direction)}`;
 		title.innerText = item.title?.replace(item.show ?? '', '').replace('%S', this.player.localize('S'))
 			.replace('%E', this.player.localize('E'));
