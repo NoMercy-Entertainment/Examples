@@ -60,6 +60,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		'transition-all',
 		'duration-300',
 		'w-available',
+		'max-h-[50vh]',
 		'scroll-p-4',
 		'scroll-snap-align-center',
 		'scroll-smooth',
@@ -70,13 +71,19 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		'sub-menu-content',
 		'flex',
 		'flex-col',
-		'max-h-available',
+		'max-h-[60vh]',
 		'w-available',
-		'overflow-auto',
+		'overflow-y-auto',
+		'overflow-x-hidden',
 		'min-w-52',
 	];
 
 	subtitleSettingActions: SubtitleSettingAction[] = [];
+
+	applyScrollbarStyles(el: HTMLElement) {
+		el.style.scrollbarWidth = 'thin';
+		el.style.scrollbarColor = 'rgba(255,255,255,0.3) transparent';
+	}
 
 	use() {
 		this.subtitleSettingActions = subtitleSettingActions(this.player);
@@ -950,8 +957,12 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			}
 		});
 		this.player.on('show-subtitleSettings-menu', (property) => {
-			this.subtitleSettingsMenuOpen = property;
-			this.syncLockActive();
+			if (property === false && typeof this.subtitleSettingsMenuOpen === 'string') {
+				// A subtitle-setting sub-menu is open; hide visually but keep the flag
+			} else {
+				this.subtitleSettingsMenuOpen = property;
+				this.syncLockActive();
+			}
 			if (property) {
 				menuFrame.classList.add('open');
 				this.player.emit('show-main-menu', false);
@@ -1097,10 +1108,11 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				'gap-1',
 				'group-[&.nomercyplayer:has(.sub-menu-open)]:!hidden',
 				'h-auto',
-				'max-h-full',
+				'max-h-[60vh]',
 				'min-w-64',
 				'mt-auto',
-				'overflow-clip',
+				'overflow-y-auto',
+				'overflow-x-hidden',
 				'p-2',
 				'pt-0',
 				'rounded-lg',
@@ -1109,6 +1121,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(parent).get();
 
 		this.mainMenu.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(this.mainMenu);
 
 		const mainHeader = this.createMainMenuHeader(this.mainMenu);
 		mainHeader.classList.add('!min-h-[2rem]', '-mr-1');
@@ -1121,23 +1134,30 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			'gap-1',
 			'group-[&.nomercyplayer:has(.sub-menu-open)]:!hidden',
 			'h-auto',
-			'max-h-full',
+			'max-h-[60vh]',
 			'min-w-64',
 			'mt-auto',
-			'overflow-clip',
+			'overflow-y-auto',
+			'overflow-x-hidden',
 			'p-2',
 			'pt-0',
 			'rounded-lg',
 		]);
 
-		this.player.once('translationsLoaded', () => {
+		const createButtons = () => {
 			this.createMenuButton(this.mainMenu, 'language');
 			this.createMenuButton(this.mainMenu, 'subtitles');
 			this.createMenuButton(this.mainMenu, 'subtitle settings');
 			this.createMenuButton(this.mainMenu, 'quality');
 			this.createMenuButton(this.mainMenu, 'speed');
 			this.createMenuButton(this.mainMenu, 'playlist');
-		});
+		};
+
+		if (Object.keys(this.player.translations).length > 0) {
+			createButtons();
+		} else {
+			this.player.once('translationsLoaded', createButtons);
+		}
 
 		this.createSubMenu(parent);
 
@@ -1409,7 +1429,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				menuButton.style.display = 'flex';
 			}
 			this.player.on('subtitleList', (captions) => {
-				if (captions.length > 1) {
+				if (captions.length > 0) {
 					menuButton.style.display = 'flex';
 				} else {
 					menuButton.style.display = 'none';
@@ -1460,6 +1480,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(languageMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		this.player.on('item', () => {
 			scrollContainer.innerHTML = '';
@@ -1518,12 +1539,24 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(subtitleMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		this.player.on('item', () => {
 			scrollContainer.innerHTML = '';
 		});
 
+		const addOffButton = () => {
+			this.createLanguageMenuButton(scrollContainer, {
+				language: '',
+				label: this.player.localize('Off'),
+				type: 'off',
+				id: -1,
+				buttonType: 'subtitle',
+			});
+		};
+
 		if (this.player.hasSubtitles()) {
+			addOffButton();
 			Object.values(this.player.subtitles()).forEach((track) => {
 				this.createLanguageMenuButton(scrollContainer, {
 					language: track.language!,
@@ -1538,6 +1571,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		this.player.on('subtitleList', (tracks) => {
 			scrollContainer.innerHTML = '';
 
+			addOffButton();
 			Object.values(tracks).forEach((track) => {
 				this.createLanguageMenuButton(scrollContainer, {
 					language: track.language!,
@@ -1645,6 +1679,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.subMenuContentStyles)
 			.appendTo(parent).get();
 
+		subtitleSettingsMenu.addEventListener('click', (e) => e.stopPropagation());
+
 		this.createMenuHeader(subtitleSettingsMenu, 'subtitle settings');
 
 		const scrollContainer = this.player.createElement('div', 'subtitleSettings-scroll-container')
@@ -1655,6 +1691,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(subtitleSettingsMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		this.createSubtitleSettingMenuButton(scrollContainer, {
 			label: 'Font',
@@ -1736,6 +1773,8 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(parent.parentElement!.parentElement!).get();
 		subtitleSettingMenu.style.display = 'none';
 
+		subtitleSettingMenu.addEventListener('click', (e) => e.stopPropagation());
+
 		this.createSubtitleSettingMenuHeader(subtitleSettingMenu, data.label);
 
 		const scrollContainer = this.player.createElement('div', `subtitleSetting-scroll-container-${data.property}`)
@@ -1746,6 +1785,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(subtitleSettingMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		this.subtitleSettingActions
 			.filter(a => a.property == data.property)
@@ -1827,6 +1867,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(speedMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		for (const speed of this.player.speeds() ?? []) {
 			const speedButton = this.player.createElement('button', `speed-button-${speed}`)
@@ -1896,6 +1937,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.appendTo(qualityMenu).get();
 
 		scrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(scrollContainer);
 
 		this.player.on('item', () => {
 			scrollContainer.innerHTML = '';
@@ -2573,6 +2615,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.scrollContainerStyles)
 			.appendTo(subMenu).get();
 		seasonScrollContainer.style.transform = 'translateX(0)';
+		this.applyScrollbarStyles(seasonScrollContainer);
 
 		seasonScrollContainer.innerHTML = '';
 		for (const [, item] of unique(this.player.playlist(), 'season').entries() ?? []) {
@@ -2594,8 +2637,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		scrollContainer.innerHTML = '';
 		scrollContainer.tabIndex = 1;
-		scrollContainer.style.scrollbarWidth = 'thin';
-		scrollContainer.style.scrollbarColor = 'rgba(255,255,255,0.3) transparent';
+		this.applyScrollbarStyles(scrollContainer);
 
 		scrollContainer.addEventListener('focus', () => {
 			(scrollContainer.firstChild as HTMLButtonElement)?.focus();

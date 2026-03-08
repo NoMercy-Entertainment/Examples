@@ -26,16 +26,14 @@ const audioOptions = ref<Option[]>([]);
 
 const uiActive = ref(false);
 const keyHandlerActive = ref(false);
-const opusActive = ref(false);
 const keyHandlerPlugin = new KeyHandlerPlugin();
 const desktopUIPlugin = new DesktopUIPlugin();
 const octopusPlugin = new OctopusPlugin();
 
-const loadMenu = ref(false);
-
 watch(videoPlayerRef, (value) => {
   if (!value) return;
   const player = value.player;
+  window.player = player;
 
   player.on('ready', () => {
     console.log('ready');
@@ -220,9 +218,6 @@ watch(videoPlayerRef, (value) => {
     });
   });
 
-  player.once('translationsLoaded', () => {
-    loadMenu.value = true;
-  });
 });
 
 const toggleUI = () => {
@@ -230,22 +225,10 @@ const toggleUI = () => {
     uiActive.value = true;
     videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
     videoPlayerRef.value?.player.usePlugin('desktopUI');
-
-    setTimeout(() => {
-      const ui = videoPlayerRef.value?.player.plugins.get('desktopUI');
-      if (loadMenu.value && ui?.mainMenu.childNodes.length == 1) {
-        ui.createMenuButton(ui.mainMenu, 'language');
-        ui.createMenuButton(ui.mainMenu, 'subtitles');
-        ui.createMenuButton(ui.mainMenu, 'subtitle settings');
-        ui.createMenuButton(ui.mainMenu, 'quality');
-        ui.createMenuButton(ui.mainMenu, 'speed');
-        ui.createMenuButton(ui.mainMenu, 'playlist');
-      }
-    }, 50);
   }
   else {
     uiActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('desktopUI').dispose();
+    videoPlayerRef.value?.player.plugins.get('desktopUI')?.dispose();
   }
 
   localStorage.setItem('NoMercy-example-video-ui', uiActive.value.toString());
@@ -259,21 +242,9 @@ const toggleKeyHandler = () => {
   }
   else {
     keyHandlerActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('keyHandler').dispose();
+    videoPlayerRef.value?.player.plugins.get('keyHandler')?.dispose();
   }
   localStorage.setItem('NoMercy-example-video-keyhandler', keyHandlerActive.value.toString());
-};
-
-const toggleOpus = () => {
-  if (!opusActive.value) {
-    opusActive.value = true;
-    videoPlayerRef.value?.player.registerPlugin('octopus', octopusPlugin);
-    videoPlayerRef.value?.player.usePlugin('octopus');
-  }
-  else {
-    opusActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('octopus').dispose();
-  }
 };
 
 const options = ref<Option[]>([

@@ -1275,7 +1275,7 @@ export class BaseUIPlugin extends Plugin {
 		}
 
 		this.player.on('subtitleList', (tracks) => {
-			if (tracks.length > 1) {
+			if (tracks.length > 0) {
 				captionButton.style.display = 'flex';
 			} else {
 				captionButton.style.display = 'none';
@@ -1941,7 +1941,8 @@ export class BaseUIPlugin extends Plugin {
 			}
 
 			this.player.on('subtitleChanged', (track) => {
-				if (track && data.id === track.id) {
+				const isActive = track ? data.id === track.id : data.id === -1;
+				if (isActive) {
 					chevron.classList.remove('hidden');
 					languageButton.classList.add('bg-white/20');
 				} else {
