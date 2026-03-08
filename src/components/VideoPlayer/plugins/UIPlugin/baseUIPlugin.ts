@@ -1941,7 +1941,7 @@ export class BaseUIPlugin extends Plugin {
 			}
 
 			this.player.on('subtitleChanged', (track) => {
-				if (data.id === track.id) {
+				if (track && data.id === track.id) {
 					chevron.classList.remove('hidden');
 					languageButton.classList.add('bg-white/20');
 				} else {
