@@ -57,5 +57,26 @@ defineProps({
 </template>
 
 <style scoped>
+#container {
+  transition: padding 0.4s ease, gap 0.4s ease;
+}
 
+#wrapper {
+  transition: max-width 0.4s ease;
+}
+
+#menu {
+  transition: opacity 0.3s ease, transform 0.3s ease, width 0.3s ease;
+  transform-origin: left center;
+}
+
+#menu.theater-hidden {
+  opacity: 0;
+  transform: scaleX(0);
+  width: 0;
+  padding: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: none;
+}
 </style>

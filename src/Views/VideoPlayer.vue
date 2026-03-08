@@ -113,11 +113,11 @@ watch(videoPlayerRef, (value) => {
     const menu = document.getElementById('menu');
     const wrapper = document.getElementById('wrapper');
     if (enabled) {
-      menu?.classList.add('!hidden');
+      menu?.classList.add('theater-hidden');
       wrapper?.classList.add('!max-w-none');
       container?.classList.add('!px-0', '!gap-0');
     } else {
-      menu?.classList.remove('!hidden');
+      menu?.classList.remove('theater-hidden');
       wrapper?.classList.remove('!max-w-none');
       container?.classList.remove('!px-0', '!gap-0');
     }
