@@ -1,15 +1,17 @@
 ﻿
-import type { PlayerConfig } from "@nomercy-entertainment/nomercy-video-player/src/types";
+import type { PlayerConfig } from "@nomercy-entertainment/nomercy-video-player";
 
 import playlist from "./playlist";
 
-const config = {
+const config: PlayerConfig = {
 	muted: false,
 	controls: false,
 	preload: 'auto',
 	debug: false,
 	playlist: playlist,
 	translations: ['/locales/{lang}/ui.json'],
+	basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master',
+	imageBasePath: 'https://image.tmdb.org/t/p/w780',
 	controlsTimeout: 3000,
 	doubleClickDelay: 500,
 	playbackRates: [
@@ -22,6 +24,6 @@ const config = {
 		1.75,
 		2,
 	],
-} satisfies Partial<PlayerConfig>;
+};
 
 export default config;

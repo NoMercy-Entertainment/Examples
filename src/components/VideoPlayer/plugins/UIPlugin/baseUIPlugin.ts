@@ -130,7 +130,7 @@ export class BaseUIPlugin extends Plugin {
 		clearTimeout(this.timeout);
 
 		// Clear references
-		this.player.plugins.desktopUIPlugin = undefined;
+		(this.player.plugins as any).desktopUIPlugin = undefined;
 		this.chapters = [];
 		this.previewTime = [];
 

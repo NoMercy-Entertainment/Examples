@@ -354,7 +354,7 @@ export class KeyHandlerPlugin extends Plugin {
 
 	getNoMercyConnectSocket() {
 		if (this.hasNoMercyConnect()) {
-			return this.player.plugins.get('videoNoMercyConnect')?.socket;
+			return (this.player.plugins.get('videoNoMercyConnect') as any)?.socket;
 		}
 		return null;
 	}
