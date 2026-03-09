@@ -205,22 +205,14 @@ canvas:not([id="visualizer"]){
   z-index: 9999;
   border-radius: 0.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
   max-height: none !important;
+  animation: pip-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-.nomercyplayer.not-floating {
-  transition: all 0.3s ease;
-}
-
-.pip-float-exit {
-  animation: pip-exit 0.3s ease;
-}
-
-@keyframes pip-exit {
+@keyframes pip-enter {
   0% {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(1.5);
     transform-origin: bottom right;
   }
   100% {
@@ -228,4 +220,8 @@ canvas:not([id="visualizer"]){
     transform: scale(1);
     transform-origin: bottom right;
   }
+}
+
+.nomercyplayer.not-floating {
+  transition: all 0.3s ease;
 }

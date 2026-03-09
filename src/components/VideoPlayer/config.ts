@@ -1,5 +1,5 @@
 ﻿
-import type  {PlayerConfig} from "@nomercy-entertainment/nomercy-video-player/src/types";
+import type { PlayerConfig } from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 import playlist from "./playlist";
 
@@ -9,6 +9,7 @@ const config = {
 	preload: 'auto',
 	debug: false,
 	playlist: playlist,
+	translations: ['/locales/{lang}/ui.json'],
 	controlsTimeout: 3000,
 	doubleClickDelay: 500,
 	playbackRates: [

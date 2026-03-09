@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
-import {defineEmits, onMounted, onUnmounted, type PropType, Ref, ref} from "vue";
+import { defineEmits, onMounted, onUnmounted, type PropType, ref, unref } from "vue";
 
-import {Option} from "@/types/types";
+import { Option } from "@/types/types";
 
 defineProps({
   options: {
@@ -80,10 +80,10 @@ onUnmounted(() => {
               class="py-1.5 px-3 theme-button flex gap-2 items-center bg-gradient-to-r rounded-md cursor-pointer mr-1 text-left"
               @click="handleItemClick(option)"
           >
-            <span v-if="option.active" class="material-icons text-white w-5">checkmark</span>
+            <span v-if="unref(option.active)" class="material-icons text-white w-5">checkmark</span>
             <span
                 :class="{
-                  'ml-7': !option.active && option.active !== undefined,
+                  'ml-7': !unref(option.active) && option.active !== undefined,
                 }"
             >{{ option.label }}</span>
           </li>

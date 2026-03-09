@@ -3,7 +3,8 @@ import {
 	convertToSeconds,
 	limitSentenceByCharacters,
 	lineBreakShowTitle,
-	unique
+	unique,
+	toTitleCase
 } from '@nomercy-entertainment/nomercy-video-player/src/player/utils';
 
 import { BaseUIPlugin } from "./baseUIPlugin";
@@ -725,7 +726,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 	}
 
 	createPIPButton(parent: HTMLDivElement, hovered = false) {
-		if (this.player.isMobile() || !this.player.hasPipEventHandler) return;
+		if (this.player.isMobile() || !this.player.hasListeners('pip')) return;
 		const pipButton = this.createUiButton(
 			parent,
 			'pip'
@@ -1187,17 +1188,31 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		submenu.style.transform = 'translateX(0)';
 
-		this.createLanguageMenu(submenu);
-		this.createSubtitleMenu(submenu);
-		this.createSubtitleSettingsMenu(submenu);
-		this.createQualityMenu(submenu);
-		this.createSpeedMenu(submenu);
+		const createSubMenus = () => {
+			this.createLanguageMenu(submenu);
+			this.createSubtitleMenu(submenu);
+			this.createSubtitleSettingsMenu(submenu);
+			this.createQualityMenu(submenu);
+			this.createSpeedMenu(submenu);
+		};
 
-		if (this.player.options.playlist && Array.isArray(this.player.options.playlist)) {
-			this.createEpisodeMenu(submenu);
-		} else {
-			this.player.once('playlist', () => {
+		const createEpisodeMenuWhenReady = () => {
+			if (this.player.options.playlist && Array.isArray(this.player.options.playlist)) {
 				this.createEpisodeMenu(submenu);
+			} else {
+				this.player.once('playlist', () => {
+					this.createEpisodeMenu(submenu);
+				});
+			}
+		};
+
+		if (Object.keys(this.player.translations).length > 0) {
+			createSubMenus();
+			createEpisodeMenuWhenReady();
+		} else {
+			this.player.once('translationsLoaded', () => {
+				createSubMenus();
+				createEpisodeMenuWhenReady();
 			});
 		}
 
@@ -1283,7 +1298,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.menuButtonTextStyles)
 			.appendTo(menuHeader).get();
 
-		menuButtonText.innerText = this.player.localize(title).toTitleCase();
+		menuButtonText.innerText = this.player.localize(toTitleCase(title));
 
 		if (title !== 'Seasons') {
 			const close = this.createUiButton(
@@ -1343,7 +1358,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.menuButtonTextStyles)
 			.appendTo(menuHeader).get();
 
-		menuButtonText.innerText = this.player.localize(title).toTitleCase();
+		menuButtonText.innerText = toTitleCase(this.player.localize(toTitleCase(title)));
 
 		const close = this.createUiButton(
 			menuHeader,
@@ -1392,7 +1407,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.menuButtonTextStyles)
 			.appendTo(menuButton).get();
 
-		menuButtonText.innerText = this.player.localize(item.toTitleCase());
+		menuButtonText.innerText = toTitleCase(this.player.localize(toTitleCase(item)));
 
 		const chevron = this.createSVGElement(menuButton, 'menu', this.buttons.chevronR, false, hovered);
 		this.player.addClasses(chevron, ['ml-auto']);
@@ -1631,7 +1646,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 				subtitleSettingButtonValueText.innerText = edgeStyles.find(f => f.value == value)!.name;
 			}
 			else {
-				subtitleSettingButtonValueText.innerText = (value + (isNumber ? '%' : '')).toTitleCase();
+				subtitleSettingButtonValueText.innerText = toTitleCase(value + (isNumber ? '%' : ''));
 			}
 
 			const chevron = this.createSVGElement(subtitleSettingButton, 'menu', this.buttons.chevronR, false, false);
@@ -1652,7 +1667,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 					subtitleSettingButtonValueText.innerText = edgeStyles.find(f => f.value == value)!.name;
 				}
 				else {
-					subtitleSettingButtonValueText.innerText = (value + (isNumber ? '%' : '')).toTitleCase();
+					subtitleSettingButtonValueText.innerText = toTitleCase(value + (isNumber ? '%' : ''));
 				}
 			});
 		}
@@ -1681,7 +1696,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 
 		subtitleSettingsMenu.addEventListener('click', (e) => e.stopPropagation());
 
-		this.createMenuHeader(subtitleSettingsMenu, 'subtitle settings');
+		this.createMenuHeader(subtitleSettingsMenu, 'Subtitle Settings');
 
 		const scrollContainer = this.player.createElement('div', 'subtitleSettings-scroll-container')
 			.addClasses([
@@ -1824,7 +1839,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			.addClasses(this.menuButtonTextStyles)
 			.appendTo(subtitleSettingActionButton).get();
 
-		subtitleSettingActionButtonText.innerText = this.player.localize(data.label).toTitleCase();
+		subtitleSettingActionButtonText.innerText = toTitleCase(this.player.localize(data.label));
 
 		const chevron = this.createSVGElement(subtitleSettingActionButton, 'checkmark', this.buttons.checkmark, false, false);
 		this.player.addClasses(chevron, ['ml-auto']);
@@ -3079,7 +3094,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		if (!item) return;
 
 		image.src = item.image && item.image != '' ? `${item.image.startsWith('http') ? '' : this.imageBaseUrl}${item.image}` : '';
-		header.innerText = `${this.player.localize(`${direction.toTitleCase()} Episode`)} ${this.getButtonKeyCode(direction)}`;
+		header.innerText = `${this.player.localize(`${toTitleCase(direction)} Episode`)} ${this.getButtonKeyCode(direction)}`;
 		title.innerText = item.title?.replace(item.show ?? '', '').replace('%S', this.player.localize('S'))
 			.replace('%E', this.player.localize('E'));
 
@@ -3121,3 +3136,4 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 		return button;
 	}
 }
+
