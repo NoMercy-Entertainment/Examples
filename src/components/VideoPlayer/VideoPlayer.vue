@@ -1,10 +1,7 @@
 ﻿<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 
-import nmplayer from "@nomercy-entertainment/nomercy-video-player/src";
-// // @ts-ignore
-// import nmplayer from "http://localhost:5503/src/index.ts";
-import type { NMPlayer } from "@nomercy-entertainment/nomercy-video-player/src/types";
+import nmplayer, { type NMPlayer, OctopusPlugin } from "@nomercy-entertainment/nomercy-video-player";
 
 declare global {
   interface Window {
@@ -14,7 +11,6 @@ declare global {
 }
 
 import config from "./config";
-import { OctopusPlugin } from "@nomercy-entertainment/nomercy-video-player/src/plugins/octopusPlugin";
 
 const props = defineProps({
   language: {
@@ -27,13 +23,13 @@ const player = ref<NMPlayer>();
 
 onMounted(() => {
     player.value = nmplayer('player1')
-        .setup({ ...config, language: props.language });
+        .setup({ ...config, language: props.language }) as unknown as NMPlayer;
 
   const octopusPlugin = new OctopusPlugin({ renderAhead: 10 });
   player.value?.registerPlugin('octopus', octopusPlugin);
   player.value?.usePlugin('octopus');
 
-  window.player = player.value;
+  window.player = player.value!;
   window.nmplayer = nmplayer;
 });
 
@@ -42,7 +38,7 @@ onUnmounted(() => {
 });
 
 defineExpose({
-  player,
+  get player() { return player.value; },
 });
 
 </script>

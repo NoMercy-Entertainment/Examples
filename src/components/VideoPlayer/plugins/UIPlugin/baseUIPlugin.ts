@@ -1,17 +1,9 @@
 import { twMerge } from 'tailwind-merge';
 import { WebVTTParser } from 'webvtt-parser';
 
-import Plugin from '@nomercy-entertainment/nomercy-video-player/src/plugin';
-import type { NMPlayer, PreviewTime, VolumeState } from '@nomercy-entertainment/nomercy-video-player/src/types';
-import {
-	breakEpisodeTitle,
-	breakLogoTitle,
-	humanTime,
-	nearestValue,
-	unique
-} from '@nomercy-entertainment/nomercy-video-player/src/player/utils';
+import { type NMPlayer, type PreviewTime, type VolumeState, type TimeData, humanTime, unique, breakLogoTitle, breakEpisodeTitle } from '@nomercy-entertainment/nomercy-video-player';
+
 import { buttons, type Icon } from './buttons';
-import { TimeData } from "@nomercy-entertainment/nomercy-video-player/src/types";
 
 export class BaseUIPlugin extends Plugin {
 	player: NMPlayer = <NMPlayer>{};
@@ -582,7 +574,7 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createBackButton(parent: HTMLDivElement, hovered = false) {
-		if (!this.player.hasBackEventHandler) return;
+		if (!this.player.hasListeners('back')) return;
 
 		const backButton = this.createUiButton(
 			parent,
@@ -665,7 +657,7 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createCloseButton(parent: HTMLDivElement, hovered = false) {
-		if (!this.player.hasCloseEventHandler) return;
+		if (!this.player.hasListeners('close')) return;
 
 		const closeButton = this.createUiButton(
 			parent,
@@ -1435,7 +1427,7 @@ export class BaseUIPlugin extends Plugin {
 	}
 
 	createTheaterButton(parent: HTMLDivElement, hovered = false) {
-		if (this.player.isMobile() || !this.player.hasTheaterEventHandler) return;
+		if (this.player.isMobile() || !this.player.hasListeners('theater')) return;
 
 		const theaterButton = this.createUiButton(
 			parent,
@@ -1983,7 +1975,7 @@ export class BaseUIPlugin extends Plugin {
 		const originEl = element!.getBoundingClientRect();
 
 		return arr.find(el => (el.getBoundingClientRect().top + (el.getBoundingClientRect().height / 2))
-			== nearestValue(arr.map(el => (el.getBoundingClientRect().top + (el.getBoundingClientRect().height / 2)))
+			== this.player.nearestValue(arr.map(el => (el.getBoundingClientRect().top + (el.getBoundingClientRect().height / 2)))
 				, originEl.top + (originEl.height / 2)));
 	}
 

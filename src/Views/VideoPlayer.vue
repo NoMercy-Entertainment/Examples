@@ -1,14 +1,13 @@
 ﻿<script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
-import type { NMPlayer, TimeData } from "@nomercy-entertainment/nomercy-video-player/src/types";
-import { DesktopUIPlugin } from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
-
 import type { Option } from "@/types/types";
 
 import VideoPlayer from '@/components/VideoPlayer/VideoPlayer.vue';
-import Layout from "@/Views/Layout.vue";
+import { DesktopUIPlugin } from "@/components/VideoPlayer/plugins/UIPlugin/desktopUIPlugin";
 import KeyHandlerPlugin from "@/components/VideoPlayer/plugins/UIPlugin/keyHandlerPlugin";
+
+import Layout from "@/Views/Layout.vue";
 
 defineProps({
   theme: {
@@ -17,7 +16,7 @@ defineProps({
   },
 });
 
-const videoPlayerRef = ref<{ player: NMPlayer }>();
+const videoPlayerRef = ref<InstanceType<typeof VideoPlayer>>();
 const isMounted = ref(false);
 
 const subtitleOptions = ref<Option[]>([]);
@@ -121,12 +120,15 @@ const switchLanguage = (code: string) => {
 
 const uiActive = ref(false);
 const keyHandlerActive = ref(false);
-let keyHandlerPlugin = new KeyHandlerPlugin();
-let desktopUIPlugin = new DesktopUIPlugin();
+let keyHandlerPlugin: KeyHandlerPlugin;
+let desktopUIPlugin: DesktopUIPlugin;
 
 watch(videoPlayerRef, (value) => {
   if (!value) return;
+
   const player = value.player;
+  if (!player) return;
+
   window.player = player;
 
   player.on('ready', () => {
@@ -177,10 +179,10 @@ watch(videoPlayerRef, (value) => {
     console.log('error');
   });
 
-  player.on('seek', (data: TimeData) => {
+  player.on('seek', (data) => {
     console.log('seek', data);
   });
-  player.on('seeked', (data: TimeData) => {
+  player.on('seeked', (data) => {
     console.log('seeked', data);
   });
 
@@ -362,12 +364,12 @@ const toggleUI = () => {
   if (!uiActive.value) {
     uiActive.value = true;
     desktopUIPlugin = new DesktopUIPlugin();
-    videoPlayerRef.value?.player.registerPlugin('desktopUI', desktopUIPlugin);
-    videoPlayerRef.value?.player.usePlugin('desktopUI');
+    videoPlayerRef.value?.player?.registerPlugin('desktopUI', desktopUIPlugin);
+    videoPlayerRef.value?.player?.usePlugin('desktopUI');
   }
   else {
     uiActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('desktopUI')?.dispose();
+    videoPlayerRef.value?.player?.plugins.get('desktopUI')?.dispose();
   }
 
   localStorage.setItem('NoMercy-example-video-ui', uiActive.value.toString());
@@ -377,12 +379,12 @@ const toggleKeyHandler = () => {
   if (!keyHandlerActive.value) {
     keyHandlerActive.value = true;
     keyHandlerPlugin = new KeyHandlerPlugin();
-    videoPlayerRef.value?.player.registerPlugin('keyHandler', keyHandlerPlugin);
-    videoPlayerRef.value?.player.usePlugin('keyHandler');
+    videoPlayerRef.value?.player?.registerPlugin('keyHandler', keyHandlerPlugin);
+    videoPlayerRef.value?.player?.usePlugin('keyHandler');
   }
   else {
     keyHandlerActive.value = false;
-    videoPlayerRef.value?.player.plugins.get('keyHandler')?.dispose();
+    videoPlayerRef.value?.player?.plugins.get('keyHandler')?.dispose();
   }
   localStorage.setItem('NoMercy-example-video-keyhandler', keyHandlerActive.value.toString());
 };
@@ -391,16 +393,16 @@ const options = computed<Option[]>(() => [
   {
     label: 'Play',
     level: 0,
-    action: () => videoPlayerRef.value?.player.play(),
+    action: () => videoPlayerRef.value?.player?.play(),
   },
   {
     label: 'Pause',
     level: 0,
-    action: () => videoPlayerRef.value?.player.pause(),
+    action: () => videoPlayerRef.value?.player?.pause(),
   },
   {
     label: 'Fullscreen',
-    action: () => videoPlayerRef.value?.player.enterFullscreen(),
+    action: () => videoPlayerRef.value?.player?.enterFullscreen(),
   },
   {
     label: 'Settings',

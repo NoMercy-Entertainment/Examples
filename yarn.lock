@@ -650,10 +650,10 @@
     audiomotion-analyzer "^4.5.0"
     hls.js "^1.5.13"
 
-"@nomercy-entertainment/nomercy-video-player@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.1.0.tgz"
-  integrity sha512-k3GlrtqFeSTK0uvpUyUDtS66fST14q8orVuqX81gNbAAV6fzGG2S2oKh15NihYTdNPekIt2slHsjeNdI9Ra2ow==
+"@nomercy-entertainment/nomercy-video-player@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/@nomercy-entertainment/nomercy-video-player/-/nomercy-video-player-1.2.0.tgz"
+  integrity sha512-KBY5HFPBeCuoscUXGCicIeZUFsv5fbblQYdlbutsqk6t9GftWbU0zneHSnm5g7god7IQ0UqKUFqU/vVx3gIUOQ==
   dependencies:
     "@nomercy-entertainment/media-session" "^1.0.1"
     hls.js "1.6.15"
@@ -769,6 +769,11 @@
   version "0.0.20"
   resolved "https://registry.npmjs.org/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz"
   integrity sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==
+
+"@types/webvtt-parser@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/@types/webvtt-parser/-/webvtt-parser-2.2.0.tgz"
+  integrity sha512-T8n08m3VWAOCVDHWPOtEehnLcVSyQaUmyjIvGCERWRPMyVooUjqWaDsvKD3bcwQSU8TLBW19YTSRx9UxBNfckA==
 
 "@vitejs/plugin-vue@^5.2.1":
   version "5.2.1"

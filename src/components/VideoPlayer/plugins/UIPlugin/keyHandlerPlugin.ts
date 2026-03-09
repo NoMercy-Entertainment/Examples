@@ -1,4 +1,5 @@
-import { Plugin, type NMPlayer } from '@nomercy-entertainment/nomercy-video-player';
+import { type NMPlayer, Plugin } from '@nomercy-entertainment/nomercy-video-player';
+
 import { textSizes } from './buttons';
 
 export interface KeyHandlerPluginArgs {

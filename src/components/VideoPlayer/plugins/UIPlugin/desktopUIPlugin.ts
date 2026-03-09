@@ -5,11 +5,11 @@ import {
 	lineBreakShowTitle,
 	unique,
 	toTitleCase
-} from '@nomercy-entertainment/nomercy-video-player/src/player/utils';
+} from '@nomercy-entertainment/nomercy-video-player';
+import type { Chapter, PlaylistItem, Position, SubtitleStyle } from '@nomercy-entertainment/nomercy-video-player';
 
 import { BaseUIPlugin } from "./baseUIPlugin";
 
-import { Chapter, PlaylistItem, Position, SubtitleStyle } from '@nomercy-entertainment/nomercy-video-player/src/types';
 import {
 	Icon,
 	edgeStyles,
