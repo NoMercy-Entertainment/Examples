@@ -1,7 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import { WebVTTParser } from 'webvtt-parser';
 
-import { type NMPlayer, type PreviewTime, type VolumeState, type TimeData, humanTime, unique, breakLogoTitle, breakEpisodeTitle } from '@nomercy-entertainment/nomercy-video-player';
+import { type NMPlayer, type PreviewTime, type VolumeState, type TimeData, humanTime, unique, breakLogoTitle, breakEpisodeTitle, Plugin } from '@nomercy-entertainment/nomercy-video-player';
 
 import { buttons, type Icon } from './buttons';
 
