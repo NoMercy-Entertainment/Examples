@@ -2777,7 +2777,7 @@ export class DesktopUIPlugin extends BaseUIPlugin {
 			])
 			.appendTo(leftSide).get();
 		image.setAttribute('loading', 'lazy');
-		image.src = item.image && item.image != '' ? `${this.imageBaseUrl.includes('https') ? '' : this.imageBaseUrl}${item.image}` : '';
+		image.src = item.image && item.image != '' ? `${item.image.startsWith('http') ? '' : this.imageBaseUrl}${item.image}` : '';
 
 		const progressContainer = this.player.createElement('div', `episode-${item.id}-progress-container`)
 			.addClasses([

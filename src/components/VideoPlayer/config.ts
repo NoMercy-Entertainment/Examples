@@ -3,6 +3,10 @@ import type { PlayerConfig } from "@nomercy-entertainment/nomercy-video-player";
 
 import playlist from "./playlist";
 
+
+const BASE = 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master/Films/Films';
+const IMG_BASE = 'https://image.tmdb.org/t/p/w780';
+
 const config: PlayerConfig = {
 	muted: false,
 	controls: false,
@@ -10,8 +14,8 @@ const config: PlayerConfig = {
 	debug: false,
 	playlist: playlist,
 	translations: ['/locales/{lang}/ui.json'],
-	basePath: 'https://raw.githubusercontent.com/NoMercy-Entertainment/media/master',
-	imageBasePath: 'https://image.tmdb.org/t/p/w780',
+	basePath: BASE,
+	imageBasePath: IMG_BASE,
 	controlsTimeout: 3000,
 	doubleClickDelay: 500,
 	playbackRates: [

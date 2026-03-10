@@ -113,7 +113,7 @@ export class BaseUIPlugin extends Plugin {
 		this.player = player;
 		this.overlay = player.overlay;
 		this.buttons = buttons();
-		this.imageBaseUrl = player.options.basePath ? '' : 'https://image.tmdb.org/t/p/w185';
+		this.imageBaseUrl = player.options.imageBasePath ?? player.options.basePath ?? '';
 		// Initialize the plugin with the player
 
 		this.player.on('play', () => {
