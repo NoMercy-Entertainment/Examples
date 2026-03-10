@@ -3,6 +3,7 @@
   "version": "0.1.16",
   "private": true,
   "type": "module",
+  "packageManager": "yarn@4.13.0",
   "scripts": {
     "dev": "vite --host  --force",
     "build": "vite build",
