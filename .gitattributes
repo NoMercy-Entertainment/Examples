@@ -1,0 +1,62 @@
+# Auto-detect and normalize
+* text=auto eol=lf
+
+# Source code
+*.vue           text
+*.ts            text
+*.js            text
+*.cjs           text
+*.mjs           text
+*.css           text diff=css
+*.scss          text
+*.html          text diff=html
+
+# Config / data
+*.json          text
+*.xml           text
+*.yml           text
+*.yaml          text
+*.md            text diff=markdown
+*.txt           text
+*.lock          text -diff
+*.env           text
+*.webmanifest   text
+*.editorconfig  text
+*.gitignore     text
+
+# Subtitles
+*.vtt           text
+*.srt           text
+*.ass           text
+
+# Shell scripts (force LF)
+*.sh            text eol=lf
+
+# Windows batch files (force CRLF)
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+
+# Binary: images
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.ico           binary
+*.svg           text
+
+# Binary: fonts
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.eot           binary
+
+# Binary: WASM / native libs
+*.wasm          binary
+*.so            binary
+*.data          binary
+*.map           binary
+
+# Linguist
+*.vue           linguist-language=Vue
+*.scss          linguist-language=SCSS
